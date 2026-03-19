@@ -8,12 +8,18 @@ import org.springframework.stereotype.Service;
 import com.kh.cam.mypage.model.dao.MypageDao;
 import com.kh.cam.mypage.model.vo.Friends;
 
+<<<<<<< Updated upstream
 @Service
 
+=======
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+>>>>>>> Stashed changes
 public class MypageServiceImpl implements MypageService{
 
-    @Autowired
-    private MypageDao mypageDao;
+    private final MypageDao mypageDao;
 
 	@Override
 	public List<Friends> selectFriendList(int memNo) {

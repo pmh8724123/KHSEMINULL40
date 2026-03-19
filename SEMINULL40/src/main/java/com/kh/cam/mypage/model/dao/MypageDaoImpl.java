@@ -8,11 +8,17 @@ import org.springframework.stereotype.Repository;
 
 import com.kh.cam.mypage.model.vo.Friends;
 
+<<<<<<< Updated upstream
 @Repository
+=======
+import lombok.RequiredArgsConstructor;
+
+@Repository
+@RequiredArgsConstructor
+>>>>>>> Stashed changes
 public class MypageDaoImpl implements MypageDao{
 
-    @Autowired
-    private SqlSessionTemplate session;
+    private final SqlSessionTemplate session;
 
 	@Override
 	public List<Friends> selectFriendList(int memNo) {
