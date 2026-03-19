@@ -1,0 +1,217 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>캠둘기 회원가입</title>
+<style>
+/* 기본 스타일 리셋 */
+body, h1, p {
+	margin: 0;
+	padding: 0;
+	font-family: 'Pretendard', sans-serif;
+}
+
+body {
+	background-color: #f0f5ff;
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+	align-items: center;
+}
+
+/* 컨테이너 */
+.container {
+	width: 100%;
+	max-width: 500px;
+	padding: 40px 20px;
+	flex: 1;
+}
+
+.header-title {
+	text-align: center;
+	font-size: 28px;
+	margin-bottom: 40px;
+	font-weight: bold;
+}
+
+/* 입력 폼 스타일 */
+.form-group {
+	margin-bottom: 20px;
+}
+
+input[type="text"], input[type="password"], input[type="email"] {
+	width: 100%;
+	padding: 15px;
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	box-sizing: border-box;
+	font-size: 14px;
+	outline: none;
+}
+
+.error-msg {
+	color: #ff4d4d;
+	font-size: 12px;
+	margin-top: 5px;
+	margin-left: 5px;
+}
+
+/* 이메일 영역 (인증 버튼 포함) */
+.email-row {
+	display: flex;
+	gap: 10px;
+	align-items: flex-start;
+}
+
+.email-row input {
+	flex: 1;
+}
+
+.btn-verify {
+	background-color: #38a5ff;
+	color: white;
+	border: none;
+	padding: 15px 20px;
+	border-radius: 8px;
+	cursor: pointer;
+	font-weight: bold;
+	white-space: nowrap;
+}
+
+/* 가입하기 버튼 */
+.btn-submit {
+	width: 100%;
+	background-color: #e8f9ed;
+	color: #333;
+	border: none;
+	padding: 18px;
+	border-radius: 8px;
+	font-size: 18px;
+	font-weight: bold;
+	cursor: pointer;
+	margin-top: 20px;
+}
+
+/* 로그인 유도 링크 */
+.login-link {
+	text-align: center;
+	margin-top: 20px;
+	font-size: 13px;
+	color: #666;
+}
+
+.login-link a {
+	color: #38a5ff;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+/* 푸터 스타일 */
+footer {
+	width: 100%;
+	background-color: #1a1a1a;
+	color: #fff;
+	padding: 30px 0;
+	display: flex;
+	justify-content: space-around;
+	font-size: 12px;
+	margin-top: 50px;
+}
+
+.footer-logo {
+	font-size: 20px;
+	font-weight: bold;
+}
+
+.footer-info {
+	display: flex;
+	gap: 40px;
+}
+
+.info-section h4 {
+	color: #ccc;
+	margin-bottom: 10px;
+}
+
+.info-section p {
+	color: #888;
+	line-height: 1.6;
+	cursor: pointer;
+}
+</style>
+</head>
+<body>
+	<c:set var="contextPath" value="${pageContext.request.contextPath}"
+		scope="application" />
+	<div class="container">
+		<h1 class="header-title">캠둘기 회원가입</h1>
+
+		<form:form action="${contextPath}/member/register" method="post">
+			<div class="form-group">
+				<input type="text" name="memId" placeholder="아이디">
+				<div class="error-msg">아이디를 입력해 주세요</div>
+			</div>
+
+			<div class="form-group">
+				<input type="password" name="memPw" placeholder="비밀번호"
+					style="margin-bottom: 10px;"> <input type="password"
+					name="memPw_confirm" placeholder="비밀번호 재입력">
+				<div class="error-msg">비밀번호를 입력해 주세요</div>
+			</div>
+
+			<div class="form-group">
+				<input type="text" name="memName" placeholder="이름">
+				<div class="error-msg">이름을 입력해 주세요</div>
+			</div>
+
+			<div class="form-group">
+				<input type="text" name="phone" placeholder="전화번호">
+				<div class="error-msg">전화번호를 입력해주세요.<br>ex) 010-0000-0000</div>
+			</div>
+
+			<div class="form-group">
+				<div class="email-row">
+					<input type="email" name="email" placeholder="이메일">
+					<button type="button" class="btn-verify">인증하기</button>
+				</div>
+				<div class="error-msg">
+					대학교 이메일을 입력해 주세요<br>ex) abc123@xxx.ac.kr
+				</div>
+			</div>
+
+			<button type="submit" class="btn-submit">가입하기</button>
+
+			<p class="login-link">
+				이미 회원이신가요? <a href="login.jsp">로그인</a>
+			</p>
+		</form:form>
+	</div>
+
+	<footer>
+		<div class="footer-left">
+			<div class="footer-logo">캠둘기</div>
+			<p style="color: #888;">대학생들의 소통 공간</p>
+		</div>
+		<div class="footer-info">
+			<div class="info-section">
+				<h4>고객지원</h4>
+				<p>공지사항</p>
+				<p>Q&A(문의하기)</p>
+			</div>
+			<div class="info-section">
+				<h4>정보</h4>
+				<p>이용약관</p>
+				<p>개인정보처리방침</p>
+			</div>
+		</div>
+		<div class="footer-right">
+			<p>© 2026 캠둘기. All rights reserved.</p>
+		</div>
+	</footer>
+
+</body>
+</html>

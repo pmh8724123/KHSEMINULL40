@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="member">
+	<insert id="insertMember">
+		<selectKey keyProperty="memNo" resultType="int" order="BEFORE">
+			SELECT SEQ_MNO.NEXTVAL FROM DUAL
+		</selectKey>
+		
+		INSERT INTO member VALUES(SEQ_MNO.CURRVAL, #{memId}, #{memPw}, #{memName}, 0, #{phone}, #{email}, DEFAULT, DEFAULT)
+	</insert>
+</mapper>
