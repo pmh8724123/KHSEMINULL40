@@ -3,9 +3,12 @@ package com.kh.cam.mypage.model.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.kh.cam.mypage.model.dao.MypageDao;
 import com.kh.cam.mypage.model.vo.Friends;
+
+@Service
 
 public class MypageServiceImpl implements MypageService{
 
