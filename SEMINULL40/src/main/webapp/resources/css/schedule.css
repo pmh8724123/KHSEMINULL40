@@ -1,0 +1,77 @@
+@charset "UTF-8";
+
+/* ===== 시간표 ===== */
+
+.timetable-header{
+	display:flex;
+	justify-content:space-between;
+	align-items:center;
+	margin-bottom:15px;
+}
+
+.tt-icons button{
+	font-size:20px;
+	margin-left:5px;
+	cursor:pointer;
+}
+
+/* 전체 시간표 */
+.timetable{
+	position:relative;
+	background:#cfd6de;
+	padding:20px;
+	border:1px solid #888;
+}
+
+/* 행 */
+.tt-row{
+	display:grid;
+	grid-template-columns:80px repeat(5,1fr);
+	height:60px;
+	border-bottom:1px solid #777;
+	align-items:center;
+}
+
+.tt-days{
+	font-weight:bold;
+	text-align:center;
+}
+
+/* 시간 */
+.tt-time{
+	text-align:center;
+}
+
+/* 셀 */
+.tt-cell{
+	border-left:1px solid #aaa;
+	cursor:pointer;
+}
+
+.tt-cell:hover{
+	background:rgba(0,0,0,0.05);
+}
+
+/* 강의 블록 */
+.lecture-block{
+	position:absolute;
+	width:18%;
+	background:#9bc7c7;
+	border-radius:12px;
+	display:flex;
+	justify-content:center;
+	align-items:center;
+	font-weight:bold;
+}
+
+/* 하단 버튼 */
+.tt-buttons{
+	margin-top:20px;
+	display:flex;
+	justify-content:center;
+	gap:20px;
+}
+
+#timetable {
+	overflow-y: auto;
+}
