@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mypage">
+
+	<!-- FriendMapper.xml -->
+
+	<!-- 내 친구 목록 조회 (수락된 친구만) -->
+	<!-- 내가 보낸 요청 + 내가 받은 요청 둘 다 포함 -->
+	<select id="getFriendList" parameterType="int"
+		resultType="Friends">
+		SELECT
+		f.SENDER_NO,
+		f.RECEIVER_NO,
+		f.STATUS,
+		m.MEMBER_NO AS friendNo,
+		m.MEMBER_NAME AS friendName,
+		m.ONLINE_STATUS AS onlineStatus
+		FROM FRIEND f
+		JOIN MEMBER m
+		ON m.MEMBER_NO = CASE
+				WHEN f.SENDER_NO = #{memberNo} THEN f.RECEIVER_NO
+				WHEN f.RECEIVER_NO = #{memberNo} THEN f.SENDER_NO
+			END
+		WHERE f.STATUS = 'Y'
+		AND (f.SENDER_NO = #{memberNo} OR f.RECEIVER_NO = #{memberNo})
+		ORDER BY m.ONLINE_STATUS ASC, m.MEMBER_NAME ASC
+	</select>
+
+	<!-- 수락 대기 중인 친구 요청 목록 (내가 받은 것만) -->
+	<select id="getPendingList" parameterType="int"
+		resultType="Friends">
+		SELECT
+		f.SENDER_NO,
+		f.RECEIVER_NO,
+		f.STATUS,
+		m.MEMBER_NO AS friendNo,
+		m.MEMBER_NAME AS friendName,
+		m.ONLINE_STATUS AS onlineStatus
+		FROM FRIEND f
+		JOIN MEMBER m ON m.MEMBER_NO = f.SENDER_NO
+		WHERE f.RECEIVER_NO = #{memberNo}
+		AND f.STATUS = 'N'
+		ORDER BY f.SENDER_NO DESC
+	</select>
+
+</mapper>

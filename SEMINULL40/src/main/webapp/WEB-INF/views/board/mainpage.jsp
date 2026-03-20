@@ -14,7 +14,7 @@
 <meta charset="UTF-8">
 <title>캠둘기</title>
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/mainpage.css">
+	href="${path}/resources/css/mainpage.css">
 
 <style>
 
