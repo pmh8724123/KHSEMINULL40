@@ -1,77 +1,359 @@
 @charset "UTF-8";
 
-/* ===== 시간표 ===== */
-
-.timetable-header{
-	display:flex;
-	justify-content:space-between;
-	align-items:center;
-	margin-bottom:15px;
+/* ── 시간표 전체 레이아웃 ──────────────────────────
+/* ── 상단 바 (드롭다운 제목 + +/- 버튼) ─────────── */
+.tt-topbar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 12px;
 }
 
-.tt-icons button{
-	font-size:20px;
-	margin-left:5px;
-	cursor:pointer;
+
+.tt-title-wrap {
+    position: relative;
+    display: inline-block;
 }
 
-/* 전체 시간표 */
-.timetable{
-	position:relative;
-	background:#cfd6de;
-	padding:20px;
-	border:1px solid #888;
+
+/* ── 시간표 이름 드롭다운 버튼 ──────────────────── */
+
+
+.tt-title-btn>button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: #fff;
+    border: 1px solid #c8d8f0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a3a5c;
+    cursor: pointer;
+    transition: background .15s, border-color .15s, box-shadow .15s;
+    box-shadow: 0 1px 4px rgba(74,144,226,0.1);
+    white-space: nowrap;  /* 긴 이름이어도 한 줄 유지 */
 }
 
-/* 행 */
-.tt-row{
-	display:grid;
-	grid-template-columns:80px repeat(5,1fr);
-	height:60px;
-	border-bottom:1px solid #777;
-	align-items:center;
+.tt-title-btn>button:hover {
+	background: #f5f5f5;
 }
 
-.tt-days{
-	font-weight:bold;
-	text-align:center;
+/* ── 드롭다운 목록 ───────────────────────────────
+   기본 숨김, .open 클래스 추가 시 표시             */
+.tt-dropdown {
+	position: absolute;
+	top: calc(100% + 4px);
+	left: 0;
+	background: #fff;
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	min-width: 200px;
+	z-index: 100;
+	overflow: hidden;
+	display: none;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* 시간 */
-.tt-time{
-	text-align:center;
+.tt-dropdown.open {
+	display: block;
 }
 
-/* 셀 */
-.tt-cell{
-	border-left:1px solid #aaa;
-	cursor:pointer;
+.tt-dropdown-item {
+	padding: 9px 14px;
+	font-size: 13px;
+	cursor: pointer;
 }
 
-.tt-cell:hover{
-	background:rgba(0,0,0,0.05);
+.tt-dropdown-item:hover {
+	background: #f5f5f5;
 }
 
-/* 강의 블록 */
-.lecture-block{
-	position:absolute;
-	width:18%;
-	background:#9bc7c7;
-	border-radius:12px;
-	display:flex;
-	justify-content:center;
-	align-items:center;
-	font-weight:bold;
+.tt-dropdown-item.active {
+	color: #185FA5;
+	font-weight: 600;
 }
 
-/* 하단 버튼 */
-.tt-buttons{
-	margin-top:20px;
-	display:flex;
-	justify-content:center;
-	gap:20px;
+/* ── +/- 버튼 묶음 ───────────────────────────────*/
+.tt-plusminus {
+	display: flex;
+	gap: 6px;
 }
 
-#timetable {
-	overflow-y: auto;
+.tt-plusminus button {
+	width: 30px;
+	height: 30px;
+	border-radius: 6px;
+	border: 1px solid #ccc;
+	background: #fff;
+	font-size: 18px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+}
+
+.tt-plusminus button:hover {
+	background: #f5f5f5;
+}
+
+/* ── 그리드 외곽 박스 ────────────────────────────*/
+.tt-grid-wrap {
+	background: #fff;
+	border: 1px solid #ddd;
+	border-radius: 10px;
+	overflow: hidden;
+}
+
+/* ── 시간표 그리드 (시간열 + 5일) ───────────────
+   첫 열: 40px 시간 표시, 나머지: 균등 분할        */
+.tt-grid {
+	display: grid;
+	grid-template-columns: 40px repeat(5, 1fr);
+}
+
+/* ── 헤더 셀 (요일 이름) ─────────────────────── */
+.tt-header-cell {
+	text-align: center;
+	padding: 8px 4px;
+	font-size: 13px;
+	font-weight: 500;
+	color: #555;
+	border-bottom: 1px solid #eee;
+	background: #f7f9fc;
+}
+
+/* ── 시간 열 ────────────────────────────────────*/
+.tt-time-col {
+	display: flex;
+	flex-direction: column;
+}
+
+.tt-time-slot {
+	height: 36px; /* 30분 = 36px */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 11px;
+	color: #aaa;
+	border-bottom: 1px solid #f0f0f0;
+}
+
+/* ── 요일 열 ────────────────────────────────────
+   position:relative → 강의 블록 절대 위치 기준    */
+.tt-day-col {
+	position: relative;
+	border-left: 1px solid #eee;
+}
+
+/* ── 가로 구분선 (배경) ──────────────────────── */
+.tt-row-line {
+	height: 36px;
+	border-bottom: 1px solid #f0f0f0;
+}
+
+/* ── 강의 블록 ───────────────────────────────────
+   절대 위치로 top/height를 JS가 계산해 배치        */
+.tt-block {
+	position: absolute;
+	left: 2px;
+	right: 2px;
+	border-radius: 6px;
+	background: #B5D4F4;
+	border: 1px solid #85B7EB;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 2px 3px;
+	overflow: hidden;
+	cursor: default;
+	transition: background .15s;
+}
+
+.tt-block span {
+	font-size: 11px;
+	font-weight: 500;
+	color: #0C447C;
+	text-align: center;
+	line-height: 1.3;
+	word-break: break-all;
+}
+
+/* ── 삭제 모드: 강의 블록 호버 시 빨간색 ─────── */
+.tt-block.delete-mode {
+	cursor: pointer;
+}
+
+.tt-block.delete-mode:hover {
+	background: #F7C1C1;
+	border-color: #F09595;
+}
+
+.tt-block.delete-mode:hover span {
+	color: #791F1F;
+}
+
+/* ── 하단 버튼 바 ────────────────────────────── */
+.tt-bottombar {
+	display: flex;
+	gap: 10px;
+	justify-content: center;
+	margin-top: 14px;
+}
+
+.tt-bottombar button {
+	padding: 9px 24px;
+	border-radius: 20px;
+	border: none;
+	font-size: 13px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: opacity .15s;
+}
+
+.btn-tt-add {
+	background: #4a90e2;
+	color: #fff;
+}
+
+.btn-tt-add:hover {
+	opacity: .85;
+}
+
+.btn-tt-del {
+	background: #E24B4A;
+	color: #fff;
+}
+
+.btn-tt-del:hover {
+	opacity: .85;
+}
+/* 삭제 모드 활성화 시 버튼 강조 */
+.btn-tt-del.active {
+	background: #A32D2D;
+	box-shadow: 0 0 0 3px rgba(226, 75, 74, .25);
+}
+
+/* ── 삭제 모드 안내 힌트 ─────────────────────── */
+.tt-del-hint {
+	font-size: 12px;
+	color: #E24B4A;
+	text-align: center;
+	margin-top: 6px;
+	min-height: 16px;
+}
+
+/* ── 강의 추가 모달 영역 ─────────────────────── */
+.tt-overlay {
+	display: none;
+	margin-top: 12px;
+}
+
+.tt-overlay.open {
+	display: block;
+}
+
+.tt-modal {
+	background: #fff;
+	border: 1px solid #ddd;
+	border-radius: 12px;
+	padding: 1.25rem 1.5rem;
+	max-width: 340px;
+	margin: 0 auto;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.tt-modal h3 {
+	font-size: 15px;
+	font-weight: 600;
+	margin-bottom: 14px;
+}
+
+.tt-modal label {
+	font-size: 12px;
+	color: #888;
+	display: block;
+	margin: 10px 0 4px;
+}
+
+.tt-modal input[type=text], .tt-modal select {
+	width: 100%;
+	padding: 7px 10px;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	font-size: 13px;
+}
+
+.tt-modal-actions {
+	display: flex;
+	gap: 8px;
+	margin-top: 16px;
+}
+
+.tt-modal-actions button {
+	flex: 1;
+	padding: 8px;
+	border-radius: 8px;
+	border: none;
+	font-size: 13px;
+	font-weight: 500;
+	cursor: pointer;
+}
+
+.btn-tt-confirm {
+	background: #4a90e2;
+	color: #fff;
+}
+
+.btn-tt-confirm:hover {
+	opacity: .85;
+}
+
+.btn-tt-cancel {
+	background: #f0f0f0;
+	color: #555;
+}
+
+.btn-tt-cancel:hover {
+	background: #e5e5e5;
+}
+
+/* ── 유효성 검사 에러 힌트 ───────────────────── */
+.tt-hint {
+	font-size: 12px;
+	color: #E24B4A;
+	text-align: center;
+	margin-top: 8px;
+	min-height: 16px;
+}
+
+
+
+
+/* ── 드래그 핸들 아이콘 ──────────────────────────────
+   마우스 올리면 grab 커서로 변경                      */
+.tt-drag-handle {
+    font-size: 14px;
+    color: #b0c4de;
+    cursor: grab;
+    flex-shrink: 0;
+    padding-right: 4px;
+    user-select: none;   /* 드래그 시 텍스트 선택 방지 */
+}
+.tt-drag-handle:active { cursor: grabbing; }
+
+/* ── 드래그 중인 항목 ────────────────────────────────
+   반투명 처리로 "들고 있는" 느낌                      */
+.tt-dropdown-item.dragging {
+    opacity: 0.4;
+}
+
+/* ── 드롭 대상 항목 ──────────────────────────────────
+   파란 상단 선으로 삽입 위치 표시                     */
+.tt-dropdown-item.drag-over {
+    border-top: 2px solid #4a90e2;
+    background: #f0f7ff;
 }
