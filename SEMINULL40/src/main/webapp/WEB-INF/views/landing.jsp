@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -192,16 +193,16 @@ body {
 			<h1>캠둘기</h1>
 		</div>
 
-		<form action="loginProcess.jsp" method="post" class="login-form">
-			<input type="text" name="id" placeholder="아이디" required> <input
-				type="password" name="pwd" placeholder="비밀번호" required>
+		<form:form action="${contextPath}/member/loginProcess" method="post" class="login-form">
+			<input type="text" name="memId" placeholder="아이디" required> <input
+				type="password" name="memPw" placeholder="비밀번호" required>
 			<button type="submit" class="login-btn">로그인</button>
 
 			<div class="login-options">
 				<label><input type="checkbox" name="stayLoggedIn">
 					로그인 유지</label> <a href="#">아이디/비밀번호 찾기</a>
 			</div>
-		</form>
+		</form:form>
 
 		<div class="signup-link">
 			<a href="${contextPath}/member/register">회원가입</a>

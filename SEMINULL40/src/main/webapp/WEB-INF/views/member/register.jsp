@@ -60,6 +60,33 @@ input[type="text"], input[type="password"], input[type="email"] {
 	margin-left: 5px;
 }
 
+select {
+	width: 100%;
+	padding: 15px;
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	box-sizing: border-box;
+	font-size: 14px;
+	outline: none;
+	background-color: white;
+	cursor: pointer;
+	appearance: none;
+	background-image:
+		url("data:image/svg+xml;utf8,<svg fill='%2338a5ff' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+	background-repeat: no-repeat;
+	background-position: right 10px center;
+}
+
+/* 포커스 시 */
+select:focus {
+	border-color: #38a5ff;
+}
+
+/* 옵션 스타일 (일부 브라우저 제한 있음) */
+select option {
+	font-size: 14px;
+}
+
 /* 이메일 영역 (인증 버튼 포함) */
 .email-row {
 	display: flex;
@@ -145,6 +172,7 @@ footer {
 </style>
 </head>
 <body>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<c:set var="contextPath" value="${pageContext.request.contextPath}"
 		scope="application" />
 	<div class="container">
@@ -168,9 +196,31 @@ footer {
 				<div class="error-msg">이름을 입력해 주세요</div>
 			</div>
 
+			<!-- 학교 선택 -->
+			<div class="form-group">
+				<select name="uniNo" id="uniSelect">
+					<option value="">학교 선택</option>
+
+					<c:forEach var="uni" items="${uniList}">
+						<option value="${uni.uniNo}">${uni.uniName}</option>
+					</c:forEach>
+				</select>
+				<div class="error-msg">학교를 선택해 주세요</div>
+			</div>
+
+			<!-- 학과 선택 -->
+			<div class="form-group">
+				<select name="deptNo" id="deptSelect">
+					<option value="">학과 선택</option>
+				</select>
+				<div class="error-msg">학과를 선택해 주세요</div>
+			</div>
+
 			<div class="form-group">
 				<input type="text" name="phone" placeholder="전화번호">
-				<div class="error-msg">전화번호를 입력해주세요.<br>ex) 010-0000-0000</div>
+				<div class="error-msg">
+					전화번호를 입력해주세요.<br>ex) 010-0000-0000
+				</div>
 			</div>
 
 			<div class="form-group">
@@ -190,6 +240,28 @@ footer {
 			</p>
 		</form:form>
 	</div>
+
+	<script>
+		document.getElementById("uniSelect").addEventListener("change", function() {
+			const uniNo = this.value;
+    		const deptSelect = document.getElementById("deptSelect");
+
+ 		   	if(uniNo === "") {
+ 			   	deptSelect.innerHTML = "<option value=''>학과 선택</option>";
+	 	       return;
+    		}
+
+	    	fetch("${contextPath}/member/deptList?uniNo=" + uniNo).then(response => response.json()).then(data => {
+    	        let options = "<option value=''>학과 선택</option>";
+
+	            data.forEach(function(dept) {
+    	            options += `<option value="\${dept.deptNo}">"\${dept.deptName}"</option>`;
+        	    });
+            
+            	deptSelect.innerHTML = options;
+        	});
+    	});
+	</script>
 
 	<footer>
 		<div class="footer-left">
