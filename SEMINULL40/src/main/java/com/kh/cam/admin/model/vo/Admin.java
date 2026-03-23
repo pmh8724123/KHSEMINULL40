@@ -1,5 +1,11 @@
 package com.kh.cam.admin.model.vo;
 
-public class Admin {
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
+public class Admin {
+	
 }
+
