@@ -9,4 +9,23 @@
 
 	<!-- 암오화 인코딩 기능을 가진 bean 객체 등록 -->
 	<bean id="bcryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+	
+	<security:http security="none" pattern="/resources/**"/>
+	
+	<security:http auto-config="true">
+		<security:intercept-url pattern="/" access="permitAll"/>
+		<security:intercept-url pattern="/member/login" access="permitAll"/>
+		<security:intercept-url pattern="/member/register" access="permitAll"/>
+		<security:intercept-url pattern="/board/selectList" access="permitAll"/>
+	
+		<security:form-login login-page="/member/login" login-processing-url="/member/loginProcess" username-parameter="memId" password-parameter="memPw" default-target-url="/board/selectList"/>
+	</security:http>
+	
+	<context:component-scan base-package="com.kh.cam.member"/>
+
+	<security:authentication-manager>
+    	<security:authentication-provider user-service-ref="memberServiceImpl">
+     		<security:password-encoder ref="bcryptPasswordEncoder"/>
+   		</security:authentication-provider>
+	</security:authentication-manager>
 </beans>
