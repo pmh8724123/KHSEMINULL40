@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="board">
+	
+	<insert id="insertBoard" parameterType="Board">
+		<!-- insert 실행 전 시퀀스 번호를 가져와서 Board 객체의 boardNo에 담아줌 -->
+		<selectKey keyProperty="boardNo" resultType="_int" order="BEFORE">
+			SELECT SEQ_BNO.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO BOARD(
+			BOARD_NO, 
+			UBTYPE_NO, 
+			BOARD_TITLE, 
+			BOARD_CONTENT,
+			BOARD_WRITER
+		)VALUES(
+			#{boardNo}, 
+			#{ubtypeNo}, 
+			#{boardTitle}, 
+			#{boardContent}, 
+			#{boardWriter}		
+		)
+	</insert>
+	
+	<insert id="insertFiles" parameterType="Attachment">
+		INSERT INTO FILES(
+		FILE_NO, 
+		ORIGIN_NAME, 
+		CHANGE_NAME, 
+		TARGET_TYPE, 
+		TARGET_NO) VALUES(
+			SEQ_FNO.NEXTVAL,
+			#{originName},
+			#{changeName},
+			#{targetType},
+			#{targetNo}
+		)
+	</insert>
+	
+	<select id="selectBoardList" resultType="Board">
+	    SELECT
+	        B.BOARD_NO,
+	        B.BOARD_TITLE,
+	        B.BOARD_WRITER,
+	        B.CREATE_DATE,
+	        B.VIEW_COUNT AS "viewCount",
+	        BT.BTYPE_NAME AS "categoryName",
+	        (SELECT COUNT(*) FROM BOARD_LIKE L WHERE L.BOARD_NO = B.BOARD_NO) AS "likeCount"
+	    FROM BOARD B
+	    LEFT JOIN UNI_BOARD_TYPE UBT ON (B.UBTYPE_NO = UBT.UNI_NO)
+	    LEFT JOIN BOARD_TYPE BT ON (UBT.BTYPE_NO = BT.BTYPE_NO)
+	    WHERE B.STATUS = 'Y'
+	    
+	    <if test="category != null and !category.equals('all')">
+	        <choose>
+	            <when test="category.equals('free')">
+	                AND BT.BTYPE_NAME = '자유게시판'
+	            </when>
+	            <when test="category.equals('qna')">
+	                AND BT.BTYPE_NAME = '질문답변'
+	            </when>
+	            <when test="category.equals('accident')">
+	                AND BT.BTYPE_NAME = '사건사고'
+	            </when>
+	            <when test="category.equals('notice')">
+	                AND BT.BTYPE_NAME = '공지사항'
+	            </when>
+	        </choose>
+	    </if>
+	    ORDER BY B.BOARD_NO DESC
+	</select>
+	
+	<!-- 조회수 증가 -->
+    <update id="increaseCount" parameterType="_int">
+        UPDATE BOARD 
+           SET VIEW_COUNT = VIEW_COUNT + 1 
+         WHERE BOARD_NO = #{boardNo} 
+           AND STATUS = 'Y'
+    </update>
+
+	<!-- 상세 조회 -->
+    <select id="selectBoard" parameterType="_int" resultType="Board">
+        SELECT 
+            BOARD_NO, 
+            UBTYPE_NO, 
+            BOARD_TITLE, 
+            BOARD_CONTENT, 
+            BOARD_WRITER, 
+            VIEW_COUNT AS "viewCount",
+            CREATE_DATE AS "createDate"
+        FROM BOARD
+        WHERE BOARD_NO = #{boardNo} 
+          AND STATUS = 'Y'
+    </select>
+
+	<!-- 게시글 수정 쿼리 추가 -->
+	<update id="updateBoard" parameterType="Board">
+	    UPDATE BOARD 
+	       SET BOARD_TITLE = #{boardTitle},
+	           BOARD_CONTENT = #{boardContent},
+	           UBTYPE_NO = #{ubtypeNo}
+	     WHERE BOARD_NO = #{boardNo} 
+	       AND STATUS = 'Y'
+	</update>
+	
+	<!-- 해당 유저가 이 글에 좋아요를 눌렀는지 확인 -->
+	<select id="checkLike" resultType="_int">
+		SELECT COUNT(*) FROM BOARD_LIKE
+		WHERE BOARD_NO = #{boardNo} AND MEM_NO = #{memNo}	
+	</select>
+	
+	<!-- 좋아요 추가 -->	
+	<insert id="insertLike">
+		INSERT INTO BOARD_LIKE (BOARD_NO, MEM_NO)
+		VALUES (#{boardNo}, #{memNo})
+	</insert>
+	
+	<!-- 좋아요 취소 -->
+	<delete id="deleteLike">
+		DELETE FROM BOARD_LIKE
+		WHERE BOARD_NO = #{boardNo} AND MEM_NO = #{memNo}
+	</delete>
+	
+	<!-- 게시글 총 좋아요 수 조회 -->
+	<select id="selectLikeCount" resultType="_int">
+		SELECT COUNT(*) FROM BOARD_LIKE WHERE BOARD_NO = #{boardNo}
+	</select>
+	
+	
+	
+
+
+</mapper>

@@ -1,0 +1,31 @@
+package com.kh.cam.board.model.service;
+
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.kh.cam.board.model.vo.Attachment;
+import com.kh.cam.board.model.vo.Board;
+
+public interface BoardService {
+
+	int insertBoard(Board b, List<Attachment> list);
+
+	List<Board> selectBoardList(@Param("category")String category);
+
+	int increaseCount(int boardNo);
+
+	Board selectBoard(int boardNo);
+
+	int updateBoard(Board b);
+
+	int checkLike(Map<String, Object> map);
+
+	int selectLikeCount(int boardNo);
+
+	void deleteLike(Map<String, Object> map);
+
+	void insertLike(Map<String, Object> map);
+	
+}

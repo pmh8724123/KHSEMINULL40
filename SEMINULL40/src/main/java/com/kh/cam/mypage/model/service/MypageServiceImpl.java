@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 
+
 public class MypageServiceImpl implements MypageService{
 
     private final MypageDao mypageDao;
@@ -21,8 +22,6 @@ public class MypageServiceImpl implements MypageService{
 	public List<Friends> selectFriendList(int memNo) {
 		return mypageDao.selectFriendList(memNo);
 	}
-	
-
 
 
 }
