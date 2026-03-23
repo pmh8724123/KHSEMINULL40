@@ -9,6 +9,7 @@ import com.kh.cam.mypage.model.vo.Friends;
 
 import lombok.RequiredArgsConstructor;
 
+
 @Service
 @RequiredArgsConstructor
 
@@ -20,7 +21,7 @@ public class MypageServiceImpl implements MypageService{
 	public List<Friends> selectFriendList(int memNo) {
 		return mypageDao.selectFriendList(memNo);
 	}
-
+	
 
 
 
