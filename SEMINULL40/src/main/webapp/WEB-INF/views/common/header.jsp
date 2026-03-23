@@ -6,7 +6,7 @@
 <c:set var="path" value="${pageContext.request.contextPath}" />
 
 <style>
-/* 헤더 css */
+/* 헤더 */
 * {
 	margin: 0;
 	padding: 0;
@@ -16,12 +16,10 @@
 
 
 .header {
-	max-width: 1200px;
 	background: #fff;
 	border: 2px solid #4a90e2;
 	border-radius: 20px;
 	padding: 15px;
-	margin: auto;
 }
 
 .top-bar {

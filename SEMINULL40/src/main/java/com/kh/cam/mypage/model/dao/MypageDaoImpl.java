@@ -12,12 +12,13 @@ import lombok.RequiredArgsConstructor;
 @Repository
 @RequiredArgsConstructor
 
+
 public class MypageDaoImpl implements MypageDao{
 
     private final SqlSessionTemplate session;
 
-	@Override
-	public List<Friends> selectFriendList(int memNo) {
-		return session.selectList("mypage.selectFriendList");
-	}
+    @Override
+    public List<Friends> selectFriendList(int memNo) {
+        return session.selectList("mypage.selectFriendList");
+    }
 }

@@ -187,20 +187,14 @@
           autoDeploy : 자동배포 설정.
       -->
 
-      <Host appBase="webapps" autoDeploy="true" name="localhost" unpackWARs="true">
+		<Host appBase="webapps" autoDeploy="true" name="localhost" unpackWARs="true">
+		
+		        <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs" pattern="%h %l %u %t &quot;%r&quot; %s %b" prefix="localhost_access_log" suffix=".txt"/>
+		
+		        <!-- 아래처럼 딱 한 줄만 남겨주세요 -->
+		        <Context docBase="SEMINULL40" path="/cam" reloadable="true" source="org.eclipse.jst.jee.server:SEMINULL40"/>
 
-        <!-- SingleSignOn valve, share authentication between web applications
-             Documentation at: /docs/config/valve.html -->
-        <!--
-        <Valve className="org.apache.catalina.authenticator.SingleSignOn" />
-        -->
-
-        <!-- Access log processes all example.
-             Documentation at: /docs/config/valve.html
-             Note: The pattern used is equivalent to using pattern="common" -->
-        <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs" pattern="%h %l %u %t &quot;%r&quot; %s %b" prefix="localhost_access_log" suffix=".txt"/>
-
-      <Context docBase="SEMINULL40" path="/cam" reloadable="true" source="org.eclipse.jst.jee.server:SEMINULL40"/></Host>
+      </Host>
     </Engine>
   </Service>
 </Server>

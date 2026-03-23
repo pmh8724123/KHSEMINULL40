@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="reply">
+	
+	<resultMap id="replyResultSet" type="Reply">
+		<id column="REPLY_NO" property="replyNo"/>
+		<result column="BOARD_NO" property="boardNo"/>
+		<result column="REPLY_CONTENT" property="replyContent"/>
+		<result column="REPLY_WRITER" property="replyWriter"/>
+		<result column="CREATE_DATE" property="createDate"/>
+		<result column="STATUS" property="status"/>
+		<result column="MEM_NAME" property="userName"/>
+	</resultMap>
+	
+	<!-- 게시글 댓글 목록 조회 -->
+	<select id="selectReplyList" resultMap="replyResultSet">
+		SELECT
+			R.REPLY_NO,
+			R.BOARD_NO,
+			R.REPLY_CONTENT,
+			R.REPLY_WRITER,
+			R.CREATE_DATE,
+			M.MEM_NAME
+		FROM REPLY R
+		JOIN MEMBER M ON (R.REPLY_WRITER = M.MEM_NO)
+		WHERE R.STATUS = 'Y'
+		 AND R.BOARD_NO = #{boardNo}
+		ORDER BY R.REPLY_NO DESC
+	</select>
+	
+	<!-- 댓글 등록 -->
+	<insert id="insertReply">
+		INSERT INTO REPLY(
+			REPLY_NO,
+			BOARD_NO,
+			REPLY_CONTENT,
+			REPLY_WRITER
+		) VALUES(
+			SEQ_RNO.NEXTVAL,
+			#{boardNo},
+			#{replyContent},
+			#{replyWriter}
+		)	
+	</insert>
+	
+	<!-- 댓글 삭제 -->
+	<update id="deleteReply">
+		UPDATE REPLY
+			SET STATUS = 'N'
+		WHERE REPLY_NO = #{replyNo}
+	</update>
+	
+	
+
+</mapper>
