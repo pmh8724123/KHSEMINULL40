@@ -37,10 +37,10 @@ public class MypageController {
 	    Member loginUser =
 	        (Member)session.getAttribute("loginUser");
 
-	    int memberNo = loginUser.getMemberNo();
+	    int memNo = loginUser.getMemNo();
 
 	    List<Friends> friendList =
-	        mypageService.selectFriendList(memberNo);
+	        mypageService.selectFriendList(memNo);
 
 	    model.addAttribute("friendList", friendList);
 */
@@ -55,7 +55,7 @@ public class MypageController {
 	public String main(HttpSession session, Model model) {
 
 	    Member loginUser = (Member) session.getAttribute("loginUser");
-	    if (loginUser == null) return "redirect:/login";
+	    if (loginUser == null) return "redirect:/";
 
 	    List<Friends> friendList = friendsService.getFriendList(loginUser.getMemNo());
 	    model.addAttribute("friendList", friendList);
@@ -63,24 +63,6 @@ public class MypageController {
 	    return "mypage"; // 뷰 이름
 	}
 
-	// 친구 추가 페이지
-	@GetMapping("/addfriend")
-	public String addFriend() {
-	    return "friend/addFriend";
-	}
-
-	// 친구 수락 페이지
-	@GetMapping("/acceptfriend")
-	public String acceptFriend(HttpSession session, Model model) {
-
-	    Member loginUser = (Member) session.getAttribute("loginUser");
-	    if (loginUser == null) return "redirect:/login";
-
-	    List<Friends> pendingList = friendsService.getPendingList(loginUser.getMemNo());
-	    model.addAttribute("pendingList", pendingList);
-
-	    return "friend/acceptFriend";
-	}
 	
 	
 }

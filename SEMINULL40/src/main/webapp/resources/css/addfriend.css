@@ -1,0 +1,158 @@
+@charset "UTF-8";
+
+body {
+	margin: 0;
+	font-family: 'Segoe UI', sans-serif;
+	background: #f7f9fc;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 100vh;
+}
+
+.addfriend-wrap {
+	background: #fff;
+	border: 1px solid #c8d8f0;
+	border-radius: 12px;
+	padding: 28px 28px;
+	width: 380px;
+	box-shadow: 0 4px 20px rgba(74, 144, 226, 0.1);
+}
+
+/* 헤더 */
+.addfriend-header {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding-bottom: 14px;
+	border-bottom: 1px solid #c8d8f0;
+	margin-bottom: 20px;
+}
+
+.back-btn {
+	background: none;
+	border: none;
+	font-size: 18px;
+	color: #6b8aaa;
+	cursor: pointer;
+	padding: 0;
+	line-height: 1;
+	transition: color .15s;
+}
+
+.back-btn:hover {
+	color: #4a90e2;
+}
+
+.addfriend-header h3 {
+	font-size: 15px;
+	font-weight: 600;
+	color: #1a3a5c;
+	margin: 0;
+}
+
+/* 검색창 */
+.search-box {
+	display: flex;
+	gap: 8px;
+	margin-bottom: 16px;
+}
+
+.search-box input {
+	flex: 1;
+	padding: 8px 12px;
+	font-size: 13px;
+	border: 1px solid #c8d8f0;
+	border-radius: 8px;
+	outline: none;
+	color: #1a3a5c;
+	background: #f7f9fc;
+	transition: border-color .15s, background .15s;
+}
+
+.search-box input:focus {
+	border-color: #4a90e2;
+	background: #fff;
+}
+
+.search-box input::placeholder {
+	color: #aaa;
+}
+
+.search-btn {
+	padding: 8px 16px;
+	font-size: 13px;
+	font-weight: 500;
+	color: #fff;
+	background: #4a90e2;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: opacity .15s;
+	white-space: nowrap;
+}
+
+.search-btn:hover {
+	opacity: .85;
+}
+
+/* 결과 영역 */
+.result-list {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.result-guide, .result-empty {
+	text-align: center;
+	padding: 40px 0;
+	font-size: 13px;
+	color: #aaa;
+}
+
+/* 결과 아이템 */
+.result-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 9px 12px;
+	border: 1px solid #e0eaf5;
+	border-radius: 8px;
+	background: #f7f9fc;
+	transition: background .15s;
+}
+
+.result-item:hover {
+	background: #f0f7ff;
+}
+
+.result-name {
+	font-size: 13px;
+	font-weight: 500;
+	color: #1a3a5c;
+}
+
+/* 친구 신청 버튼 */
+.add-btn {
+	padding: 5px 12px;
+	font-size: 12px;
+	font-weight: 500;
+	color: #185FA5;
+	background: #B5D4F4;
+	border: 1px solid #85B7EB;
+	border-radius: 20px;
+	cursor: pointer;
+	transition: opacity .15s;
+}
+
+.add-btn:hover {
+	opacity: .8;
+}
+
+/* 이미 신청함 */
+.add-btn.sent {
+	color: #aaa;
+	background: #f1f5f9;
+	border-color: #ddd;
+	cursor: default;
+}

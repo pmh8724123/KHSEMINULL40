@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8"%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <c:set var="path" value="${pageContext.request.contextPath}" />
 
@@ -9,11 +9,18 @@
 <meta name="_csrf" content="${_csrf.token}" />
 <meta name="_csrf_header" content="${_csrf.headerName}" />
 
+
+<!-- 1순위 적용 -->
 <link rel="stylesheet" href="${path}/resources/css/mainpage.css">
+
+
+<link rel="stylesheet" href="${path}/resources/css/attendance.css">
 
 <link rel="stylesheet" href="${path}/resources/css/friends.css">
 
 <link rel="stylesheet" href="${path}/resources/css/schedule.css">
+
+<link rel="stylesheet" href="${path}/resources/css/setting.css">
 
 <!-- =============================================
      전체 마이페이지 + 출석체크 통합 스타일
@@ -123,6 +130,10 @@
    선택된 탭 내용만 보임                           */
 .tab-panel.active {
 	display: block;
+}
+
+#friend.tab-panel.active {
+	display: flex;
 }
 
 /* ── 친구 탭: 세로 스크롤 허용 ─────────────────
@@ -281,12 +292,10 @@
 				<div class="friend-actions">
 					<!-- 친구 추가 페이지로 이동 -->
 					<button class="friend-btn"
-						onclick="location.href='${pageContext.request.contextPath}/addfriend'">
-						친구 추가</button>
+						onclick="location.href='${path}/addfriend'">친구 추가</button>
 					<!-- 수락 대기 중인 친구 요청 페이지로 이동 -->
 					<button class="friend-btn"
-						onclick="location.href='${pageContext.request.contextPath}/acceptfriend'">
-						친구 수락</button>
+						onclick="location.href='${path}/acceptfriend'">친구 수락</button>
 				</div>
 			</div>
 
@@ -304,10 +313,10 @@
 						<div class="friend-info">
 							<%-- 프로필 이미지 (사용 시 주석 해제)
                     <img src="${path}/resources/profile/${f.profileImg}"
-                         class="profile-img" alt="${f.memberName} 프로필"> --%>
+                         class="profile-img" alt="${f.memName} 프로필"> --%>
 							<div class="friend-text">
 								<!-- 친구 이름 (receiverNo 기준으로 상대방 이름 표시) -->
-								<span class="friend-name">${f.memberName}</span>
+								<span class="friend-name">${f.memName}</span>
 								<!-- 온라인 여부: status 'O' = 온라인 -->
 								<c:choose>
 									<c:when test="${f.status eq 'O'}">
@@ -403,8 +412,176 @@
 
 		<!-- ── 설정 패널 ───────────────────────────── -->
 		<div id="setting" class="tab-panel">
-			<h3>설정 영역</h3>
+
+			<!-- 개인정보 수정 카드 -->
+			<div class="setting-card">
+				<h3 class="setting-card-title">개인정보 수정</h3>
+
+				<div class="setting-form">
+
+					<!-- 프로필 이미지 -->
+					<%-- <div class="setting-profile-wrap">
+						<div class="setting-profile-img-box">
+							<img id="settingProfilePreview"
+								src="${path}/resources/profile/${loginUser.profileImg}"
+								alt="프로필 이미지"
+								onerror="this.src='${path}/resources/img/default_profile.png'"> 
+						</div>
+						<label class="setting-profile-btn" for="settingProfileInput">
+							이미지 변경 </label> <input type="file" id="settingProfileInput"
+							accept="image/*" style="display: none"
+							onchange="previewProfile(this)">
+					</div>	--%>
+
+					<!-- 이름 -->
+					<div class="setting-field">
+						<label>이름</label> <input type="text" id="settingName"
+							placeholder="새 이름을 입력하세요" value="${loginUser.memName}">
+					</div>
+
+					<!-- 아이디 -->
+					<div class="setting-field">
+						<label>아이디</label> <input type="text" id="settingId"
+							placeholder="새 아이디를 입력하세요" value="${loginUser.memId}">
+					</div>
+
+					<!-- 이메일 -->
+					<div class="setting-field">
+						<label>이메일</label> <input type="email" id="settingEmail"
+							placeholder="새 이메일을 입력하세요" value="${loginUser.email}">
+					</div>
+
+					<!-- 학과 번호 -->
+					<div class="setting-field">
+						<label>학과 번호</label> <input type="text" id="settingDeptNo"
+							placeholder="학과 번호를 입력하세요" value="${loginUser.deptNo}">
+					</div>
+
+					<!-- 현재 비밀번호 -->
+					<div class="setting-field">
+						<label>현재 비밀번호</label> <input type="password" id="settingCurPw"
+							placeholder="현재 비밀번호를 입력하세요">
+					</div>
+
+					<!-- 새 비밀번호 -->
+					<div class="setting-field">
+						<label>새 비밀번호</label> <input type="password" id="settingNewPw"
+							placeholder="새 비밀번호를 입력하세요 (변경 시에만 입력)">
+					</div>
+
+					<!-- 새 비밀번호 확인 -->
+					<div class="setting-field">
+						<label>새 비밀번호 확인</label> <input type="password"
+							id="settingNewPwCk" placeholder="새 비밀번호를 다시 입력하세요">
+					</div>
+
+					<!-- 유효성 메시지 -->
+					<div class="setting-hint" id="settingHint"></div>
+
+					<button class="setting-save-btn" onclick="saveSetting()">저장</button>
+
+				</div>
+			</div>
+
+			<!-- 로그아웃 / 회원탈퇴 카드 -->
+			<div class="setting-card">
+				<button class="setting-logout-btn"
+					onclick="location.href='${path}/logout'">로그아웃</button>
+				<button class="setting-withdraw-btn" onclick="confirmWithdraw()">
+					회원 탈퇴</button>
+			</div>
+			<script>
+			// 프로필 이미지 미리보기
+			// 파일 선택 즉시 서버 전송 없이 브라우저에서 바로 이미지를 미리 보여주는 기능
+			function previewProfile(input) {
+				
+				// 파일 선택됐는지 확인
+			    if (input.files && input.files[0]) {
+			        const reader = new FileReader();
+			        
+			        reader.onload = e => {
+			            document.getElementById('settingProfilePreview').src = e.target.result;
+			        };
+			        
+			        // 변환 완료시 onload 실행
+			        reader.readAsDataURL(input.files[0]);
+			    }
+			}
+
+			// 저장
+			function saveSetting() {
+			    const hint    = document.getElementById('settingHint');
+			    const curPw   = document.getElementById('settingCurPw').value.trim();
+			    const newPw   = document.getElementById('settingNewPw').value.trim();
+			    const newPwCk = document.getElementById('settingNewPwCk').value.trim();
+
+			    hint.style.color = '#E24B4A';
+			    hint.textContent = '';
+
+			    // 새 비밀번호 입력 시 현재 비밀번호 필수
+			    if (newPw && !curPw) {
+			        hint.textContent = '현재 비밀번호를 입력해주세요.';
+			        return;
+			    }	
+
+			    // 새 비밀번호 확인 일치
+			    if (newPw && newPw !== newPwCk) {
+			        hint.textContent = '새 비밀번호가 일치하지 않습니다.';
+			        return;
+			    }
+
+			    // FormData로 파일 포함 전송
+			    const formData = new FormData();
+			    formData.append('memName',  document.getElementById('settingName').value.trim());
+			    formData.append('memId',    document.getElementById('settingId').value.trim());
+			    formData.append('email', document.getElementById('settingEmail').value.trim());
+			    formData.append('deptNo',      document.getElementById('settingDeptNo').value.trim());
+			    formData.append('curPw',       curPw);
+			    formData.append('newPw',       newPw);
+
+			    const profileFile = document.getElementById('settingProfileInput').files[0];
+			    if (profileFile) {
+			        formData.append('profileImg', profileFile);
+			    }
+
+			    // Ajax 전송
+			    $.ajax({
+			        url        : '${path}/setting/update',
+			        type       : 'POST',
+			        data       : formData,
+			        processData: false,   // FormData는 jQuery가 변환하면 안 됨
+			        contentType: false,   // FormData는 Content-Type 자동 설정
+			        headers    : { '${_csrf.headerName}': '${_csrf.token}' },
+
+			        success: function(data) {
+			            if (data.result === 'ok') {
+			                hint.style.color = '#16a34a';
+			                hint.textContent = '저장되었습니다.';
+			            } else {
+			                hint.style.color = '#E24B4A';
+			                hint.textContent = data.message || '저장에 실패했습니다.';
+			            }
+			        },
+
+			        error: function() {
+			            hint.style.color = '#E24B4A';
+			            hint.textContent = '서버와 연결할 수 없습니다.';
+			        }
+			    });
+			}
+
+			// 회원탈퇴
+			function confirmWithdraw() {
+			    if (confirm('정말 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+			        location.href = '${path}/withdraw';
+			    }
+			}
+			
+			</script>
+
+
 		</div>
+		<!-- /setting -->
 
 
 	</div>
