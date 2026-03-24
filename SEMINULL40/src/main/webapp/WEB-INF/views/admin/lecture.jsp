@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -50,21 +51,21 @@
 				</thead>
 
 				<tbody>
-					<% for(int i=1; i<=30; i++){ %>
+					<c:forEach var="l" items="${list}">
 					<tr>
-						<td><%= i %></td>
-						<td>아아아아아</td>
+						<td>${l.lectureNo}</td>
+						<td>${l.lectureName}</td>
 						<td>홍길동</td>
 						<td>09:00</td>
 						<td>12:00</td>
-						<td>1번강의장</td>
+						<td>${l.lectureRoom}</td>
 						<td>sysdate</td>
 						<td>
 							<button class="btn btn-approve">수정</button>
 							<button class="btn btn-reject">삭제</button>
 						</td>
 					</tr>
-					 <% } %>
+					</c:forEach>
 				</tbody>
 			</table>
 		</div>

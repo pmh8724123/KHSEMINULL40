@@ -1,5 +1,67 @@
 package com.kh.cam.admin.model.dao;
 
-public class AdminDaoImpl {
+import java.util.List;
+import java.util.Map;
 
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.stereotype.Repository;
+
+import com.kh.cam.common.model.vo.DepartmentDTO;
+import com.kh.cam.member.model.vo.MemberDTO;
+import com.kh.cam.mypage.model.vo.Lecture;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Repository
+@Slf4j
+@RequiredArgsConstructor
+public class AdminDaoImpl implements AdminDao{
+	
+	private final SqlSessionTemplate session;
+
+	@Override
+	public List<MemberDTO> selectMemberList() {
+		return session.selectList("admin.selectMemberList");
+	}
+	
+	@Override
+	public int updateMemberStatus(int memNo, String status) {
+		return session.update("admin.updateMemberStatus",
+                Map.of("memNo", memNo, "status", status));
+	}
+	
+	@Override
+	public List<MemberDTO> selectMemberJoinList() {
+		return session.selectList("admin.selectMemberJoinList");
+	}
+
+	@Override
+	public int updateMemberJoin(int memNo, String status) {
+		return session.update("admin.updateMemberJoin",
+                Map.of("memNo", memNo, "status", status));
+	}
+
+	@Override
+	public List<DepartmentDTO> selectDepartmentList() {
+		return session.selectList("admin.selectDepartmentList");
+	}
+
+	@Override
+	public List<Lecture> selectLectureList() {
+		return session.selectList("admin.selectLectureList");
+	}
+	
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

@@ -118,7 +118,7 @@ body {
 		<form action="loginProcess.jsp" method="post" class="login-form">
 			<input type="text" name="id" placeholder="아이디" required> 
 			<input type="password" name="pwd" placeholder="비밀번호" required>
-			<button onclick="location.href='main'"
+			<button onclick="location.href='admin/main'"
 				type="submit" class="login-btn">로그인</button>
 		</form>
 		<button onclick="location.href='${pageContext.request.contextPath}'"
