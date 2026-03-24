@@ -14,6 +14,4 @@ public interface MemberService {
 
 	List<Department> selectDeptList(int uniId);
 
-	Member loginMember(Member m);
-
 }

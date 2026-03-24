@@ -22,7 +22,6 @@ public class MemberDaoImpl implements MemberDao {
 	
 	@Override
 	public int insertMember(Member member) {
-		log.info(member.toString());
 		return session.insert("member.insertMember", member);
 	}
 
@@ -34,11 +33,6 @@ public class MemberDaoImpl implements MemberDao {
 	@Override
 	public List<Department> selectDeptList(int uniNo) {
 		return session.selectList("member.selectDeptList", uniNo);
-	}
-
-	@Override
-	public Member loginMember(Member m) {
-		return session.selectOne("member.loginMember", m);
 	}
 
 	@Override

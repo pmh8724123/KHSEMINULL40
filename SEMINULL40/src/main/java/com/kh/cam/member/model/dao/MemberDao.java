@@ -16,8 +16,6 @@ public interface MemberDao {
 
 	List<Department> selectDeptList(int uniNo);
 
-	Member loginMember(Member m);
-
 	Member loadUserByUsername(String username);
 
 }
