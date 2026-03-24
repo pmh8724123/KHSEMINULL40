@@ -10,7 +10,7 @@
 
     <h2>학교 관리</h2>
     <a href="department">학과 관리</a>
-    <a href="class">수업 관리</a>
+    <a href="lecture">강의 관리</a>
     
     <h2>게시판 관리</h2>    
     <a href="notice">공지사항</a>

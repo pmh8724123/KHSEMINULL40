@@ -67,6 +67,11 @@ public class MemberController {
 		// 유효성 검사 성공시 비밀번호 암오화하여 회원가입
 		member.setMemPw(pwEncoder.encode(member.getMemPw()));
 		mService.insertMember(member);
+		log.debug("Member : {}", member);
+		
+		// 유효성 검사 성공시 비밀번호 암호화하여 회원가입
+		String encryptedPassword = pwEncoder.encode(member.getMemPw());
+		member.setMemPw(encryptedPassword);
 		
 		return "redirect:/";
 	}

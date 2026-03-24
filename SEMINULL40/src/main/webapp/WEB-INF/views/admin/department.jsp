@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+	
 <!DOCTYPE html>
 <html>
 <head>
@@ -32,14 +34,14 @@
                 <input type="text" placeholder="검색어 입력">
                 <button>검색</button>
             </div>
-                <button class="btn btn-add">과목 추가</button>
+                <button class="btn btn-add">학과 추가</button>
 		</div>
 
 		<div class="table-container">
 			<table>
 				<thead>
 					<tr>
-						<th>학과번호</th>
+						<th>과목번호</th>
 						<th>과목이름</th>
 						<th>작성자</th>
 						<th>작성/수정날짜</th>
@@ -48,18 +50,18 @@
 				</thead>
 
 				<tbody>
-					<% for(int i=1; i<=30; i++){ %>
+					<c:forEach var="d" items="${list}">
 					<tr>
-						<td><%= i %></td>
-						<td>컴퓨터공학과</td>
-						<td>박무혁(pmh8724)</td>
+						<td>${d.deptNo}</td>
+						<td>${d.deptName}</td>
+						<td>${d.memName}</td>
 						<td>sysdate</td>
 						<td>
 							<button class="btn btn-approve">수정</button>
 							<button class="btn btn-reject">삭제</button>
 						</td>
 					</tr>
-					 <% } %>
+					</c:forEach>
 				</tbody>
 			</table>
 		</div>

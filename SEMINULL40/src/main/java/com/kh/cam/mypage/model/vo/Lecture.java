@@ -5,17 +5,22 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class Class {
+public class Lecture {
 	
 	// 강의 번호
-	private int classNo;
+	private int lectureNo;
 	
 	// 학과 번호
 	private int deptNo;
 
 	// 강의 제목
-	private String className;
+	private String lectureName;
 
 	// 교수 이름
 	private String professorName;
+	
+	// 강의장
+	private String lectureRoom;
+	
+	
 }

@@ -1,4 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="admin">
+
+<!--☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ 멤버 START ☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆-->
+	<select id="selectMemberList" resultType="com.kh.cam.member.model.vo.MemberDTO">
+	    SELECT 
+	    	M.*,
+	    	D.DEPT_NAME AS deptName,
+	    	U.UNI_NAME AS uniName
+	    FROM MEMBER M
+	    LEFT JOIN DEPARTMENT D ON M.DEPT_NO = D.DEPT_NO
+	    LEFT JOIN UNIVERSITY U ON D.UNI_NO = U.UNI_NO
+	</select>
+	
+	<update id="updateMemberStatus">
+		UPDATE MEMBER
+		SET STATUS = #{status}
+		WHERE MEM_NO = #{memNo}
+	</update>
+	
+	<select id="selectMemberJoinList" resultType="com.kh.cam.member.model.vo.MemberDTO">
+	    SELECT 
+	    	M.*,
+	    	D.DEPT_NAME AS deptName,
+	    	U.UNI_NAME AS uniName
+	    FROM MEMBER M
+	    LEFT JOIN DEPARTMENT D ON M.DEPT_NO = D.DEPT_NO
+	    LEFT JOIN UNIVERSITY U ON D.UNI_NO = U.UNI_NO
+	    WHERE STATUS = 'N'
+	</select>
+	
+	<update id="updateMemberJoin">
+		UPDATE MEMBER
+		SET STATUS = #{status}
+		WHERE MEM_NO = #{memNo}
+	</update>
+<!--★★★★★★★★★★★★★★★★★ 멤버 END ★★★★★★★★★★★★★★★★★-->
+
+<!--☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ 학과 START ☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆-->
+	<select id="selectDepartmentList" resultType="com.kh.cam.common.model.vo.DepartmentDTO">
+		SELECT 
+			D.DEPT_NO,
+			D.DEPT_NAME,
+			M.MEM_NAME AS memName
+		FROM DEPARTMENT D
+		LEFT JOIN MEMBER M ON D.DEPT_NO = M.DEPT_NO
+	</select>
+	
+	
+	
+<!--★★★★★★★★★★★★★★★★★ 학과 END ★★★★★★★★★★★★★★★★★-->
+	
+	<select id="selectLectureList" resultType="com.kh.cam.mypage.model.vo.Lecture">
+		SELECT *
+		FROM CLASS
+	</select>
+	
+	
+	
+	
+	
     </mapper>
