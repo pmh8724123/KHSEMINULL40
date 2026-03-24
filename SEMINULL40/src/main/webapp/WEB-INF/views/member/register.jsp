@@ -171,54 +171,50 @@ footer {
 }
 </style>
 </head>
-<body>
+<body data-context-path="${pageContext.request.contextPath}">
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<c:set var="contextPath" value="${pageContext.request.contextPath}"
 		scope="application" />
 	<div class="container">
 		<h1 class="header-title">캠둘기 회원가입</h1>
 
-		<form:form action="${contextPath}/member/register" method="post">
+		<form:form action="${contextPath}/member/register" method="post" modelAttribute="member" id="registerForm">
 			<div class="form-group">
-				<input type="text" name="memId" placeholder="아이디">
-				<div class="error-msg">아이디를 입력해 주세요</div>
+				<input type="text" name="memId" id="memId" placeholder="아이디">
+				<div class="error-msg" id="idMsg"><p>아이디를 입력해 주세요</p></div>
 			</div>
 
 			<div class="form-group">
-				<input type="password" name="memPw" placeholder="비밀번호"
-					style="margin-bottom: 10px;"> <input type="password"
-					name="memPw_confirm" placeholder="비밀번호 재입력">
-				<div class="error-msg">비밀번호를 입력해 주세요</div>
+				<input type="password" name="memPw" id="memPw" placeholder="비밀번호" style="margin-bottom: 10px;"> 
+				<input type="password" name="memPwConfirm" id="memPwConfirm" placeholder="비밀번호 재입력">
+				<div class="error-msg" id="pwMsg">비밀번호를 입력해 주세요</div>	
 			</div>
 
 			<div class="form-group">
-				<input type="text" name="memName" placeholder="이름">
-				<div class="error-msg">이름을 입력해 주세요</div>
+				<input type="text" name="memName" id="memName" placeholder="이름">
+				<div class="error-msg" id="nameMsg">이름을 입력해 주세요</div>
 			</div>
 
-			<!-- 학교 선택 -->
 			<div class="form-group">
 				<select name="uniNo" id="uniSelect">
 					<option value="">학교 선택</option>
-
 					<c:forEach var="uni" items="${uniList}">
 						<option value="${uni.uniNo}">${uni.uniName}</option>
 					</c:forEach>
 				</select>
-				<div class="error-msg">학교를 선택해 주세요</div>
+				<div class="error-msg" id="uniMsg">학교를 선택해 주세요</div>
 			</div>
 
-			<!-- 학과 선택 -->
 			<div class="form-group">
 				<select name="deptNo" id="deptSelect">
 					<option value="">학과 선택</option>
 				</select>
-				<div class="error-msg">학과를 선택해 주세요</div>
+				<div class="error-msg" id="deptMsg">학과를 선택해 주세요</div>
 			</div>
 
 			<div class="form-group">
 				<input type="text" name="phone" placeholder="전화번호">
-				<div class="error-msg">
+				<div class="error-msg" id="phoneMsg">
 					전화번호를 입력해주세요.<br>ex) 010-0000-0000
 				</div>
 			</div>
@@ -228,7 +224,7 @@ footer {
 					<input type="email" name="email" placeholder="이메일">
 					<button type="button" class="btn-verify">인증하기</button>
 				</div>
-				<div class="error-msg">
+				<div class="error-msg" id="emailMsg">
 					대학교 이메일을 입력해 주세요<br>ex) abc123@xxx.ac.kr
 				</div>
 			</div>
@@ -236,33 +232,37 @@ footer {
 			<button type="submit" class="btn-submit">가입하기</button>
 
 			<p class="login-link">
-				이미 회원이신가요? <a href="login.jsp">로그인</a>
+				이미 회원이신가요? <a href="${contextPath}">로그인</a>
 			</p>
 		</form:form>
 	</div>
 
-	<script>
+<!-- 	<script>
 		document.getElementById("uniSelect").addEventListener("change", function() {
-			const uniNo = this.value;
-    		const deptSelect = document.getElementById("deptSelect");
+		    const uniNo = this.value;
+		    const deptSelect = document.getElementById("deptSelect");
 
- 		   	if(uniNo === "") {
- 			   	deptSelect.innerHTML = "<option value=''>학과 선택</option>";
-	 	       return;
-    		}
+		    if (uniNo === "") {
+		        deptSelect.innerHTML = "<option value=''>학과 선택</option>";
+		        return;
+		    }
 
-	    	fetch("${contextPath}/member/deptList?uniNo=" + uniNo).then(response => response.json()).then(data => {
-    	        let options = "<option value=''>학과 선택</option>";
+		    fetch("${contextPath}/member/deptList?uniNo=" + uniNo)
+		        .then(res => res.json())
+		        .then(data => {
+		            let options = "<option value=''>학과 선택</option>";
 
-	            data.forEach(function(dept) {
-    	            options += `<option value="\${dept.deptNo}">"\${dept.deptName}"</option>`;
-        	    });
-            
-            	deptSelect.innerHTML = options;
-        	});
-    	});
-	</script>
+		            data.forEach(dept => {
+		                options += `<option value="\${dept.deptNo}">\${dept.deptName}</option>`;
+		            });
 
+		            deptSelect.innerHTML = options;
+		        });
+		});
+	</script> -->
+	
+	<script src="${contextPath}/resources/js/register.js" ></script> 
+	
 	<footer>
 		<div class="footer-left">
 			<div class="footer-logo">캠둘기</div>

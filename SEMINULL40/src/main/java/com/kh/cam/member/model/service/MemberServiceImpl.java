@@ -38,11 +38,6 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 	}
 
 	@Override
-	public Member loginMember(Member m) {
-		return mDao.loginMember(m);
-	}
-
-	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		Member member = mDao.loadUserByUsername(username);
 		
