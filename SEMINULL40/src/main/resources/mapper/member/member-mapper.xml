@@ -8,10 +8,10 @@
 	
 	<insert id="insertMember">
 		<selectKey keyProperty="memNo" resultType="int" order="BEFORE">
-			SELECT SEQ_MNO.NEXTVAL FROM DUAL
+			SELECT SEQ_MEM.NEXTVAL FROM DUAL
 		</selectKey>
 		
-		INSERT INTO member VALUES(SEQ_MNO.CURRVAL, #{memId}, #{memPw}, #{memName}, #{deptNo}, #{phone}, #{email}, DEFAULT, DEFAULT)
+		INSERT INTO member VALUES(SEQ_MEM.CURRVAL, #{memId}, #{memPw}, NULL, #{memName}, #{deptNo}, NULL, DEFAULT, DEFAULT)
 	</insert>
 	
 	<select id="selectUniList" resultType="University">
@@ -22,9 +22,32 @@
 		SELECT dept_no, dept_name FROM department WHERE uni_no = #{uniNo}
 	</select>
 	
-	<select id="loadUserByUsername" resultType="Member">
-		SELECT * FROM member WHERE mem_id = #{userName}
+	<select id="loadUserByUsername" resultMap="memberInfo">
+		SELECT m.mem_no, m.mem_id, m.mem_pw, m.mem_name, u.uni_no, u.uni_name, d.dept_no, d.dept_name, m.student_no, a.authority, m.phone ,m.create_date, m.status
+		FROM member m
+		LEFT JOIN department d ON m.dept_no = d.dept_no
+		LEFT JOIN university u ON u.uni_no = d.uni_no
+		LEFT JOIN authorities a ON m.mem_no = a.mem_no
+		WHERE m.mem_id = #{userName}
 	</select>
+	<resultMap type="Member" id="memberInfo">
+		<id property="memNo" column="mem_no"/>
+		<result property="memId" column="mem_id"/>
+		<result property="memPw" column="mem_pw"/>
+		<result property="memName" column="mem_name"/>
+		<result property="uniNo" column="uni_no"/>
+		<result property="uniName" column="uni_name"/>
+		<result property="deptNo" column="dept_no"/>
+		<result property="deptName" column="dept_name"/>
+		<result property="phone" column="phone"/>
+		<result property="email" column="email"/>
+		<result property="createDate" column="create_date"/>
+		<result property="status" column="status"/>
+		
+		<collection property="authorities" ofType="Authority">
+			<result property="authority" column="authority"/>
+		</collection>
+	</resultMap>
 	
 	<select id="updateMemberStatus" resultType="Member">
 		UPDATE MEMBER

@@ -111,7 +111,7 @@ public class BoardController {
 					list.add(at);
 				}
 			}
-		}	
+		 }	
 		// JSP에서 <select name="ubtypeNo"> 값을 보내므로 b.ubtypeNo에 자동 매핑됨
 		int result = boardService.updateBoard(b, list, deleteFileNos);
 		return (result > 0) ? "redirect:/board/detail?boardno=" + b.getBoardNo() : "common/errorPage";

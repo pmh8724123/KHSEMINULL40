@@ -209,7 +209,7 @@ body {
 		</div>
 	</div>
 
-	<footer class="footer">
+<!-- 	<footer class="footer">
 		<div class="footer-content">
 			<div class="footer-brand">
 				<div class="footer-logo-text">캠둘기</div>
@@ -234,6 +234,8 @@ body {
 			<div class="footer-copyright">&copy; 2026 캠둘기. All rights
 				reserved.</div>
 		</div>
-	</footer>
+	</footer> -->
+	
+	<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 </body>
 </html>
