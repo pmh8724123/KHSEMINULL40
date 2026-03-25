@@ -1,5 +1,6 @@
 package com.kh.cam.board.model.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,14 @@ public interface BoardDao {
 	void deleteLike(SqlSessionTemplate sqlSession, Map<String, Object> map);
 
 	void insertLike(SqlSessionTemplate sqlSession, Map<String, Object> map);
+
+	int insertReport(SqlSessionTemplate sqlSession, Map<String, Object> map);
+
+	ArrayList<Attachment> selectAttachmentList(SqlSessionTemplate sqlSession, int boardNo);
+
+	int deleteAttachment(SqlSessionTemplate sqlSession, int fileNo);
+
+	int deleteBoard(SqlSessionTemplate sqlSession, int boardNo);
 
 
 }

@@ -103,6 +103,31 @@
 	       AND STATUS = 'Y'
 	</update>
 	
+	<!-- 게시글 삭제(상태값만 변경) -->
+	<update id="deleteBoard">
+		UPDATE BOARD
+			SET STATUS = 'N'
+		WHERE BOARD_NO = #{boardNo}	
+	</update>	
+	
+	<select id="selectAttachmentList" resultType="Attachment">
+		SELECT 
+			FILE_NO AS "fileNo",
+			ORIGIN_NAME AS "originName",
+			CHANGE_NAME AS "changeName",
+			TARGET_TYPE AS "targetType",
+			TARGET_NO AS "targetNo"	
+		FROM FILES
+		WHERE TARGET_NO = #{boardNo}
+			AND TARGET_TYPE = 'BOARD'			
+	</select>
+	
+	<delete id="deleteAttachment" parameterType="_int">
+		DELETE FROM FILES
+		WHERE FILE_NO = #{fileNo}	
+	</delete>
+	
+	
 	<!-- 해당 유저가 이 글에 좋아요를 눌렀는지 확인 -->
 	<select id="checkLike" resultType="_int">
 		SELECT COUNT(*) FROM BOARD_LIKE
@@ -127,7 +152,23 @@
 	</select>
 	
 	
+	<insert id="insertReport" parameterType="hashmap">
+		INSERT INTO REPORT(
+			REPORT_NO,
+			REPORT_MEM,
+			REASON_NO,
+			REASON_CONTENT,
+			TARGET_TYPE,
+			TARGET_NO
+		) VALUES(
+			SEQ_REPORT_NO.NEXTVAL,
+			#{reportMem},
+			#{reasonNo},
+			#{reasonContent},
+			#{targetType},
+			#{targetNo}
+		)
+	</insert>
 	
-
 
 </mapper>

@@ -22,7 +22,7 @@ public class ReplyDaoImpl implements ReplyDao {
 
 	@Override
 	public int deleteReply(SqlSessionTemplate sqlSession, int replyNo) {
-		return sqlSession.delete("reply.deleteReply",replyNo);
+		return sqlSession.update("reply.deleteReply",replyNo);
 	}
 
 }
