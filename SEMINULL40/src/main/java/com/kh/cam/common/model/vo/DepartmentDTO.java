@@ -11,7 +11,4 @@ public class DepartmentDTO {
 	private int deptNo;
 	private int uniNo;
 	private String deptName;
-	
-	private String memName;
-	
 }

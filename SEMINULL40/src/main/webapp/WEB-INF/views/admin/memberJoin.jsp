@@ -56,14 +56,14 @@
 						<tr>
 							<th>회원번호</th>
 							<th>아이디</th>
+							<th>학번</th>
 							<th>이름</th>
 							<th>학교</th>
 							<th>학과</th>
 							<th>전화번호</th>
-							<th>이메일</th>
-							<th>요청일</th>
+							<th>생성날짜</th>
 							<th>상태</th>
-							<th>승인/거절</th>
+							<th>변경</th>
 						</tr>
 					</thead>
 
@@ -72,11 +72,11 @@
 							<tr>
 								<td>${m.memNo}</td>
 								<td>${m.memId}</td>
+								<td>${m.studentNo}</td>
 								<td>${m.memName}</td>
 								<td>${m.uniName}</td>
 								<td>${m.deptNo}</td>
 								<td>${m.phone}</td>
-								<td>${m.email}</td>
 								<td>${m.createDate}</td>
 								<td>${m.status}</td>
 								<td>
@@ -105,15 +105,6 @@
 		</div>
 	</div>
 	
-	<script>
-    const overlay = document.getElementById("toast-overlay");
-
-    if (overlay) {
-        setTimeout(() => {
-            overlay.style.display = "none";
-        }, 1500); // 1.5초 후 사라짐
-    }
-	</script>
-
+	<script src="${pageContext.request.contextPath}/resources/js/admin.js"></script>
 </body>
 </html>
