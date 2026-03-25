@@ -109,7 +109,7 @@ public class AdminController {
 	public String insertDepartment(@ModelAttribute Department dept) {
 
 		dept.setUniNo(1); // 테스트
-
+//		asdasdasd
 		System.out.println("deptName: " + dept.getDeptName()); // 테스트
 		System.out.println("uniNo: " + dept.getUniNo()); // 테스트
 
