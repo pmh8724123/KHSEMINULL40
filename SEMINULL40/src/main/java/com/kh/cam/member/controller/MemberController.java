@@ -1,5 +1,6 @@
 package com.kh.cam.member.controller;
 
+import java.security.Provider.Service;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -60,7 +61,7 @@ public class MemberController {
 	public String register(@Validated @ModelAttribute Member member, BindingResult bindingResult, Model model,  RedirectAttributes ra) {
 		// 유효성 검사 실패
 		if(bindingResult.hasErrors()) {
-			log.info("error : {}", bindingResult.getFieldError());
+			model.addAttribute("uniList", mService.selectUniList());
 			return "member/register";
 		}
 		

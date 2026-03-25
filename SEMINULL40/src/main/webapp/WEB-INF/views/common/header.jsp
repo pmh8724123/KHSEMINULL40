@@ -3,6 +3,7 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <c:set var="path" value="${pageContext.request.contextPath}" />
 
@@ -119,15 +120,15 @@
 		<!-- 접속 권한이 회원일때 -->
 		<!-- 접속 권한 : 회원일때 보이게 하고 그에 맞는 데이터 갖고오기 -->
 		<div class="right">
-			<span class="school">OOO님/OO대학교</span>
+			<span class="school">
+				<sec:authentication property="principal.member.memName"/>님 /
+				<sec:authentication property="principal.member.uniName"/>
+			</span>
 			<form:form action="${contextPath}/member/logout" method="post">
 				<button type="submit" class="logout">로그아웃</button>			
 			</form:form>
 		</div>
 	</div>
-	
-	
-		<!-- 접속 권한 없는 사람(회원이 아닌 사람)일때 -->
 
 	<!-- 검색 -->
 	<div class="search-box">

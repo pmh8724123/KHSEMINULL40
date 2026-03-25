@@ -211,21 +211,16 @@ footer {
 				</select>
 				<div class="error-msg" id="deptMsg">학과를 선택해 주세요</div>
 			</div>
-
+			
 			<div class="form-group">
-				<input type="text" name="phone" placeholder="전화번호">
+				<input type="text" name="studentNo" id="studentNo" placeholder="학번">
+				<div class="error-msg" id="snoMsg">학번을 입력해 주세요</div>
+			</div>
+			
+			<div class="form-group">
+				<input type="text" name="phone" id="phone" placeholder="전화번호">
 				<div class="error-msg" id="phoneMsg">
 					전화번호를 입력해주세요.<br>ex) 010-0000-0000
-				</div>
-			</div>
-
-			<div class="form-group">
-				<div class="email-row">
-					<input type="email" name="email" placeholder="이메일">
-					<button type="button" class="btn-verify">인증하기</button>
-				</div>
-				<div class="error-msg" id="emailMsg">
-					대학교 이메일을 입력해 주세요<br>ex) abc123@xxx.ac.kr
 				</div>
 			</div>
 
@@ -236,54 +231,9 @@ footer {
 			</p>
 		</form:form>
 	</div>
-
-<!-- 	<script>
-		document.getElementById("uniSelect").addEventListener("change", function() {
-		    const uniNo = this.value;
-		    const deptSelect = document.getElementById("deptSelect");
-
-		    if (uniNo === "") {
-		        deptSelect.innerHTML = "<option value=''>학과 선택</option>";
-		        return;
-		    }
-
-		    fetch("${contextPath}/member/deptList?uniNo=" + uniNo)
-		        .then(res => res.json())
-		        .then(data => {
-		            let options = "<option value=''>학과 선택</option>";
-
-		            data.forEach(dept => {
-		                options += `<option value="\${dept.deptNo}">\${dept.deptName}</option>`;
-		            });
-
-		            deptSelect.innerHTML = options;
-		        });
-		});
-	</script> -->
 	
 	<script src="${contextPath}/resources/js/register.js" ></script> 
 	
-	<footer>
-		<div class="footer-left">
-			<div class="footer-logo">캠둘기</div>
-			<p style="color: #888;">대학생들의 소통 공간</p>
-		</div>
-		<div class="footer-info">
-			<div class="info-section">
-				<h4>고객지원</h4>
-				<p>공지사항</p>
-				<p>Q&A(문의하기)</p>
-			</div>
-			<div class="info-section">
-				<h4>정보</h4>
-				<p>이용약관</p>
-				<p>개인정보처리방침</p>
-			</div>
-		</div>
-		<div class="footer-right">
-			<p>© 2026 캠둘기. All rights reserved.</p>
-		</div>
-	</footer>
-
+	<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 </body>
 </html>
