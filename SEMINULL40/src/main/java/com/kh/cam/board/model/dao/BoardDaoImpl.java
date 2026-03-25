@@ -42,7 +42,12 @@ public class BoardDaoImpl implements BoardDao {
 	public int updateBoard(SqlSessionTemplate sqlSession, Board b) {
 		return sqlSession.update("board.updateBoard", b);
 	}
-
+	
+	@Override
+	public int deleteBoard(SqlSessionTemplate sqlSession, int boardNo) {
+		return sqlSession.delete("board.deleteBoard", boardNo);
+	}
+	
 	@Override
 	public int checkLike(SqlSessionTemplate sqlSession, Map<String, Object> map) {
 		return sqlSession.selectOne("board.checkLike", map);
@@ -77,4 +82,5 @@ public class BoardDaoImpl implements BoardDao {
 	public int deleteAttachment(SqlSessionTemplate sqlSession, int fileNo) {
 		return sqlSession.delete("board.deleteAttachment", fileNo);
 	}
+
 }

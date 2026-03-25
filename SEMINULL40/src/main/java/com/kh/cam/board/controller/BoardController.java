@@ -111,14 +111,39 @@ public class BoardController {
 					list.add(at);
 				}
 			}
-		}
-		
-		
-		
+		 }	
 		// JSP에서 <select name="ubtypeNo"> 값을 보내므로 b.ubtypeNo에 자동 매핑됨
-		int result = boardService.updateBoard(b, list);
+		int result = boardService.updateBoard(b, list, deleteFileNos);
 		return (result > 0) ? "redirect:/board/detail?boardno=" + b.getBoardNo() : "common/errorPage";
 	}
+	
+	// 게시글 삭제
+	@GetMapping("/delete")
+	public String deleteBoard(@RequestParam("boardno")int boardNo, HttpSession session, Model model) {
+		
+		// 1. 로그인 유저와 작성자 비교 로직 (나중)
+		/*
+		 * Member loginUser = (Member)session.getAttribute("loginUser");
+		 * Board b = boardService.selectBoard(boardNo);
+		 * if(loginUser == null || loginUser.getMemno() != b.getBoardWriter()){
+		 * 	model.addAttribute("erroMsg", "삭제 권한이 없습니다.");
+		 * 	return "common/errorPage";
+		 * }
+		 */
+		
+		// 2. 삭제 서비스 호출
+		int result = boardService.deleteBoard(boardNo);
+		
+		if(result > 0) {
+			// 삭제 성공시 리스트 페이지로 이동
+			return "redirect:/board/list";
+		}else {
+			model.addAttribute("errorMsg","게시글 삭제 실패");
+			return "common/errorPage";
+		}
+	}
+	
+	
 	
 	// 게시글 상세보기
 	@GetMapping("/detail")

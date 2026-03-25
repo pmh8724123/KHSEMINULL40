@@ -103,6 +103,13 @@
 	       AND STATUS = 'Y'
 	</update>
 	
+	<!-- 게시글 삭제(상태값만 변경) -->
+	<update id="deleteBoard">
+		UPDATE BOARD
+			SET STATUS = 'N'
+		WHERE BOARD_NO = #{boardNo}	
+	</update>	
+	
 	<select id="selectAttachmentList" resultType="Attachment">
 		SELECT 
 			FILE_NO AS "fileNo",

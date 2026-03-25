@@ -33,6 +33,8 @@ public interface BoardService {
 
 	ArrayList<Attachment> selectAttachmentList(int boardNo);
 
+	int deleteBoard(int boardNo);
+
 
 	
 }

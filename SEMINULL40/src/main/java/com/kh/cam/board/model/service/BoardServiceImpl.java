@@ -38,7 +38,13 @@ public class BoardServiceImpl implements BoardService {
 	public List<Board> selectBoardList(String category) {
 		return boardDao.selectBoardList(sqlSession, category);
 	}
-
+	
+	@Override
+	public int deleteBoard(int boardNo) {
+		return boardDao.deleteBoard(sqlSession, boardNo);
+	}
+	
+	
 	@Override
 	public int increaseCount(int boardNo) {
 		return boardDao.increaseCount(sqlSession,boardNo);

@@ -37,5 +37,7 @@ public interface BoardDao {
 
 	int deleteAttachment(SqlSessionTemplate sqlSession, int fileNo);
 
+	int deleteBoard(SqlSessionTemplate sqlSession, int boardNo);
+
 
 }
