@@ -1,5 +1,6 @@
 package com.kh.cam.board.model.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -49,11 +50,6 @@ public class BoardServiceImpl implements BoardService {
 	}
 
 	@Override
-	public int updateBoard(Board b) {
-		return boardDao.updateBoard(sqlSession, b);
-	}
-
-	@Override
 	public int checkLike(Map<String, Object> map) {
 		return boardDao.checkLike(sqlSession, map);
 
@@ -73,4 +69,42 @@ public class BoardServiceImpl implements BoardService {
 	public void insertLike(Map<String, Object> map) {
 		boardDao.insertLike(sqlSession, map);
 	}
+
+	@Override
+	public int insertReport(Map<String, Object> map) {
+		return boardDao.insertReport(sqlSession, map);
+	}
+
+	@Override
+	public ArrayList<Attachment> selectAttachmentList(int boardNo) {
+		return boardDao.selectAttachmentList(sqlSession, boardNo);
+	}
+
+	@Override
+	@Transactional
+	public int updateBoard(Board b, List<Attachment> list, String deleteFileNos) { // 3개로 수정
+	    int result = boardDao.updateBoard(sqlSession, b);
+	    
+	    if(result > 0) {
+	        // 기존 파일 삭제 로직
+	        if(deleteFileNos != null && !deleteFileNos.equals("")) {
+	            String[] nos = deleteFileNos.split(",");
+	            for(String fileNo : nos) {
+	                // 이 부분에 빨간불이 들어온다면 아래 3번 과정을 진행하세요.
+	                boardDao.deleteAttachment(sqlSession, Integer.parseInt(fileNo));
+	            }
+	        }
+
+	        // 새 파일 추가 로직
+	        if(list != null && !list.isEmpty()) {
+	            for(Attachment at : list) {
+	                at.setTargetNo(b.getBoardNo());
+	                result += boardDao.insertFiles(sqlSession, at);
+	            }
+	        }
+	    }
+	    return result;
+	}
+
+
 }
