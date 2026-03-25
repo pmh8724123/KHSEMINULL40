@@ -1,9 +1,7 @@
 package com.kh.cam.member.model.service;
 
-import java.util.Collections;
 import java.util.List;
 
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.kh.cam.common.model.vo.Department;
 import com.kh.cam.common.model.vo.University;
 import com.kh.cam.member.model.dao.MemberDao;
+import com.kh.cam.member.model.vo.CustomUserDetails;
 import com.kh.cam.member.model.vo.Member;
 
 import lombok.RequiredArgsConstructor;
@@ -42,14 +41,10 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 		Member member = mDao.loadUserByUsername(username);
 		
 		if(member == null) {
-			throw new UsernameNotFoundException(username);
+			throw new UsernameNotFoundException("존재하지 않는 사용자 : " + username);
 		}
 		
-		return new org.springframework.security.core.userdetails.User(
-	            member.getMemId(),
-	            member.getMemPw(),
-	            Collections.singletonList(new SimpleGrantedAuthority("USER"))
-	    );
+		return new CustomUserDetails(member);
 	}
 
 }

@@ -20,6 +20,14 @@ const uniMsg = document.getElementById("uniMsg");
 // 학과 변수
 const dept = document.getElementById("deptSelect");
 const deptMsg = document.getElementById("deptMsg");
+
+// 학번 변수
+const sno = document.getElementById("studentNo");
+const snoMsg = document.getElementById("snoMsg");
+
+// 전화번호 변수
+const phone = document.getElementById("phone");
+const pMsg = document.getElementById("phoneMsg");
 		
 // 아이디 이벤트리스너
 memId.addEventListener("input", function() {
@@ -78,7 +86,7 @@ uni.addEventListener("change", function() {
 
 	if(uniNo == "") {
 		dept.innerHTML = "<option value=''>학과 선택</option>";
-		uniMsg.innerHTML = "학교를 선택해 주세요"
+		uniMsg.innerHTML = "학교를 선택해 주세요";
 		return;
 	}
 
@@ -98,9 +106,29 @@ uni.addEventListener("change", function() {
 // 학과 선택 이벤트리스너
 dept.addEventListener("change", function() {
 	if(dept.value == "") {
-		deptMsg.innerHTML = "학과를 선택해 주세요"
+		deptMsg.innerHTML = "학과를 선택해 주세요";
 		return;
 	}
 
 	deptMsg.innerHTML = "&nbsp;";
+});
+
+// 학번 리스너
+sno.addEventListener("input", function() {
+	if(this.value == "") {
+		snoMsg.innerHTML = "학번을 입력해 주세요";
+		return;
+	}
+
+	snoMsg.innerHTML = "&nbsp;";
+});
+
+// 전화번호 리스너
+phone.addEventListener("input", function() {
+	if(this.value == "") {
+		pMsg.innerHTML = "전화번호를 입력해 주세요";
+		return;
+	}
+
+	pMsg.innerHTML = "&nbsp;";
 });

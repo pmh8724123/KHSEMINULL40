@@ -1,5 +1,6 @@
 package com.kh.cam.board.model.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +35,7 @@ public class BoardDaoImpl implements BoardDao {
 
 	@Override
 	public Board selectBoard(SqlSessionTemplate sqlSession, int boardNo) {
-		return sqlSession.selectOne("selectBoard",boardNo);
+		return sqlSession.selectOne("board.selectBoard",boardNo);
 	}
 
 	@Override
@@ -60,5 +61,20 @@ public class BoardDaoImpl implements BoardDao {
 	@Override
 	public void insertLike(SqlSessionTemplate sqlSession, Map<String, Object> map) {
 		sqlSession.insert("board.insertLike", map);
+	}
+
+	@Override
+	public int insertReport(SqlSessionTemplate sqlSession, Map<String, Object> map) {
+		return sqlSession.insert("board.insertReport",map);
+	}
+
+	@Override
+	public ArrayList<Attachment> selectAttachmentList(SqlSessionTemplate sqlSession, int boardNo) {
+		return (ArrayList)sqlSession.selectList("board.selectAttachmentList", boardNo);
+	}
+
+	@Override
+	public int deleteAttachment(SqlSessionTemplate sqlSession, int fileNo) {
+		return sqlSession.delete("board.deleteAttachment", fileNo);
 	}
 }

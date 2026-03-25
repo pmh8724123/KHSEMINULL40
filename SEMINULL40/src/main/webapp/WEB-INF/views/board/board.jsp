@@ -142,7 +142,6 @@
             <li onclick="location.href='list?category=free'" class="${cur == 'free' ? 'active' : ''}">자유게시판</li>
             <li onclick="location.href='list?category=qna'" class="${cur == 'qna' ? 'active' : ''}">질문답변</li>
             <li onclick="location.href='list?category=accident'" class="${cur == 'accident' ? 'active' : ''}">사건사고</li>
-            <li onclick="location.href='list?category=notice'" class="${cur == 'notice' ? 'active' : ''}">공지사항</li>
         </ul>
 
         <div class="post-container">

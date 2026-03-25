@@ -14,12 +14,14 @@
 	
 	<security:http auto-config="true">
 		<security:intercept-url pattern="/" access="permitAll"/>
-		<security:intercept-url pattern="/member/login" access="permitAll"/>
 		<security:intercept-url pattern="/member/register" access="permitAll"/>
 	
-		<security:form-login login-page="/member/login" login-processing-url="/member/loginProcess" username-parameter="memId" password-parameter="memPw" default-target-url="/board/list"/>
+		<security:form-login login-page="/" login-processing-url="/member/loginProcess" username-parameter="memId" password-parameter="memPw" default-target-url="/board/list"/>
 		<security:logout logout-url="/member/logout" invalidate-session="true" logout-success-url="/"/>
 	
+	
+		<security:intercept-url pattern="/admin" access="permitAll"/>
+		
 		<!-- <security:remember-me data-source-ref="datasource" token-validity-seconds="1209600"/> -->
 	</security:http>
 	

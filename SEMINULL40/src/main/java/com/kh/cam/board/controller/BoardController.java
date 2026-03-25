@@ -4,16 +4,17 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date; // java.sql.Date 대신 java.util.Date를 사용하세요
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
-import org.springframework.beans.factory.annotation.Autowired; // 추가
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelExtensionsKt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,57 +33,42 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class BoardController {
 	
-	// 1. Service 주입 (이 부분이 있어야 BoardService.메소드 호출이 가능합니다)
 	@Autowired
 	private BoardService boardService; 
 
+	// 게시글 목록 조회
 	@GetMapping("/list")
 	public String boardList(
 			@RequestParam(value="category", required=false, defaultValue="all") String category,
 			Model model) {
-		log.info("현재 선택된 카테고리: {}", category);
-		
 		List<Board> list = boardService.selectBoardList(category);
-		
-		model.addAttribute("boardList",list);
-		model.addAttribute("cur",category);
-		
+		model.addAttribute("boardList", list);
+		model.addAttribute("cur", category);
 		return "board/board";
 	}
 	
+	// 글쓰기 페이지 이동
 	@GetMapping("/write")
-	public String writeForm(
-			@RequestParam(value="category", required=false) String category,
-			Model model) {
-		log.info("글쓰기 진입 카테고리: {}", category);
+	public String writeForm(@RequestParam(value="category", required=false) String category) {
 		return "board/writeBoard";
 	}
 	
+	// 게시글 등록
 	@PostMapping("/insert.bo")
-	public String insertBoard(Board b, String category, MultipartFile[] upfiles, HttpSession session) {
-	    
-	    // 카테고리 매핑 로직
-	    int ubtypeNo = 1; 
-	    if("qna".equals(category)) ubtypeNo = 2;
-	    else if("notice".equals(category)) ubtypeNo = 3;
-	    b.setUbtypeNo(ubtypeNo);
-
-	    b.setBoardWriter(1); // 테스트용
+	public String insertBoard(Board b, MultipartFile[] upfiles, HttpSession session) {
+	    // b.getUbtypeNo()에 JSP에서 선택한 1, 2, 3이 자동으로 들어옵니다.
+	    b.setBoardWriter(1); // 로그인 기능 구현 전 테스트용
 
 	    List<Attachment> list = new ArrayList<>();
-	    String savePath = session.getServletContext().getRealPath("/resources/upload_files/");
-	    
-	    File dir = new File(savePath);
-	    if(!dir.exists()) dir.mkdirs();
-
 	    if(upfiles != null) {
+	        String savePath = session.getServletContext().getRealPath("/resources/upload_files/");
+	        makeDirectory(savePath); // 폴더 생성 공통 메서드 호출
+
 		    for(MultipartFile f : upfiles) {
 		        if(!f.getOriginalFilename().equals("")) {
-		            String originName = f.getOriginalFilename();
 		            String changeName = saveFile(f, savePath); 
-
 		            Attachment at = new Attachment();
-		            at.setOriginName(originName);
+		            at.setOriginName(f.getOriginalFilename());
 		            at.setChangeName(changeName);
 		            at.setTargetType("BOARD");
 		            list.add(at);
@@ -90,109 +76,101 @@ public class BoardController {
 		    }
 	    }
 
-	    // 2. 주입받은 변수명(소문자 boardService)으로 호출해야 합니다.
 	    int result = boardService.insertBoard(b, list);
-
-	    if(result > 0) {
-	        return "redirect:/board/list";
-	    } else {
-	        return "common/errorPage"; 
-	    }
+	    return (result > 0) ? "redirect:/board/list" : "common/errorPage";
 	}
 
-	// 파일명 변경 및 서버 저장 메소드
+	// 수정페이지 이동
+	@GetMapping("/updateForm")
+	public String updateForm(@RequestParam("boardno") int boardNo, Model model) {
+		model.addAttribute("b", boardService.selectBoard(boardNo));
+		
+		model.addAttribute("list",boardService.selectAttachmentList(boardNo));
+		return "board/writeBoard";		
+	}
+	
+	// 게시글 수정
+	@PostMapping("/update.bo")
+	public String updateBoard(Board b, MultipartFile[] upfiles,
+			  String deleteFileNos
+			, HttpSession session) {
+		
+		List<Attachment> list = new ArrayList<>();
+		
+		// 새로운 첨부파일이 있는지 확인
+		if(upfiles !=null) {
+			String savePath = session.getServletContext().getRealPath("resources/upload_files/");
+			for(MultipartFile f : upfiles) {
+				if(!f.getOriginalFilename().equals("")) {
+					String changeName = saveFile(f,savePath);
+					Attachment at = new Attachment();
+					at.setOriginName(f.getOriginalFilename());
+					at.setChangeName(changeName);
+					at.setTargetType("BOARD");
+					at.setTargetNo(b.getBoardNo());
+					list.add(at);
+				}
+			}
+		}
+		
+		
+		
+		// JSP에서 <select name="ubtypeNo"> 값을 보내므로 b.ubtypeNo에 자동 매핑됨
+		int result = boardService.updateBoard(b, list);
+		return (result > 0) ? "redirect:/board/detail?boardno=" + b.getBoardNo() : "common/errorPage";
+	}
+	
+	// 게시글 상세보기
+	@GetMapping("/detail")
+	public String boardDetail(@RequestParam("boardno") int boardNo, Model model) {
+		if(boardService.increaseCount(boardNo) > 0) {
+			model.addAttribute("b", boardService.selectBoard(boardNo));
+			model.addAttribute("list", boardService.selectAttachmentList(boardNo));
+			return "board/boardDetail";
+		} else {
+			model.addAttribute("errorMsg", "게시글 조회 실패");
+			return "common/errorPage";
+		}
+	}
+
+	// --- 공통 메서드 (중복 제거) ---
+
+	private void makeDirectory(String path) {
+	    File dir = new File(path);
+	    if(!dir.exists()) dir.mkdirs();
+	}
+
 	private String saveFile(MultipartFile upfile, String savePath) {
 	    String originName = upfile.getOriginalFilename();
-	    
-	    // java.util.Date를 사용하여 현재 시간 구하기
 	    String currentTime = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
 	    int ranNum = (int)(Math.random() * 90000 + 10000);
 	    String ext = originName.substring(originName.lastIndexOf("."));
 	    
 	    String changeName = currentTime + ranNum + ext;
-
 	    try {
 	        upfile.transferTo(new File(savePath + changeName));
 	    } catch (IOException e) {
-	        e.printStackTrace();
+	        log.error("파일 저장 오류: {}", e.getMessage());
 	    }
 	    return changeName;
 	}
 
-	// 수정페이지로 이동 (기존 데이터 조회)
-	@GetMapping("/updateForm")
-	public String updateForm(@RequestParam("boardno")int boardNo, Model model) {
-		
-		Board b = boardService.selectBoard(boardNo);
-		
-		model.addAttribute("b",b);
-		
-		return "board/writeBoard";		
-	}
-	
-	
-	@PostMapping("/update.bo")
-	public String updateBoard(Board b, HttpSession session) {
-		
-		System.out.println("수정 요청 게시글 정보" + b);
-		
-		int result = boardService.updateBoard(b);
-		
-		if(result > 0) {
-			return "redirect:/board/detail?boardno=" + b.getBoardNo();
-		}else {
-			return "common/errorPage";
-		}
-	}
-	
-	
-	// 게시판 상세보기
-	@GetMapping("/detail")
-	public String boardDetail(@RequestParam("boardno")int boardNo, Model model) {
-		
-		// 1. 조회수 증가 (Service에서 처리)
-		int result = boardService.increaseCount(boardNo);
-		
-		if(result > 0) {
-			// 2. 게시글 상세 정보 조회
-			Board b = boardService.selectBoard(boardNo);
-			
-			// 3. 댓글 리스트 조회(나중에 구현)
-			// List<Reply> rList = boardService.selectReplyList(boardNo);
-			
-			model.addAttribute("b",b);
-			// model.addAttribute("rList",rList);
-			
-			return "board/boardDetail";
-		}else {
-			model.addAttribute("errorMsg","게시글 조회 실패");
-			return "common/errorPage";
-		}
-		
-	}
-	
-	// 좋아요 상태 확인(추가/삭제)
+	// --- Ajax 응답 메서드들 ---
+
 	@ResponseBody
 	@PostMapping(value = "/like", produces = "text/html; charset=UTF-8")
 	public String boardLike(int boardNo, int memNo) {
-		
 		Map<String, Object> map = new HashMap<>();
-		map.put("boardNo",boardNo);
+		map.put("boardNo", boardNo);
 		map.put("memNo", memNo);
 		
-		// 이미 좋아요를 눌렀는지 체크
-		int check = boardService.checkLike(map);
-		
-		if(check > 0) {
-			// 이미 했으면 삭제
+		if(boardService.checkLike(map) > 0) {
 			boardService.deleteLike(map);
 			return "delete";
-		}else {
-			// 없으면 등록
+		} else {
 			boardService.insertLike(map);
 			return "insert";
 		}
-		
 	}
 		
 	@ResponseBody
@@ -201,9 +179,16 @@ public class BoardController {
 		return boardService.selectLikeCount(boardNo);
 	}
 	
+	@GetMapping("/report")
+	public String report(@RequestParam("boardNo") int boardNo, Model model) {
+		model.addAttribute("boardNo", boardNo);
+		return "board/report";		
+	}
 	
-	
-	
-	
-	
+	@ResponseBody
+	@PostMapping(value = "/report", produces = "text/html; charset=UTF-8")
+	public String insertReport(@RequestParam Map<String, Object> map) {
+	    map.put("reportMem", 1); // 테스트용 유저 번호
+	    return (boardService.insertReport(map) > 0) ? "success" : "fail";
+	}
 }
