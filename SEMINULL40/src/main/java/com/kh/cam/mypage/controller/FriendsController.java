@@ -7,6 +7,8 @@ import java.util.Map;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,23 +17,42 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.kh.cam.member.model.service.MemberService;
 import com.kh.cam.member.model.vo.Member;
 import com.kh.cam.mypage.model.service.FriendsService;
 import com.kh.cam.mypage.model.vo.Friends;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @Controller
+@Slf4j
+@RequiredArgsConstructor
 public class FriendsController {
-	@Autowired
-	private FriendsService friendsService;
+	
+	
+	private final FriendsService fService;
+	private final MemberService mService;
+	
+	
+	private int getMemNo() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		String memName = auth.getName();
+		int result = mService.getMemNo(memName);
+		log.info("친구 값 : {}", result);
+		
+		
+		return result;
+	}
 
 	// 친구 추가 페이지 이동
 	@GetMapping("/addfriend")
 	public String addFriend(HttpSession session) {
 
 		// 세션에 로그인 정보가 없을때 로그인 창으로 보내기
-		if (session.getAttribute("loginUser") == null) {
-			return "redirect:/";
-		}
+//		if (session.getAttribute("loginUser") == null) {
+//			return "redirect:/";
+//		}
 		return "friends/addfriend";
 	}
 
@@ -42,8 +63,8 @@ public class FriendsController {
 	public List<Friends> searchMember(@RequestParam String keyword, HttpSession session) {
 
 		// 세션에서 로그인한 사람의 memNo를 senderNo로 사용
-		Member loginUser = (Member) session.getAttribute("loginUser");
-		return friendsService.searchMember(loginUser.getMemNo(), keyword);
+		// Member loginUser = (Member) session.getAttribute("loginUser");
+		return fService.searchMember(getMemNo(), keyword);
 	}
 
 	// 친구 신청 (Ajax POST)
@@ -53,10 +74,10 @@ public class FriendsController {
 	public Map<String, String> friendRequest(@RequestBody Map<String, Integer> body, HttpSession session) {
 
 		// 세션에서 로그인한 사람의 memNo를 senderNo로 사용
-		Member loginUser = (Member) session.getAttribute("loginUser");
+		// Member loginUser = (Member) session.getAttribute("loginUser");
 
 		// body에서 receiverNo(요청 받는 사람 memNo) 꺼내서 전달
-		String result = friendsService.insertFriendRequest(loginUser.getMemNo(), body.get("receiverNo"));
+		String result = fService.insertFriendRequest(getMemNo(), body.get("receiverNo"));
 
 		Map<String, String> response = new HashMap<>();
 		response.put("result", result);
@@ -77,14 +98,14 @@ public class FriendsController {
 	@GetMapping("/acceptfriend")
 	public String acceptFriend(HttpSession session, Model model) {
 
-		if (session.getAttribute("loginUser") == null) {
-			return "redirect:/";
-		}
+		//if (session.getAttribute("loginUser") == null) {
+		//	return "redirect:/";
+		//}
 
-		Member loginUser = (Member) session.getAttribute("loginUser");
+		// Member loginUser = (Member) session.getAttribute("loginUser");
 
 		// 내 memNo를 receiverNo로 사용해서 대기 목록 조회
-		List<Friends> pendingList = friendsService.getPendingList(loginUser.getMemNo());
+		List<Friends> pendingList = fService.getPendingList(getMemNo());
 		model.addAttribute("pendingList", pendingList);
 
 		return "friends/acceptfriend";
@@ -96,11 +117,11 @@ public class FriendsController {
 	@ResponseBody
 	public Map<String, String> acceptFriend(@RequestBody Map<String, Integer> body, HttpSession session) {
 
-		Member loginUser = (Member) session.getAttribute("loginUser");
+		// Member loginUser = (Member) session.getAttribute("loginUser");
 
 		// body에서 senderNo(요청 보낸 사람 memNo) 꺼내서 전달
 		// 내 memNo를 receiverNo로 사용
-		String result = friendsService.acceptFriend(body.get("senderNo"), loginUser.getMemNo());
+		String result = fService.acceptFriend(body.get("senderNo"), getMemNo());
 
 		Map<String, String> response = new HashMap<>();
 		response.put("result", result);
@@ -113,11 +134,11 @@ public class FriendsController {
 	@ResponseBody
 	public Map<String, String> rejectFriend(@RequestBody Map<String, Integer> body, HttpSession session) {
 
-		Member loginUser = (Member) session.getAttribute("loginUser");
+		// Member loginUser = (Member) session.getAttribute("loginUser");
 
 		// body에서 senderNo(요청 보낸 사람 memNo) 꺼내서 전달
 		// 내 memNo를 receiverNo로 사용
-		String result = friendsService.rejectFriend(body.get("senderNo"), loginUser.getMemNo());
+		String result = fService.rejectFriend(body.get("senderNo"), getMemNo());
 
 		Map<String, String> response = new HashMap<>();
 		response.put("result", result);

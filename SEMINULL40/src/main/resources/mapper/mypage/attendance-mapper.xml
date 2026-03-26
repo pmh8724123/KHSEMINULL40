@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace = Dao 인터페이스 경로 (DaoImpl 아님 주의) -->
+<mapper namespace="attendance">
+
+	<!-- 오늘 출석 여부: TRUNC로 시간 제거 후 날짜만 비교 <select id="selectTodayAttendance" 
+		parameterType="int" resultType="int"> SELECT COUNT(*) FROM attendance WHERE 
+		mem_no = #{memNo} AND TRUNC(attend_Days) = TRUNC(SYSDATE) </select> 최근 7일 
+		출석 날짜 목록 (오늘 포함, 최신순) <select id="selectRecentDates" parameterType="int" 
+		resultType="java.util.Date"> SELECT TRUNC(attend_Days) FROM attendance LEFT 
+		JOIN MEMBER USING(USER_NO) WHERE mem_no = #{memNo} AND TRUNC(attend_Days) 
+		>= TRUNC(SYSDATE) - 6 ORDER BY ATTEND_DAYS DESC </select> -->
+	<!-- 출석 INSERT: 날짜는 서버 SYSDATE 사용 -->
+	
+	<insert id="updateAttend">
+		UPDATE attendance
+		SET COUNT = COUNT + 1, ATTEND_DAYS =
+		SYSDATE
+		WHERE MEM_NO = #{memNo}
+	</insert>
+
+	<select id="selectAttendCnt" resultType="int">
+		SELECT MAX(COUNT)
+		FROM ATTENDANCE
+		WHERE MEM_NO = #{memNo}
+	</select>
+
+
+	<select id="checkToday" resultType="int">
+		SELECT COUNT(*)
+		FROM
+		ATTENDANCE
+		WHERE MEM_NO = #{memNo}
+		AND TRUNC(ATTEND_DAYS) =
+		TRUNC(SYSDATE)
+	</select>
+
+	<insert id="insertAttendance">
+		MERGE INTO ATTENDANCE a
+		USING DUAL ON (a.MEM_NO = #{memNo})
+		WHEN MATCHED THEN
+		UPDATE SET ATTEND_DAYS = SYSDATE,
+		COUNT = a.COUNT + 1
+		WHERE TRUNC(ATTEND_DAYS) <![CDATA[ < ]]> TRUNC(SYSDATE) -- 오늘 이미 했으면 업데이트 안 함
+		WHEN NOT MATCHED THEN
+		INSERT (MEM_NO, ATTEND_DAYS, COUNT)
+		VALUES (#{memNo}, SYSDATE, 1)
+	</insert>
+
+	<select id="getTotalCount" resultType="int">
+		SELECT MAX(COUNT)
+		FROM
+		ATTENDANCE
+		WHERE MEM_NO = #{memNo}
+	</select>
+</mapper>

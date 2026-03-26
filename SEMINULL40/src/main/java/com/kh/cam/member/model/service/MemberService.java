@@ -14,4 +14,6 @@ public interface MemberService {
 
 	List<Department> selectDeptList(int uniId);
 
+	int getMemNo(String memName);
+
 }

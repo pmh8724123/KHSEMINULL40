@@ -9,7 +9,7 @@
 <meta name="_csrf" content="${_csrf.token}" />
 <meta name="_csrf_header" content="${_csrf.headerName}" />
 
-
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 <!-- 1순위 적용 -->
 <link rel="stylesheet" href="${path}/resources/css/mainpage.css">
 
@@ -22,10 +22,10 @@
 
 <link rel="stylesheet" href="${path}/resources/css/setting.css">
 
+
 <!-- =============================================
-     전체 마이페이지 + 출석체크 통합 스타일
-     색상 기조: 기존 파란 계열 (#A1CFFF, #4a90e2) + 보라 계열 (#534AB7) 유지
-     변경 항목: 레이아웃 간격 / 타이포 / 카드 그림자 / 탭 버튼 전환 효과
+     공통 마이페이지 스타일 
+     색상 : 기존 파란 계열 (#A1CFFF, #4a90e2) + 보라 계열 (#534AB7)
 ============================================= -->
 <style>
 
@@ -33,8 +33,7 @@
    마이페이지 전체를 감싸는 최상위 박스            */
 .mypage-container {
 	width: 800px;
-	margin: 50px auto;
-	/* 추가: 좌우 여백 확보 (작은 화면 대비) */
+	margin: 50px auto; /* 좌우 여백 확보 (작은 화면 대비) */
 	padding: 0 16px;
 	box-sizing: border-box;
 }
@@ -42,11 +41,11 @@
 /* ── 페이지 제목 ────────────────────────────────
    "마이페이지" 타이틀 영역                        */
 .title {
-	margin-bottom: 24px; /* 기존 20px → 여백 살짝 넓힘 */
+	margin-bottom: 24px;
 	font-size: 26px;
 	font-weight: 700;
 	color: #1a1a1a;
-	letter-spacing: -0.5px; /* 추가: 자간 조임으로 타이틀 정돈 */
+	letter-spacing: -0.5px; /* 자간 조임으로 타이틀 정돈 */
 }
 
 /* ── 탭 버튼 감싸는 래퍼 ───────────────────────
@@ -54,7 +53,7 @@
 .tab-wrapper {
 	display: flex;
 	justify-content: center;
-	margin: 0 0 0px 0; /* 기존 30px → 탭과 콘텐츠 간격 제거 (탭-콘텐츠 연결감) */
+	margin: 0 0 0px 0;
 }
 
 /* ── 탭 버튼 묶음 ───────────────────────────────     */
@@ -76,16 +75,16 @@
 	justify-content: center;
 	width: 200px;
 	padding: 10px 20px;
-	border: 1px solid #4a90e2; /* 기존 색상 유지 */
+	border: 1px solid #4a90e2;
 	background: white;
 	cursor: pointer;
 	border-radius: 10px;
 	font-size: 14px;
 	font-weight: 500;
-	color: #4a90e2; /* 추가: 텍스트도 파란색 계열로 통일 */
+	color: #4a90e2;
 	transition: background 0.2s, color 0.2s, transform 0.1s;
-	/* 추가: 전환 애니메이션 */
-	display: flex; /* 추가: 아이콘 + 텍스트 수직 정렬 */
+	/* 전환 애니메이션 */
+	display: flex;
 	align-items: center;
 	gap: 6px;
 }
@@ -127,7 +126,7 @@
 }
 
 /* ── 활성화된 패널 ──────────────────────────────
-   선택된 탭 내용만 보임                           */
+   선택됐을 때만 보이게 선택은 .active로 구별                          */
 .tab-panel.active {
 	display: block;
 }
@@ -143,11 +142,6 @@
 	max-height: 500px;
 }
 </style>
-
-
-
-
-
 
 
 
@@ -200,6 +194,7 @@
             // 모든 탭 버튼에서 active 제거
             document.querySelectorAll(".tab-btn")
                     .forEach(btn => btn.classList.remove("active"));
+            
 
             // 모든 탭 패널 숨김
             document.querySelectorAll(".tab-panel")
@@ -234,15 +229,17 @@
 						<p class="att-sub">7일 출석하고 포인트를 받으세요!</p>
 					</div>
 					<div style="text-align: right">
-						<!-- JS attRender()가 동적으로 숫자 업데이트 -->
-						<div class="att-day-num" id="attDayNum">1</div>
+
+						<div class="att-day-num" id="attDayNum">${attendCnt}</div>
 						<div class="att-day-label">일차</div>
 					</div>
 				</div>
 
 				<!-- 출석 체크 버튼 -->
 				<div class="att-btn-wrap">
-					<button class="att-btn" id="attBtn">출석 체크하기</button>
+					<form action="${path}/attendance/check">
+						<button class="att-btn" id="attBtn">출석 체크하기</button>
+					</form>
 				</div>
 
 				<!-- 7개 날짜 도형 컨테이너 (JS가 동적 생성) -->
@@ -256,7 +253,7 @@
 						<span id="attProgLabel">0 / 7일</span>
 					</div>
 					<div class="att-prog-bar">
-						<!-- JS가 width % 를 조절해 진행률 표시 -->
+						<!-- JS가 width를 백분율로 진행률 표시 -->
 						<div class="att-prog-fill" id="attProgFill" style="width: 0%"></div>
 					</div>
 				</div>
@@ -268,11 +265,110 @@
 			<!-- /att-card -->
 
 			<script>
-			    var CSRF_TOKEN   = '${_csrf.token}';
-			    var CSRF_HEADER  = '${_csrf.headerName}';
-			    var CONTEXT_PATH = '<%=request.getContextPath()%>';
+ 			
+ 			var token = $("meta[name='_csrf']").attr("content");
+ 			var header = $("meta[name='_csrf_header']").attr("content");
+			
+ 			
+			// UI 업데이트 함수 (도형 생성 + 진행바 + 레이블)
+	        function updateAttendanceUI(count) {
+		        const maxDays = 7; // 목표 일수
+		        
+		        const currentCount = parseInt(count);
+	            // (1) 상단 큰 숫자 업데이트
+	            $("#attDayNum").text(currentCount);
+
+	            // (2) 7개 도트(도형) 동적 생성 및 상태 표시
+	            let dotsHtml = "";
+	            for (let i = 1; i <= maxDays; i++) {
+	                let statusClass = "";
+	                let content = i + "일";
+
+	                if (i <= currentCount) {
+	                    statusClass = "done"; // 출석 완료
+	                    content = "✓";
+	                } else if (i === currentCount + 1 && currentCount < maxDays) {
+	                    statusClass = "today"; // 다음 출석 예정
+	                }
+
+	                dotsHtml += '<div class="att-dot ' + statusClass + '">' +
+                    '  <span>' + content + '</span>' +
+                    '  <span class="di">' + (i <= currentCount ? "완료" : "일차") + '</span>' +
+                    '</div>';
+	            }
+	            $("#attDots").html(dotsHtml);
+
+	            
+	            
+	            
+	            // (3) 진행률 바 및 레이블 업데이트
+	            let progressPercent = (currentCount / maxDays) * 100;
+	            if (progressPercent > 100) progressPercent = 100; // 7일 넘어가도 100% 고정
+	            if (progressPercent < 0) progressPercent = 0;
+	            
+	            console.log("계산된 퍼센트:", progressPercent);
+
+	            $("#attProgFill").css("width", progressPercent + "%");
+	            $("#attProgLabel").text(currentCount + " / " + maxDays + "일");
+
+	            // (4) 보상 메시지 처리
+	            if (currentCount >= maxDays) {
+	                $("#attReward").text("🎉 7일 출석 완료! 보상이 지급되었습니다.");
+	                $("#attBtn").prop("disabled", true).text("출석 완료");
+	            }
+	        }
+ 			
+ 			
+			    $(document).ready(function() {
+			        // 1. 서버에서 전달받은 출석 횟수 (EL 사용)
+			        // 만약 EL이 작동하지 않는 환경이라면 $("#attDayNum").text()로 가져옵니다.
+			        let attendCount = Number("${attendCnt}"); 
+    				console.log("초기 출석수:", attendCount);
+					
+    				if(isNaN(attendCount)) {
+    					attendCount = 0;
+    				}
+    				
+			        // 초기 화면 업데이트 실행
+			        updateAttendanceUI(attendCount);
+
+			        // 2. 출석 체크 버튼 클릭 이벤트 (AJAX)
+			        $("#attBtn").on("click", function(e) {
+			            e.preventDefault(); // 폼 기본 제출 막기
+			            $.ajax({
+			                url: "${path}/attendance/check",
+			                type: "POST",
+			                beforeSend: function(xhr) {
+			                    xhr.setRequestHeader(header, token); // 토큰 전달 필수!
+			                },
+			                success: function(res) {
+			                    if (res === "success") {
+			                        alert("출석 체크가 완료되었습니다!");
+			                        location.href = "${path}/member/mypage";
+			                        location.reload();
+			                        $("#attBtn").prop("disabled", true).text("출석 완료");
+			                        
+			                    } else if (res === "already_done") {
+			                        alert("오늘은 이미 출석하셨습니다. 내일 다시 참여해주세요!");
+			                        location.href = "${path}/member/mypage";
+			                    } else {
+			                        alert("로그인이 필요한 서비스입니다.");
+			                    }	
+			                },
+			                error: function() {
+			                    alert("서버 통신 오류가 발생했습니다.");
+			                }
+			            });
+			            
+			            updateAttendanceUI(attendCount);
+			            
+			        });
+
+			    });
+			    
+			    
 			</script>
-			<script src="${path}/resources/js/attendance.js"></script>
+
 
 		</div>
 		<!-- /attendance -->
@@ -315,9 +411,9 @@
                     <img src="${path}/resources/profile/${f.profileImg}"
                          class="profile-img" alt="${f.memName} 프로필"> --%>
 							<div class="friend-text">
-								<!-- 친구 이름 (receiverNo 기준으로 상대방 이름 표시) -->
+								<!-- 친구 이름 / receiverNo(memNo) 기준으로 상대방 이름 표시 -->
 								<span class="friend-name">${f.memName}</span>
-								<!-- 온라인 여부: status 'O' = 온라인 -->
+								<!-- 온라인 여부 / status 'O' = 온라인 -->
 								<c:choose>
 									<c:when test="${f.status eq 'O'}">
 										<span class="online">온라인</span>
@@ -338,7 +434,7 @@
 		<!-- ── 시간표 패널 ─────────────────────────────── -->
 		<div id="timetable" class="tab-panel">
 
-			<!-- 상단 바: 시간표 선택 드롭다운(좌) + +/- 버튼(우) -->
+			<!-- 상단 바: 시간표 선택 드롭다운(좌) ,  +/- 버튼(우) -->
 			<div class="tt-topbar">
 				<div class="tt-title-wrap" id="ttTitleWrap">
 					<!-- 드롭다운 버튼: onclick 제거, id 추가 -->
@@ -348,10 +444,10 @@
 					</button>
 					<div class="tt-dropdown" id="ttDropdown"></div>
 					<div class="tt-plusminus">
-						<!-- + 버튼: onclick 제거, id 추가 -->
+						<!--  + 버튼 : prompt로 강의 제목을 받고, 그 강의에 대한 요일, 시간 설정 -->
 						<button id="ttBtnAdd" title="시간표 추가" style="color: #4a90e2">+</button>
 
-						<!-- − 버튼: onclick 제거, id 추가 -->
+						<!--  - 버튼 : 클릭 시 삭제 모드 활성화  -->
 						<button id="ttBtnMinus" title="시간표 삭제" style="color: #E24B4A">−</button>
 					</div>
 				</div>
@@ -433,11 +529,6 @@
 							onchange="previewProfile(this)">
 					</div>	--%>
 
-					<!-- 이름 -->
-					<div class="setting-field">
-						<label>이름</label> <input type="text" id="settingName"
-							placeholder="새 이름을 입력하세요" value="${loginUser.memName}">
-					</div>
 
 					<!-- 아이디 -->
 					<div class="setting-field">
@@ -445,10 +536,16 @@
 							placeholder="새 아이디를 입력하세요" value="${loginUser.memId}">
 					</div>
 
-					<!-- 이메일 -->
+					<!-- 학번 -->
 					<div class="setting-field">
-						<label>이메일</label> <input type="email" id="settingEmail"
-							placeholder="새 이메일을 입력하세요" value="${loginUser.email}">
+						<label>학번</label> <input type="text" id="settingName"
+							placeholder="새 학번을 입력하세요" value="${loginUser.studentNo}">
+					</div>
+
+					<!-- 전화번호 -->
+					<div class="setting-field">
+						<label>전화번호</label> <input type="email" id="settingEmail"
+							placeholder="새 전화번호를 입력하세요" value="${loginUser.phone}">
 					</div>
 
 					<!-- 학과 번호 -->
@@ -572,8 +669,8 @@
 
 			// 회원탈퇴
 			function confirmWithdraw() {
-			    if (confirm('정말 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
-			        location.href = '${path}/withdraw';
+			    if (confirm('회원 탈퇴 페이지로 이동하시겠습니까?')) {
+			        location.href = '${path}/member/withdraw';
 			    }
 			}
 			

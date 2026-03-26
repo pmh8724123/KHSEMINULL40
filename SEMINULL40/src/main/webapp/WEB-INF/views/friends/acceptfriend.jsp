@@ -6,7 +6,7 @@
 
 <c:set var="path" value="${pageContext.request.contextPath}" />
 
-<!DOCTYPE html>
+
 <html>
 <head>
 <meta charset="UTF-8">
@@ -60,6 +60,7 @@
 	        // /acceptfriend/accept 또는 /acceptfriend/reject로 요청
 	        url  : '${path}/acceptfriend/' + action,
 	        type : 'POST',
+	        // 서버로 보내는 데이터 형식 지정
 	        contentType: 'application/json',
 	        data : JSON.stringify({ senderNo: senderNo }),
 	        headers: { '${_csrf.headerName}': '${_csrf.token}' },
@@ -74,6 +75,7 @@
 	                    '</span>';
 
 	                // 1.5초 후 해당 아이템 제거
+	                // 서서히 사라지게 만드는 효과(fade out)
 	                setTimeout(() => {
 	                    item.style.transition = 'opacity .3s';
 	                    item.style.opacity = '0';

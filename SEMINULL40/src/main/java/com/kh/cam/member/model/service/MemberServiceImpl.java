@@ -47,4 +47,9 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 		return new CustomUserDetails(member);
 	}
 
+	@Override
+	public int getMemNo(String memName) {
+		return mDao.getMemNo(memName);
+	}
+
 }

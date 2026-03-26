@@ -10,21 +10,36 @@ import java.util.List;
 @Repository
 public class AttendanceDaoImpl implements AttendanceDao{
 
+	
+	
     @Autowired
     private SqlSessionTemplate sqlSession;
 
     // 오늘 출석 여부 확인 (1: 출석함 / 0: 안 함)
-    public int selectTodayAttendance(int memNo) {
-        return sqlSession.selectOne("selectTodayAttendance", memNo);
-    }
-
-    // 최근 7일 출석 날짜 목록 조회 (연속 일차 계산용)
-    public List<Date> selectRecentDates(int memNo) {
-        return sqlSession.selectList("selectRecentDates", memNo);
+    public int selectAttendCnt(int memNo) {
+        Integer cnt = sqlSession.selectOne("attendance.selectAttendCnt", memNo);
+    	return (cnt == null) ? 0 : cnt;
     }
 
     // 출석 INSERT
-    public void insertAttendance(int memNo) {
-        sqlSession.insert("insertAttendance", memNo);
+    public int updateAttend(int memNo) {
+        return sqlSession.update("attendance.updateAttend", memNo);
     }
+
+	@Override
+	public int checkToday(int memNo) {
+		return sqlSession.selectOne("attendance.checkToday", memNo);
+	}
+
+	@Override
+	public int insertAttendance(int memNo) {
+		return sqlSession.insert("attendance.insertAttendance", memNo);
+	}
+
+	@Override
+	public int getTotalCount(int memNo) {
+		return sqlSession.selectOne("attendance.getTotalCount", memNo);
+	}
+
+
 }

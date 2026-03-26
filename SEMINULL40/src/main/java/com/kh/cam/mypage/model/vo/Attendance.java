@@ -1,5 +1,7 @@
 package com.kh.cam.mypage.model.vo;
 
+import java.util.Date;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,6 +10,6 @@ import lombok.NoArgsConstructor;
 public class Attendance {
 	
 	private int memNo;
-	private int AttendDays;
-	
+	private Date attendDays;
+	private int count;
 }

@@ -18,7 +18,7 @@ public class FriendsDaoImpl implements FriendsDao {
 
 	@Override
 	public List<Friends> getFriendList(int memNo) {
-		return sqlSession.selectList("getFriendList", memNo);
+		return sqlSession.selectList("friends.getFriendList", memNo);
 	}
 
 
@@ -28,7 +28,7 @@ public class FriendsDaoImpl implements FriendsDao {
 	@Override
 	public List<Friends> getPendingList(int receiverNo) {
 	    // receiverNo: 로그인한 사람의 memNo (내가 받은 요청만 조회)
-	    return sqlSession.selectList("getPendingList", receiverNo);
+	    return sqlSession.selectList("friends.getPendingList", receiverNo);
 	}
 
 	// 친구 수락
@@ -38,7 +38,7 @@ public class FriendsDaoImpl implements FriendsDao {
 	    Map<String, Object> map = new HashMap<>();
 	    map.put("senderNo",   senderNo);   // 요청 보낸 사람 memNo
 	    map.put("receiverNo", receiverNo); // 요청 받은 사람 memNo (내 memNo)
-	    return sqlSession.update("acceptFriend", map);
+	    return sqlSession.update("friends.acceptFriend", map);
 	}
 
 	// 친구 거절
@@ -48,7 +48,7 @@ public class FriendsDaoImpl implements FriendsDao {
 	    Map<String, Object> map = new HashMap<>();
 	    map.put("senderNo",   senderNo);   // 요청 보낸 사람 memNo
 	    map.put("receiverNo", receiverNo); // 요청 받은 사람 memNo (내 memNo)
-	    return sqlSession.delete("rejectFriend", map);
+	    return sqlSession.delete("friends.rejectFriend", map);
 	}
 
 	
@@ -60,7 +60,7 @@ public class FriendsDaoImpl implements FriendsDao {
 		Map<String, Object> map = new HashMap<>();
 		map.put("senderNo", senderNo); // 본인 제외 및 신청 여부 확인용
 		map.put("keyword", keyword); // 검색어
-		return sqlSession.selectList("searchMember", map);
+		return sqlSession.selectList("friends.searchMember", map);
 	}
 
 	
@@ -69,7 +69,7 @@ public class FriendsDaoImpl implements FriendsDao {
 	// FRIEND 테이블에 senderNo, receiverNo, status('N') 삽입
 	@Override
 	public int insertFriendRequest(Friends vo) {
-		return sqlSession.insert("insertFriendRequest", vo);
+		return sqlSession.insert("friends.insertFriendRequest", vo);
 	}
 
 	
@@ -81,7 +81,7 @@ public class FriendsDaoImpl implements FriendsDao {
 		Map<String, Object> map = new HashMap<>();
 		map.put("senderNo", senderNo); // 요청 보내는 사람 memNo
 		map.put("receiverNo", receiverNo); // 요청 받는 사람 memNo
-		return sqlSession.selectOne("checkAlreadyRequested", map);
+		return sqlSession.selectOne("friends.checkAlreadyRequested", map);
 	}
 
 }

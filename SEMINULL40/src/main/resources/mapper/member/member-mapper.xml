@@ -30,6 +30,8 @@
 		LEFT JOIN authorities a ON m.mem_no = a.mem_no
 		WHERE m.mem_id = #{userName}
 	</select>
+
+
 	<resultMap type="Member" id="memberInfo">
 		<id property="memNo" column="mem_no"/>
 		<result property="memId" column="mem_id"/>
@@ -56,13 +58,8 @@
 	</select>
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	<select id="getMemNo" resultType="int">
+		SELECT mem_no FROM member WHERE mem_id = #{memName}
+	</select>
+
 </mapper>

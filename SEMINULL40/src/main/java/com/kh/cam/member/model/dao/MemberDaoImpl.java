@@ -40,4 +40,9 @@ public class MemberDaoImpl implements MemberDao {
 		return session.selectOne("member.loadUserByUsername", username);
 	}
 
+	@Override
+	public int getMemNo(String memName) {
+		return session.selectOne("member.getMemNo", memName);
+	}
+
 }

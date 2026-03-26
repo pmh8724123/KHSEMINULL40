@@ -13,6 +13,9 @@
 	<security:http security="none" pattern="/resources/**"/>
 	
 	<security:http auto-config="true">
+		<security:intercept-url pattern="/attendance" access="permitAll"/>
+		
+	
 		<security:intercept-url pattern="/" access="permitAll"/>
 		<security:intercept-url pattern="/member/register" access="permitAll"/>
 	
