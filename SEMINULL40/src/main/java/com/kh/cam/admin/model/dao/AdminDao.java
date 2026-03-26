@@ -8,7 +8,7 @@ import com.kh.cam.mypage.model.vo.Lecture;
 
 public interface AdminDao {
 
-	List<Member> selectMemberList();
+	List<Member> selectMemberList(int uniNo);
 
 	int updateMemberStatus(int memNo, String status);
 	

@@ -21,7 +21,7 @@ public class AdminDaoImpl implements AdminDao{
 	private final SqlSessionTemplate session;
 
 	@Override
-	public List<Member> selectMemberList() {
+	public List<Member> selectMemberList(int uniNo) {
 		return session.selectList("admin.selectMemberList");
 	}
 	

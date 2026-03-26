@@ -16,7 +16,7 @@ public interface AdminService {
 
 	int updateMemberJoin(int memNo, String status);
 
-	List<Department> selectDepartmentList();
+	List<Department> selectDepartmentList(int uniNo);
 
 	int insertDepartment(Department dept);
 

@@ -40,7 +40,7 @@ public class AdminServiceImpl implements AdminService{
 	}
 
 	@Override
-	public List<Department> selectDepartmentList() {
+	public List<Department> selectDepartmentList(int uniNo) {
 		return adminDao.selectDepartmentList();
 	}
 	

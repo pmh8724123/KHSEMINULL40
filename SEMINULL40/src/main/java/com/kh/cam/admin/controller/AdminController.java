@@ -2,6 +2,11 @@ package com.kh.cam.admin.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
+import org.springframework.security.core.AuthenticatedPrincipal;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.kh.cam.admin.model.service.AdminService;
 import com.kh.cam.common.model.vo.Department;
+import com.kh.cam.member.model.vo.CustomUserDetails;
 import com.kh.cam.member.model.vo.Member;
 import com.kh.cam.mypage.model.vo.Lecture;
 
@@ -96,8 +102,11 @@ public class AdminController {
 // ---------------------학교관리----------------------------------
 	// 학과 관리 조회
 	@GetMapping("/department")
-	public String DepartmentList(Model model) {
-		List<Department> list = adminService.selectDepartmentList();
+	public String DepartmentList(Model model, @AuthenticationPrincipal CustomUserDetails user) {
+		
+		int uniNo = user.getMember().getUniNo();
+		
+		List<Department> list = adminService.selectDepartmentList(uniNo);
 
 		model.addAttribute("list", list);
 
@@ -106,17 +115,29 @@ public class AdminController {
 
 	// 학과 추가
 	@PostMapping("/department/insert")
-	public String insertDepartment(@ModelAttribute Department dept) {
-
+	public String insertDepartment(@ModelAttribute Department dept, HttpSession session) {
+		
 		dept.setUniNo(1); // 테스트
-//		asdasdasd
 		System.out.println("deptName: " + dept.getDeptName()); // 테스트
 		System.out.println("uniNo: " + dept.getUniNo()); // 테스트
 
 		adminService.insertDepartment(dept);
-
+		
 		return "redirect:/admin/department";
 	}
+	
+	// 학과 수정
+		@PostMapping("/department/update")
+		public String updateDepartment(@ModelAttribute Department dept) {
+			
+			dept.setUniNo(1); // 테스트
+			System.out.println("deptName: " + dept.getDeptName()); // 테스트
+			System.out.println("uniNo: " + dept.getUniNo()); // 테스트
+
+			adminService.insertDepartment(dept);
+			
+			return "redirect:/admin/department";
+		}
 
 	// 수업 관리
 	@GetMapping("/lecture")
@@ -134,7 +155,7 @@ public class AdminController {
 
 		adminService.insertLecture(lec);
 
-		return "redirect:/admin/Lecture";
+		return "redirect:/admin/lecture";
 	}
 
 // ---------------------게시판 관리----------------------------------
