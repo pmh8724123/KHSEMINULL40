@@ -173,7 +173,7 @@ table th:first-child, table td:first-child {
 }
 
 table th:last-child, table td:last-child {
-	width: 120px;
+	width: 200px;
 }
 
 /* 셀 */
@@ -212,13 +212,34 @@ tbody tr:hover {
 }
 
 .btn-reject {
+    background: #ffff80;
+    color: #000000;
+}
+
+.btn-reject:hover {
+    background: #ffff00;
+    transform: scale(1.05);
+}
+
+.btn-delete {
     background: #e74c3c;
     color: white;
 }
 
-.btn-reject:hover {
+.btn-delete:hover {
     background: #c0392b;
     transform: scale(1.05);
+}
+
+.action-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px; 
+}
+
+.action-box form {
+    margin: 0;
 }
 
 /* 🔥 카드 */

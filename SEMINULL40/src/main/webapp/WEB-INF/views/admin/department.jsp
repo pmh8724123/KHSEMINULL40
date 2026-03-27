@@ -72,7 +72,7 @@
 						<td>${d.deptName}</td>
 						<td>
 							<button class="btn btn-approve">수정</button>
-							<button class="btn btn-reject">삭제</button>
+							<button class="btn btn-delete">삭제</button>
 						</td>
 					</tr>
 					</c:forEach>
