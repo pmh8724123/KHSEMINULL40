@@ -1,21 +1,14 @@
 package com.kh.cam.mypage.model.service;
 
-import java.util.Date;
-import java.util.Map;
+import com.kh.cam.mypage.model.vo.Attendance;
 
 
 public interface AttendanceService {
 
-	int updateAttend(int memNo);
+	int insertAtt(int memNo);
 
-	int selectAttendCnt(int memNo);
+	Attendance selectAtt(int memNo);
 
-	int checkToday(int memNo);
-
-	int insertAttendance(int memNo);
-
-	
-
-
+	int updateAtt(int memNo);
 
 }

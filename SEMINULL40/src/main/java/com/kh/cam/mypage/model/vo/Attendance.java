@@ -12,4 +12,5 @@ public class Attendance {
 	private int memNo;
 	private Date attendDays;
 	private int count;
+	
 }

@@ -41,8 +41,8 @@ public class MemberDaoImpl implements MemberDao {
 	}
 
 	@Override
-	public int getMemNo(String memName) {
-		return session.selectOne("member.getMemNo", memName);
+	public String selectMemId(Member m) {
+		return session.selectOne("member.selectMemId", m);
 	}
 
 }

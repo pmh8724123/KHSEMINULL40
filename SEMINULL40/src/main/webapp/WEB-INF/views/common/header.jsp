@@ -143,7 +143,7 @@
 		<a href="${path}/board/list">게시판</a>
 		<a href="${path}/rating">평가</a>
 		<a href="${path}/timetable">시간표</a>
-		<a href="${path}/member/mypage">마이페이지</a>
+		<a href="${path}/mypage">마이페이지</a>
 		<a href="${path}/notice">공지사항</a>
 	</nav>
 </header>

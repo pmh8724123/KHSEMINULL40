@@ -18,6 +18,6 @@ public interface MemberDao {
 
 	Member loadUserByUsername(String username);
 
-	int getMemNo(String memName);
+	String selectMemId(Member m);
 
 }

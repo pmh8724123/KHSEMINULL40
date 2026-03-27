@@ -11,7 +11,7 @@
 			SELECT SEQ_MEM.NEXTVAL FROM DUAL
 		</selectKey>
 		
-		INSERT INTO member VALUES(SEQ_MEM.CURRVAL, #{memId}, #{memPw}, NULL, #{memName}, #{deptNo}, NULL, DEFAULT, DEFAULT)
+		INSERT INTO member VALUES(SEQ_MEM.CURRVAL, #{memId}, #{memPw}, #{studentNo}, #{memName}, #{deptNo}, #{phone}, DEFAULT, DEFAULT)
 	</insert>
 	
 	<select id="selectUniList" resultType="University">
@@ -57,9 +57,7 @@
 		WHERE MEM_NO = #{memNo}
 	</select>
 	
-	
-	<select id="getMemNo" resultType="int">
-		SELECT mem_no FROM member WHERE mem_id = #{memName}
+	<select id="selectMemId" resultType="String">
+		SELECT mem_id FROM member WHERE mem_name = #{memName} AND phone = #{phone}
 	</select>
-
 </mapper>
