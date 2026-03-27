@@ -13,19 +13,33 @@
 	<security:http security="none" pattern="/resources/**"/>
 	
 	<security:http auto-config="true">
+		<security:intercept-url pattern="/attendance" access="permitAll"/>
+		
+	
 		<security:intercept-url pattern="/" access="permitAll"/>
 		<security:intercept-url pattern="/member/register" access="permitAll"/>
+		<security:intercept-url pattern="/member/findIdPw" access="permitAll"/>
+		
+		
+		<security:intercept-url pattern="/board/**" access="hasRole('USER')"/>
+		<security:intercept-url pattern="/mypage" access="hasRole('USER')"/>
+		<security:intercept-url pattern="/mypage/**" access="hasRole('USER')"/>
+		<security:intercept-url pattern="/attendance/**" access="hasRole('USER')"/>
 	
+		<security:intercept-url pattern="/security/accessDenied" access="permitAll"/>
+		<security:intercept-url pattern="/admin" access="hasRole('ADMIN', 'MASTER')"/>
+		
 		<security:form-login login-page="/" login-processing-url="/member/loginProcess" username-parameter="memId" password-parameter="memPw" default-target-url="/board/list"/>
 		<security:logout logout-url="/member/logout" invalidate-session="true" logout-success-url="/"/>
-	
-	
-		<security:intercept-url pattern="/admin" access="permitAll"/>
 		
-		<!-- <security:remember-me data-source-ref="datasource" token-validity-seconds="1209600"/> -->
+		<security:remember-me data-source-ref="datasource" token-validity-seconds="1209600"/>
+		<security:access-denied-handler error-page="/member/waiting"/>
 	</security:http>
 	
-	<context:component-scan base-package="com.kh.cam.member"/>
+	<context:component-scan base-package="com.kh.cam.member">	
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+	
 
 	<security:authentication-manager>
     	<security:authentication-provider user-service-ref="memberServiceImpl">

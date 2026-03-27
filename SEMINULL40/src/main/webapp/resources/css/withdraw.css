@@ -1,0 +1,327 @@
+/* ================================================================
+   [ 회원탈퇴 페이지 전용 CSS ]
+
+   색상
+     - 메인 색상 : #4a90e2
+     - 선택 : #A1CFFF
+     - 경고 : #E24B4A
+================================================================ */
+
+
+/* ── 페이지 전체 여백 ──────────────────────────────────────────── */
+.withdraw-page {
+	width: 680px;
+	margin: 50px auto;
+	padding: 0 16px;
+	box-sizing: border-box;
+}
+
+/* ── 페이지 상단 제목 ─────────────────────────────────────────── */
+.withdraw-page-title {
+	font-size: 22px;
+	font-weight: 700;
+	color: #1a1a1a;
+	letter-spacing: -0.5px;
+	margin-bottom: 24px;
+	/* 왼쪽 빨간 세로선 : 경고성 페이지임을 시각적으로 암시 */
+	border-left: 4px solid #E24B4A;
+	padding-left: 12px;
+}
+
+/* ── 카드 본체 ────────────────────────────────────────────────── */
+/* 마이페이지의 setting-card / att-card 와 동일한 흰색 라운드 카드 형태 */
+.withdraw-card {
+	background: #fff;
+	border-radius: 16px;
+	padding: 36px 32px;
+	/* 마이페이지와 동일한 파란 계열 그림자 */
+	box-shadow: 0 4px 20px rgba(74, 144, 226, 0.12);
+}
+
+/* ── 카드 헤더 (아이콘 + 제목 + 부제) ────────────────────────── */
+.withdraw-card-header {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	margin-bottom: 28px;
+	padding-bottom: 20px;
+	/* 하단 구분선 */
+	border-bottom: 1.5px solid #f0f0f0;
+}
+
+/* 아이콘을 담는 정사각형 박스 */
+.withdraw-card-header .icon-box {
+	width: 52px;
+	height: 52px;
+	background: #fff0f0; /* 연한 빨강 배경으로 경고 느낌 */
+	border-radius: 14px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0; /* 부모가 좁아져도 아이콘 박스 크기 유지 */
+}
+
+.withdraw-card-header .icon-box i {
+	font-size: 24px;
+	color: #E24B4A;
+}
+
+/* 제목 텍스트 그룹 */
+.withdraw-card-header .header-text h2 {
+	font-size: 20px;
+	font-weight: 700;
+	color: #1a1a1a;
+	margin: 0 0 4px 0;
+}
+
+.withdraw-card-header .header-text p {
+	font-size: 13px;
+	color: #888;
+	margin: 0;
+}
+
+/* ── 탈퇴 시 삭제 항목 경고 박스 ─────────────────────────────── */
+/* 탈퇴 전 사용자가 인지해야 할 삭제 항목 목록을 시각적으로 강조 */
+.warn-box {
+	background: #fff8f8;
+	border: 1.5px solid #fdd;
+	border-radius: 12px;
+	padding: 18px 20px;
+	margin-bottom: 24px;
+}
+
+/* 경고 박스 상단 타이틀 */
+.warn-box .warn-title {
+	font-size: 13px;
+	font-weight: 700;
+	color: #E24B4A;
+	margin-bottom: 12px;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+/* 삭제 항목 목록 : 기본 ul 스타일 초기화 후 커스텀 불릿 적용 */
+.warn-box ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.warn-box ul li {
+	font-size: 13px;
+	color: #555;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+/* ::before 로 붉은 원형 불릿을 직접 그림 (li 마커 대체) */
+.warn-box ul li::before {
+	content: '';
+	width: 6px;
+	height: 6px;
+	background: #E24B4A;
+	border-radius: 50%;
+	flex-shrink: 0;
+}
+
+/* ── 카드 내부 구분선 ─────────────────────────────────────────── */
+.withdraw-divider {
+	height: 1px;
+	background: #f0f0f0;
+	margin: 24px 0;
+}
+
+/* ── 입력 필드 공통 래퍼 ──────────────────────────────────────── */
+.field-wrap {
+	margin-bottom: 16px;
+}
+
+.field-wrap label {
+	display: block;
+	font-size: 13px;
+	font-weight: 600;
+	color: #444;
+	margin-bottom: 7px;
+}
+
+/* 필수 항목 빨간 별표 */
+.field-wrap label .required {
+	color: #E24B4A;
+	margin-left: 2px;
+}
+
+/* input / select 공통 스타일 */
+.field-wrap input, .field-wrap select {
+	width: 100%;
+	padding: 11px 14px;
+	border: 1.5px solid #dde8f5;
+	border-radius: 10px;
+	font-size: 14px;
+	color: #1a1a1a;
+	background: #f8fbff;
+	box-sizing: border-box;
+	outline: none;
+	transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* 포커스 시 파란 테두리 + 은은한 글로우 */
+.field-wrap input:focus, .field-wrap select:focus {
+	border-color: #4a90e2;
+	box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.12);
+	background: #fff;
+}
+
+/* select 전용 : 기본 화살표 제거 후 커스텀 SVG 화살표 삽입 */
+.field-wrap select {
+	cursor: pointer;
+	appearance: none;
+	/*
+     * inline SVG를 data URI로 변환하여 background-image 로 삽입
+     * 외부 이미지 파일 없이 커스텀 드롭다운 화살표(▼)를 구현
+     * %23 = '#' URL 인코딩
+     */
+	background-image:
+		url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%234a90e2' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 14px center;
+	padding-right: 36px; /* 화살표와 텍스트가 겹치지 않도록 오른쪽 여백 확보 */
+}
+
+/* ── 동의 체크박스 영역 ───────────────────────────────────────── */
+/* 탈퇴에 동의한다는 명시적 확인 절차 */
+.agree-box {
+	background: #f8fbff;
+	border: 1.5px solid #dde8f5;
+	border-radius: 12px;
+	padding: 16px 18px;
+	margin-bottom: 20px;
+}
+
+.agree-box label {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	cursor: pointer;
+	font-size: 13px;
+	color: #444;
+	line-height: 1.6;
+}
+
+/* accent-color 로 체크박스 색상을 경고 색상으로 통일 */
+.agree-box input[type="checkbox"] {
+	width: 17px;
+	height: 17px;
+	accent-color: #E24B4A;
+	flex-shrink: 0;
+	margin-top: 2px;
+	cursor: pointer;
+}
+
+
+
+
+
+
+
+/* ── 유효성 / 오류 메시지 출력 영역 ──────────────────────────── */
+/* JS에서 textContent를 채워 에러 메시지를 표시 */
+.withdraw-hint {
+	font-size: 13px;
+	font-weight: 500;
+	min-height: 20px; /* 메시지가 없을 때도 레이아웃이 흔들리지 않도록 높이 확보 */
+	margin-bottom: 16px;
+	color: #E24B4A; /* 색상은 빨강 (에러용) */
+}
+
+
+
+
+
+
+/* ── 하단 버튼 행 ─────────────────────────────────────────────── */
+.withdraw-actions {
+	display: flex;
+	gap: 10px;
+	justify-content: flex-end; /* 버튼을 오른쪽 정렬 */
+}
+
+/* 취소 버튼 : 마이페이지와 동일한 파란 아웃라인 스타일 */
+.btn-cancel {
+	padding: 12px 28px;
+	border: 1.5px solid #4a90e2;
+	background: white;
+	border-radius: 10px;
+	font-size: 14px;
+	font-weight: 600;
+	color: #4a90e2;
+	cursor: pointer;
+	transition: background 0.2s, transform 0.1s;
+}
+
+.btn-cancel:hover {
+	background: #e8f4ff;
+	transform: translateY(-1px);
+}
+
+/* 탈퇴 확인 버튼 : 경고 강조 */
+.btn-withdraw {
+	padding: 12px 28px;
+	border: none;
+	background: #E24B4A;
+	border-radius: 10px;
+	font-size: 14px;
+	font-weight: 700;
+	color: white;
+	cursor: pointer;
+	box-shadow: 0 2px 8px rgba(226, 75, 74, 0.3);
+	transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+}
+
+.btn-withdraw:hover {
+	background: #c73b3a;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 14px rgba(226, 75, 74, 0.4);
+}
+
+/* disabled 상태 : Ajax 전송 중 중복 클릭 방지용 */
+.btn-withdraw:disabled {
+	background: #ccc;
+	box-shadow: none;
+	cursor: not-allowed;
+	transform: none;
+}
+
+
+
+
+/* ── 탈퇴 완료 화면 ───────────────────────────────────────────── */
+/* 기본은 숨겨두고, Ajax 성공 응답 시 JS로 display:block으로 전환해서 보이게 */
+.withdraw-success {
+	display: none;
+	text-align: center;
+	padding: 60px 0 40px;
+}
+
+.withdraw-success .success-icon {
+	font-size: 52px;
+	color: #4a90e2;
+	margin-bottom: 18px;
+}
+
+.withdraw-success h3 {
+	font-size: 20px;
+	font-weight: 700;
+	color: #1a1a1a;
+	margin-bottom: 8px;
+}
+
+.withdraw-success p {
+	font-size: 14px;
+	color: #888;
+	line-height: 1.7;
+}

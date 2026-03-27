@@ -1,9 +1,11 @@
 package com.kh.cam.member.controller;
 
-import java.security.Provider.Service;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,7 +24,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.kh.cam.common.model.vo.Department;
 import com.kh.cam.member.model.service.MemberService;
 import com.kh.cam.member.model.validator.MemberValidator;
+import com.kh.cam.member.model.vo.CustomUserDetails;
 import com.kh.cam.member.model.vo.Member;
+import com.kh.cam.mypage.model.service.AttendanceService;
+import com.kh.cam.mypage.model.vo.Attendance;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +40,9 @@ public class MemberController {
 
 	private final BCryptPasswordEncoder pwEncoder;
 	private final MemberService mService;
+	private final AttendanceService attService;
+	
+	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 	
 	// 회원가입 페이지 이동
 	@GetMapping("/register")
@@ -43,18 +51,15 @@ public class MemberController {
 		return "member/register";
 	}
 	
-	@GetMapping("deptList")
+	@GetMapping("/deptList")
 	@ResponseBody
 	public List<Department> deptList(@RequestParam int uniNo) {
 		return mService.selectDeptList(uniNo);
 	}
 	
-	@InitBinder
+	@InitBinder("member")
 	public void initBinder(WebDataBinder binder) {
 		binder.addValidators(new MemberValidator());
-		
-//		SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMdd");
-//		dateFormat.setLenient(false);
 	}
 	
 	@PostMapping("/register")
@@ -68,9 +73,39 @@ public class MemberController {
 		// 유효성 검사 성공시 비밀번호 암오화하여 회원가입
 		member.setMemPw(pwEncoder.encode(member.getMemPw()));
 		mService.insertMember(member);
-		log.debug("Member : {}", member);
+		
+		// 회원 출석정보 추가
+		attService.insertAtt(member.getMemNo());
 		
 		return "redirect:/";
 	}
 	
+	@GetMapping("/waiting")
+	public String waiting() {
+		return "common/waiting";
+	}
+	
+	@GetMapping("/findIdPw")
+	public String findIdPw() {
+		return "member/findIdPw";
+	}
+	
+	@PostMapping("/findIdPw")
+	public String findMember(@ModelAttribute Member m, @RequestParam String type, Model model) {		
+		String result;
+		System.out.println(m.getMemName() + " / " +  m.getPhone());
+		switch(type) {
+		case "id" :
+			result = mService.selectMemId(m);
+			System.out.println(result);
+			model.addAttribute("idResult", mService.selectMemId(m));
+			break;
+		case "pw" :
+			result = "";
+			break;
+		}
+		
+		return "member/findIdPw";
+	}
+
 }

@@ -2,6 +2,9 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
 
 <c:set var="path" value="${pageContext.request.contextPath}" />
 
@@ -9,7 +12,7 @@
 <meta name="_csrf" content="${_csrf.token}" />
 <meta name="_csrf_header" content="${_csrf.headerName}" />
 
-
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 <!-- 1순위 적용 -->
 <link rel="stylesheet" href="${path}/resources/css/mainpage.css">
 
@@ -22,10 +25,10 @@
 
 <link rel="stylesheet" href="${path}/resources/css/setting.css">
 
+
 <!-- =============================================
-     전체 마이페이지 + 출석체크 통합 스타일
-     색상 기조: 기존 파란 계열 (#A1CFFF, #4a90e2) + 보라 계열 (#534AB7) 유지
-     변경 항목: 레이아웃 간격 / 타이포 / 카드 그림자 / 탭 버튼 전환 효과
+     공통 마이페이지 스타일 
+     색상 : 기존 파란 계열 (#A1CFFF, #4a90e2) + 보라 계열 (#534AB7)
 ============================================= -->
 <style>
 
@@ -33,8 +36,7 @@
    마이페이지 전체를 감싸는 최상위 박스            */
 .mypage-container {
 	width: 800px;
-	margin: 50px auto;
-	/* 추가: 좌우 여백 확보 (작은 화면 대비) */
+	margin: 50px auto; /* 좌우 여백 확보 (작은 화면 대비) */
 	padding: 0 16px;
 	box-sizing: border-box;
 }
@@ -42,11 +44,11 @@
 /* ── 페이지 제목 ────────────────────────────────
    "마이페이지" 타이틀 영역                        */
 .title {
-	margin-bottom: 24px; /* 기존 20px → 여백 살짝 넓힘 */
+	margin-bottom: 24px;
 	font-size: 26px;
 	font-weight: 700;
 	color: #1a1a1a;
-	letter-spacing: -0.5px; /* 추가: 자간 조임으로 타이틀 정돈 */
+	letter-spacing: -0.5px; /* 자간 조임으로 타이틀 정돈 */
 }
 
 /* ── 탭 버튼 감싸는 래퍼 ───────────────────────
@@ -54,7 +56,7 @@
 .tab-wrapper {
 	display: flex;
 	justify-content: center;
-	margin: 0 0 0px 0; /* 기존 30px → 탭과 콘텐츠 간격 제거 (탭-콘텐츠 연결감) */
+	margin: 0 0 0px 0;
 }
 
 /* ── 탭 버튼 묶음 ───────────────────────────────     */
@@ -76,16 +78,16 @@
 	justify-content: center;
 	width: 200px;
 	padding: 10px 20px;
-	border: 1px solid #4a90e2; /* 기존 색상 유지 */
+	border: 1px solid #4a90e2;
 	background: white;
 	cursor: pointer;
 	border-radius: 10px;
 	font-size: 14px;
 	font-weight: 500;
-	color: #4a90e2; /* 추가: 텍스트도 파란색 계열로 통일 */
+	color: #4a90e2;
 	transition: background 0.2s, color 0.2s, transform 0.1s;
-	/* 추가: 전환 애니메이션 */
-	display: flex; /* 추가: 아이콘 + 텍스트 수직 정렬 */
+	/* 전환 애니메이션 */
+	display: flex;
 	align-items: center;
 	gap: 6px;
 }
@@ -121,13 +123,13 @@
 .tab-panel {
 	display: none;
 	padding: 28px 24px;
-	min-height: 100%;
+	/* min-height: 100%; */
 	border: none;
 	box-sizing: border-box;
 }
 
 /* ── 활성화된 패널 ──────────────────────────────
-   선택된 탭 내용만 보임                           */
+   선택됐을 때만 보이게 선택은 .active로 구별                          */
 .tab-panel.active {
 	display: block;
 }
@@ -146,17 +148,12 @@
 
 
 
-
-
-
-
-
 <!-- 아이콘 삽입용 CDN -->
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 
-<jsp:include page="/WEB-INF/views/common2/header.jsp" />
+<jsp:include page="/WEB-INF/views/common/header.jsp" />
 
 <div class="mypage-container">
 
@@ -165,24 +162,16 @@
 	<!-- 탭 버튼 영역 -->
 	<div class="tab-wrapper">
 		<div class="tab-menu">
-
-			<!-- 출석체크 탭 버튼 -->
-			<button class="tab-btn active" onclick="showTab('attendance', this)">
+			<button class="tab-btn ${category == 'attendance' ? 'active' : ''}" onclick="showTab('attendance')">
 				<i class="fa-regular fa-calendar-check"></i> 출석체크
 			</button>
-
-			<!-- 친구 탭 버튼 -->
-			<button class="tab-btn" onclick="showTab('friend', this)">
+			<button class="tab-btn ${category == 'friend' ? 'active' : ''}" onclick="showTab('friend')">
 				<i class="fa-solid fa-user-group"></i> 친구
 			</button>
-
-			<!-- 시간표 탭 버튼 -->
-			<button class="tab-btn" onclick="showTab('timetable', this)">
+			<button class="tab-btn ${category == 'timetable' ? 'active' : ''}" onclick="showTab('timetable')">
 				<i class="fa-solid fa-calendar-days"></i> 시간표
 			</button>
-
-			<!-- 설정 탭 버튼 -->
-			<button class="tab-btn" onclick="showTab('setting', this)">
+			<button class="tab-btn ${category == 'setting' ? 'active' : ''}" onclick="showTab('setting')">
 				<i class="fa-solid fa-gear"></i> 설정
 			</button>
 
@@ -195,22 +184,8 @@
            아이콘 클릭 시 버튼이 아닌 <i>에 active 붙는 사항 수정
     ============================================= -->
 	<script>
-        function showTab(tabName, clickedBtn) {
-
-            // 모든 탭 버튼에서 active 제거
-            document.querySelectorAll(".tab-btn")
-                    .forEach(btn => btn.classList.remove("active"));
-
-            // 모든 탭 패널 숨김
-            document.querySelectorAll(".tab-panel")
-                    .forEach(panel => panel.classList.remove("active"));
-
-            // 클릭된 버튼에 active 추가
-            // (this로 받아서 아이콘 클릭 시 버그 방지)
-            clickedBtn.classList.add("active");
-
-            // 해당 tabName의 패널 활성화
-            document.getElementById(tabName).classList.add("active");
+        function showTab(tabName) {
+        	location.href = "${pageContext.request.contextPath}/mypage?category=" + tabName;
         }
     </script>
 
@@ -221,10 +196,10 @@
          showTab() 의 display 제어가 정상 동작
     ============================================= -->
 	<div class="tab-content">
-
-
 		<!-- ── 출석체크 패널 ─────────────────────── -->
-		<div id="attendance" class="tab-panel active">
+		<!-- <div id="attendance" class="tab-panel active"> -->
+		<div id="attendance"
+			class="tab-panel ${category == 'attendance' ? 'active' : ''}">
 			<div class="att-card">
 
 				<!-- 카드 헤더: 제목(좌) + 현재 일차(우) -->
@@ -234,53 +209,84 @@
 						<p class="att-sub">7일 출석하고 포인트를 받으세요!</p>
 					</div>
 					<div style="text-align: right">
-						<!-- JS attRender()가 동적으로 숫자 업데이트 -->
-						<div class="att-day-num" id="attDayNum">1</div>
+						<div class="att-day-num">${attCnt}</div>
 						<div class="att-day-label">일차</div>
 					</div>
 				</div>
 
-				<!-- 출석 체크 버튼 -->
-				<div class="att-btn-wrap">
-					<button class="att-btn" id="attBtn">출석 체크하기</button>
-				</div>
+				<form:form action="${path}/attendance/updateAtt" method="post">
+					<div class="att-btn-wrap" name>
+						<c:choose>
+							<c:when test="${attCnt >= 7}">
+								<button class="att-btn" disabled>출석 완료</button>
+							</c:when>
 
-				<!-- 7개 날짜 도형 컨테이너 (JS가 동적 생성) -->
-				<div class="att-days" id="attDots"></div>
+							<c:when test="${checkedToday}">
+								<button class="att-btn" disabled style="font-size: 12px">
+									내일 오전 12시에 가능합니다</button>
+							</c:when>
+
+							<c:otherwise>
+								<button type="submit" class="att-btn">출석 체크하기</button>
+							</c:otherwise>
+						</c:choose>
+					</div>
+				</form:form>
+
+				<div class="att-days">
+					<c:forEach var="i" begin="1" end="7">
+						<c:set var="cls" value="att-dot" />
+
+						<c:if test="${i <= attCnt}">
+							<c:set var="cls" value="${cls} done" />
+						</c:if>
+
+						<c:if test="${i == attCnt + 1}">
+							<c:set var="cls" value="${cls} today" />
+						</c:if>
+
+						<div class="${cls}">
+							<span>${i}</span> <span class="di"> <c:choose>
+									<c:when test="${i <= attCnt}">✔</c:when>
+									<c:otherwise>일</c:otherwise>
+								</c:choose>
+							</span>
+						</div>
+					</c:forEach>
+				</div>
 
 				<!-- 진행률 바 -->
 				<div class="att-progress-wrap">
 					<div class="att-prog-labels">
-						<span>진행률</span>
-						<!-- JS가 "N / 7일" 형식으로 업데이트 -->
-						<span id="attProgLabel">0 / 7일</span>
+						<span>진행률</span> <span>${attCnt} / 7일</span>
 					</div>
 					<div class="att-prog-bar">
-						<!-- JS가 width % 를 조절해 진행률 표시 -->
-						<div class="att-prog-fill" id="attProgFill" style="width: 0%"></div>
+						<div class="att-prog-fill" style="width: ${(attCnt / 7.0) * 100}%">
+						</div>
 					</div>
 				</div>
 
-				<!-- 특정 일차 달성 시 보상 메시지 (JS가 텍스트 삽입) -->
-				<div class="att-reward" id="attReward"></div>
+				<div class="att-reward">
+					<c:choose>
+						<c:when test="${attCnt == 5}">포인트 +10</c:when>
+						<c:when test="${attCnt == 6}">포인트 +10</c:when>
+						<c:when test="${attCnt == 7}">포인트 +50 (7일 달성!)</c:when>
+					</c:choose>
+				</div>
 
 			</div>
-			<!-- /att-card -->
-
-			<script>
-			    var CSRF_TOKEN   = '${_csrf.token}';
-			    var CSRF_HEADER  = '${_csrf.headerName}';
-			    var CONTEXT_PATH = '<%=request.getContextPath()%>';
-			</script>
-			<script src="${path}/resources/js/attendance.js"></script>
-
 		</div>
+
+
+
+
 		<!-- /attendance -->
 
 
 		<!-- ── 친구 패널 ──────────────────────────────────────── -->
-		<div id="friend" class="tab-panel">
-
+		<!-- <div id="friend" class="tab-panel"> -->
+		<div id="friend"
+			class="tab-panel ${category == 'friend' ? 'active' : ''}">
 			<!-- 상단: 제목 + 버튼 -->
 			<div class="friend-header">
 				<div>
@@ -315,9 +321,9 @@
                     <img src="${path}/resources/profile/${f.profileImg}"
                          class="profile-img" alt="${f.memName} 프로필"> --%>
 							<div class="friend-text">
-								<!-- 친구 이름 (receiverNo 기준으로 상대방 이름 표시) -->
+								<!-- 친구 이름 / receiverNo(memNo) 기준으로 상대방 이름 표시 -->
 								<span class="friend-name">${f.memName}</span>
-								<!-- 온라인 여부: status 'O' = 온라인 -->
+								<!-- 온라인 여부 / status 'O' = 온라인 -->
 								<c:choose>
 									<c:when test="${f.status eq 'O'}">
 										<span class="online">온라인</span>
@@ -336,9 +342,11 @@
 		<!-- /friend -->
 
 		<!-- ── 시간표 패널 ─────────────────────────────── -->
-		<div id="timetable" class="tab-panel">
+		<!-- <div id="timetable" class="tab-panel"> -->
+		<div id="timetable"
+			class="tab-panel ${category == 'timetable' ? 'active' : ''}">
 
-			<!-- 상단 바: 시간표 선택 드롭다운(좌) + +/- 버튼(우) -->
+			<!-- 상단 바: 시간표 선택 드롭다운(좌) ,  +/- 버튼(우) -->
 			<div class="tt-topbar">
 				<div class="tt-title-wrap" id="ttTitleWrap">
 					<!-- 드롭다운 버튼: onclick 제거, id 추가 -->
@@ -348,10 +356,10 @@
 					</button>
 					<div class="tt-dropdown" id="ttDropdown"></div>
 					<div class="tt-plusminus">
-						<!-- + 버튼: onclick 제거, id 추가 -->
+						<!--  + 버튼 : prompt로 강의 제목을 받고, 그 강의에 대한 요일, 시간 설정 -->
 						<button id="ttBtnAdd" title="시간표 추가" style="color: #4a90e2">+</button>
 
-						<!-- − 버튼: onclick 제거, id 추가 -->
+						<!--  - 버튼 : 클릭 시 삭제 모드 활성화  -->
 						<button id="ttBtnMinus" title="시간표 삭제" style="color: #E24B4A">−</button>
 					</div>
 				</div>
@@ -411,7 +419,9 @@
 
 
 		<!-- ── 설정 패널 ───────────────────────────── -->
-		<div id="setting" class="tab-panel">
+		<!-- <div id="setting" class="tab-panel"> -->
+		<div id="setting"
+			class="tab-panel ${category == 'setting' ? 'active' : ''}">
 
 			<!-- 개인정보 수정 카드 -->
 			<div class="setting-card">
@@ -433,11 +443,6 @@
 							onchange="previewProfile(this)">
 					</div>	--%>
 
-					<!-- 이름 -->
-					<div class="setting-field">
-						<label>이름</label> <input type="text" id="settingName"
-							placeholder="새 이름을 입력하세요" value="${loginUser.memName}">
-					</div>
 
 					<!-- 아이디 -->
 					<div class="setting-field">
@@ -445,10 +450,16 @@
 							placeholder="새 아이디를 입력하세요" value="${loginUser.memId}">
 					</div>
 
-					<!-- 이메일 -->
+					<!-- 학번 -->
 					<div class="setting-field">
-						<label>이메일</label> <input type="email" id="settingEmail"
-							placeholder="새 이메일을 입력하세요" value="${loginUser.email}">
+						<label>학번</label> <input type="text" id="settingName"
+							placeholder="새 학번을 입력하세요" value="${loginUser.studentNo}">
+					</div>
+
+					<!-- 전화번호 -->
+					<div class="setting-field">
+						<label>전화번호</label> <input type="email" id="settingEmail"
+							placeholder="새 전화번호를 입력하세요" value="${loginUser.phone}">
 					</div>
 
 					<!-- 학과 번호 -->
@@ -572,8 +583,8 @@
 
 			// 회원탈퇴
 			function confirmWithdraw() {
-			    if (confirm('정말 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
-			        location.href = '${path}/withdraw';
+			    if (confirm('회원 탈퇴 페이지로 이동하시겠습니까?')) {
+			        location.href = '${path}/member/withdraw';
 			    }
 			}
 			

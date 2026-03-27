@@ -1,42 +1,33 @@
 // controller/AttendanceController.java
 package com.kh.cam.mypage.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.kh.cam.member.model.vo.CustomUserDetails;
 import com.kh.cam.mypage.model.service.AttendanceService;
 
-import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @RequestMapping("/attendance")
+@RequiredArgsConstructor
+@Slf4j
 public class AttendanceController {
+    
+    private final AttendanceService attService;
 
-    @Autowired
-    private AttendanceService attendanceService;
-
-    // SecurityContextHolder에서 직접 memNo 꺼내기
-    // @AuthenticationPrincipal 대신 사용 (인터페이스 직접 주입 오류 방지)
-    private int getMemNo() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        // getUsername()이 memNo 숫자 문자열을 반환한다고 하셨으므로 int로 파싱
-        return Integer.parseInt(auth.getName());
+    @PostMapping("/updateAtt")
+    public String updateAtt(RedirectAttributes ra) {
+    	CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    	int memNo = user.getUserno();
+    	attService.updateAtt(memNo);
+    	
+    	return "redirect:/mypage?category=attendance";
     }
-
-    // GET /attendance/status : 페이지 로드 시 출석 상태 조회
-    @GetMapping("/status")
-    @ResponseBody
-    public Map<String, Object> status() {
-        return attendanceService.getAttendanceStatus(getMemNo());
-    }
-
-    // POST /attendance/check : 출석 체크 실행
-    @PostMapping("/check")
-    @ResponseBody
-    public Map<String, Object> check() {
-        return attendanceService.doCheck(getMemNo());
-    }
+ 
 }

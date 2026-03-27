@@ -1,6 +1,8 @@
 package com.kh.cam.mypage.model.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,14 +29,14 @@ public class FriendsServiceImpl implements FriendsService {
 	@Override
 	public List<Friends> searchMember(int senderNo, String keyword) {
 		List<Friends> list = friendsDao.searchMember(senderNo, keyword);
-
+		
+		Map<String, Object> map = new HashMap<>();
 		// FRIEND 테이블 JOIN 결과의 status가 'Y'면 이미 신청한 것
-		for (Friends vo : list) {
-			if ("Y".equals(vo.getStatus())) {
-				vo.setRequested(true);
-			}
-		}
-		return list;
+		map.put("senderNo", senderNo); // XML의 #{senderNo}와 일치해야 함
+	    map.put("keyword", keyword);   // XML의 #{keyword}와 일치해야 함
+	    
+	    // 네임스페이스가 "mypage"이므로 호출 시 주의
+	    return friendsDao.searchMember(senderNo, keyword);
 	}
 
 	// 친구 요청

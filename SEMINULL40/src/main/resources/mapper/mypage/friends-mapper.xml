@@ -2,25 +2,22 @@
 <!DOCTYPE mapper
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="mypage">
+<mapper namespace="friends">
 
 	<!-- FriendMapper.xml -->
 
 	<!-- 내 친구 목록 조회 (수락된 친구만) -->
 	<!-- 내가 보낸 요청 + 내가 받은 요청 둘 다 포함 -->
-	<select id="getFriendList" parameterType="int"
-		resultType="Friends">
+	<select id="getFriendList" parameterType="map" resultType="map">
 		SELECT
 		f.SENDER_NO,
 		f.RECEIVER_NO,
 		f.STATUS,
-		m.MEM_NO AS
-		friendNo,
-		m.MEM_NAME AS friendName,
-		m.ONLINE_STATUS AS onlineStatus
-		FROM FRIEND f
-		JOIN MEMBER m
-		ON m.MEM_NO = CASE
+		m.MEM_NO,
+		m.MEM_NAME,
+		m.ONLINE_STATUS
+		FROM FRIENDS f
+		JOIN MEMBER m ON m.MEM_NO = CASE
 		WHEN f.SENDER_NO =
 		#{memNo} THEN f.RECEIVER_NO
 		WHEN f.RECEIVER_NO = #{memNo} THEN
@@ -30,7 +27,7 @@
 		AND (f.SENDER_NO = #{memNo} OR
 		f.RECEIVER_NO =
 		#{memNo})
-		ORDER BY m.ONLINE_STATUS ASC, m.MEM_NAME
+		ORDER BY m.STATUS ASC, m.MEM_NAME
 		ASC
 	</select>
 
@@ -39,44 +36,43 @@
 	<!-- ── addfriend ───────────────────────────────────────────── 이름으로 회원 
 		검색 MEMBER 테이블의 memName 컬럼 LIKE 검색 본인(memNo = senderNo) 제외 이미 신청 여부는 FRIEND 
 		테이블 LEFT JOIN으로 확인 -->
-	<select id="searchMember" parameterType="map"
-		resultType="Friends">
+	<select id="searchMember" parameterType="map" resultType="friends">
 		SELECT
-		m.MEM_NO AS memNo,
-		m.MEM_NAME AS memName,
-		CASE
-		WHEN f.SENDER_NO IS NOT NULL THEN 'Y'
-		ELSE 'N'
-		END AS status
+		m.MEM_NO,
+		m.MEM_NAME,
+		f.STATUS
+
+		<!--CASE WHEN f.SENDER_NO IS NOT NULL THEN 'Y' ELSE 'N' END AS status -->
 		FROM MEMBER m
-		LEFT JOIN FRIEND f
-		ON ( f.SENDER_NO = #{senderNo}
-		AND f.RECEIVER_NO = m.MEM_NO)
+		LEFT JOIN FRIENDS f ON (
+		(f.SENDER_NO = #{senderNo} AND
+		f.RECEIVER_NO = m.MEM_NO)
+		OR
+		(f.SENDER_NO = m.MEM_NO AND f.RECEIVER_NO =
+		#{senderNo})
+		)
 		WHERE m.MEM_NAME LIKE '%' || #{keyword} || '%'
-		AND m.MEM_NO != #{senderNo}
+		AND m.MEM_NO
+		!= #{senderNo}
 		ORDER BY m.MEM_NAME ASC
 	</select>
 
 	<!-- 친구 요청 INSERT FRIEND 테이블에 senderNo, receiverNo, status('N') 삽입 -->
-	<insert id="insertFriendRequest" parameterType="Friends">
-		INSERT INTO FRIEND (
-		SENDER_NO,
-		RECEIVER_NO,
-		STATUS
-		) VALUES (
-		#{senderNo},
-		#{receiverNo},
-		'N'
-		)
+	<insert id="insertFriendRequest" parameterType="friends">
+		INSERT INTO FRIENDS 
+		(SENDER_NO, RECEIVER_NO, STATUS) 
+		VALUES (#{senderNo}, #{receiverNo}, 'N')
 	</insert>
 
 	<!-- 이미 친구 요청이 존재하는지 확인 양방향 모두 체크 (중복 신청 방지) -->
-	<select id="checkAlreadyRequested" parameterType="map"
+	<select id="checkAlreadyRequested" parameterType="friends"
 		resultType="int">
 		SELECT COUNT(*)
-		FROM FRIEND
-		WHERE (SENDER_NO = #{senderNo} AND RECEIVER_NO = #{receiverNo})
-		OR (SENDER_NO = #{receiverNo} AND RECEIVER_NO = #{senderNo})
+		FROM FRIENDS
+		WHERE (SENDER_NO = #{senderNo}
+		AND RECEIVER_NO = #{receiverNo})
+		OR (SENDER_NO = #{receiverNo} AND
+		RECEIVER_NO = #{senderNo})
 	</select>
 
 
@@ -88,22 +84,23 @@
 		JOIN으로 요청 보낸 사람 이름 가져옴 -->
 	<select id="getPendingList" parameterType="int"
 		resultType="Friends">
-		SELECT
-		f.SENDER_NO AS senderNo,
-		f.RECEIVER_NO AS receiverNo,
-		f.STATUS AS status,
-		m.MEM_NO AS memNo,
-		m.MEM_NAME AS memName
-		FROM FRIEND f
+		SELECT 
+		f.SENDER_NO,
+		f.RECEIVER_NO,
+		f.STATUS,
+		m.MEM_NO,
+		m.MEM_NAME
+		FROM FRIENDS f
 		JOIN MEMBER m ON m.MEM_NO = f.SENDER_NO
-		WHERE f.RECEIVER_NO = #{receiverNo}
+		WHERE f.RECEIVER_NO =
+		#{receiverNo}
 		AND f.STATUS = 'N'
 		ORDER BY f.SENDER_NO DESC
 	</select>
 
 	<!-- 친구 수락 FRIEND 테이블의 status 'N' → 'Y' UPDATE -->
 	<update id="acceptFriend" parameterType="map">
-		UPDATE FRIEND
+		UPDATE FRIENDS
 		SET STATUS = 'Y'
 		WHERE SENDER_NO = #{senderNo}
 		AND RECEIVER_NO = #{receiverNo}
@@ -111,7 +108,7 @@
 
 	<!-- 친구 거절 FRIEND 테이블에서 해당 요청 DELETE -->
 	<delete id="rejectFriend" parameterType="map">
-		DELETE FROM FRIEND
+		DELETE FROM FRIENDS
 		WHERE SENDER_NO = #{senderNo}
 		AND RECEIVER_NO = #{receiverNo}
 	</delete>

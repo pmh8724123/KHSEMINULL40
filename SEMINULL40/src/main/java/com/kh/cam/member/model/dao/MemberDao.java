@@ -18,4 +18,6 @@ public interface MemberDao {
 
 	Member loadUserByUsername(String username);
 
+	String selectMemId(Member m);
+
 }

@@ -9,8 +9,6 @@ public interface FriendsDao {
 	// 수락된 친구 목록 조회 (내가 보낸 + 받은 요청 모두 포함)
 	public List<Friends> getFriendList(int memNo);
 
-	// 수락 대기 중인 요청 목록 조회 (내가 받은 것만)
-	public List<Friends> getPendingList(int memNo);
 
 	// 이름(keyword)으로 회원 검색
 	// MEMBER 테이블의 memName 컬럼 LIKE 검색

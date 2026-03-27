@@ -200,7 +200,7 @@ body {
 
 			<div class="login-options">
 				<label for="remember-me"><input type="checkbox" name="remember-me" id="remember-me">
-					로그인 유지</label> <a href="#">아이디/비밀번호 찾기</a>
+					로그인 유지</label> <a href="${contextPath}/member/findIdPw">아이디/비밀번호 찾기</a>
 			</div>
 		</form:form>
 
