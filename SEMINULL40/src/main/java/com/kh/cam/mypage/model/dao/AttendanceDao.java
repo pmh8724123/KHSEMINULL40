@@ -1,13 +1,13 @@
 package com.kh.cam.mypage.model.dao;
 
-import java.util.Date;
-import java.util.List;
+import com.kh.cam.mypage.model.vo.Attendance;
 
 public interface AttendanceDao {
-    int selectTodayAttendance(int memNo);
-    
-    List<Date> selectRecentDates(int memNo);
-    
-    void insertAttendance(int memNo);
-    
+	
+	int insertAtt(int memNo);
+	
+	Attendance selectAtt(int memNo);
+	
+	int updateAtt(int memNo);
+
 }

@@ -20,5 +20,6 @@ public class MemberDTO {
 	
 	private String deptName;
 	private String uniName;
+	private int uniNo;
 	
 }

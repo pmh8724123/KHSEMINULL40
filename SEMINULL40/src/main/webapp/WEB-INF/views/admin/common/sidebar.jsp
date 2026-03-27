@@ -14,7 +14,7 @@
     
     <h2>게시판 관리</h2>    
     <a href="notice">공지사항</a>
-	<a href="board">게시판 관리</a>
+	<a href="adminBoard">게시판 관리</a>
     <a href="reply">댓글 관리</a>
     
     <h2>신고 관리</h2>

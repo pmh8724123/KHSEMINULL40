@@ -178,7 +178,9 @@ footer {
 	<div class="container">
 		<h1 class="header-title">캠둘기 회원가입</h1>
 
+
 		<form:form action="${contextPath}/member/register" method="post" modelAttribute="member" id="registerForm">
+
 			<div class="form-group">
 				<input type="text" name="memId" id="memId" placeholder="아이디">
 				<div class="error-msg" id="idMsg"><p>아이디를 입력해 주세요</p></div>

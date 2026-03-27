@@ -1,5 +1,6 @@
 package com.kh.cam.member.model.vo;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Collectors;
@@ -8,9 +9,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public class CustomUserDetails implements UserDetails {
+public class CustomUserDetails implements UserDetails{
 
-	private Member member;
+	private static final long serialVersionUID = 1L;
+	private final Member member;
 	
 	public CustomUserDetails(Member member) {
 		this.member = member;
@@ -36,7 +38,8 @@ public class CustomUserDetails implements UserDetails {
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return member.getAuthorities().stream().map(auth -> new SimpleGrantedAuthority(auth.getAuthority())).collect(Collectors.toList());
+		return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+//		return member.getAuthorities().stream().map(auth -> new SimpleGrantedAuthority(auth.getAuthority())).collect(Collectors.toList());
 	}
 
 	@Override
