@@ -178,18 +178,21 @@ footer {
 	<div class="container">
 		<h1 class="header-title">캠둘기 회원가입</h1>
 
-
 		<form:form action="${contextPath}/member/register" method="post" modelAttribute="member" id="registerForm">
+
 
 			<div class="form-group">
 				<input type="text" name="memId" id="memId" placeholder="아이디">
-				<div class="error-msg" id="idMsg"><p>아이디를 입력해 주세요</p></div>
+				<div class="error-msg" id="idMsg">
+					<p>아이디를 입력해 주세요</p>
+				</div>
 			</div>
 
 			<div class="form-group">
-				<input type="password" name="memPw" id="memPw" placeholder="비밀번호" style="margin-bottom: 10px;"> 
-				<input type="password" name="memPwConfirm" id="memPwConfirm" placeholder="비밀번호 재입력">
-				<div class="error-msg" id="pwMsg">비밀번호를 입력해 주세요</div>	
+				<input type="password" name="memPw" id="memPw" placeholder="비밀번호"
+					style="margin-bottom: 10px;"> <input type="password"
+					name="memPwConfirm" id="memPwConfirm" placeholder="비밀번호 재입력">
+				<div class="error-msg" id="pwMsg">비밀번호를 입력해 주세요</div>
 			</div>
 
 			<div class="form-group">
@@ -213,12 +216,12 @@ footer {
 				</select>
 				<div class="error-msg" id="deptMsg">학과를 선택해 주세요</div>
 			</div>
-			
+
 			<div class="form-group">
-				<input type="text" name="studentNo" id="studentNo" placeholder="학번">
+				<input type="text" name="strStudentNo" id="studentNo" placeholder="학번">
 				<div class="error-msg" id="snoMsg">학번을 입력해 주세요</div>
 			</div>
-			
+
 			<div class="form-group">
 				<input type="text" name="phone" id="phone" placeholder="전화번호">
 				<div class="error-msg" id="phoneMsg">
@@ -232,10 +235,18 @@ footer {
 				이미 회원이신가요? <a href="${contextPath}">로그인</a>
 			</p>
 		</form:form>
+
+
 	</div>
 	
-	<script src="${contextPath}/resources/js/register.js" ></script> 
-	
+	<c:if test="${not empty requestScope['org.springframework.validation.BindingResult.member'].fieldErrors}">
+    	<script>
+     	   alert("${requestScope['org.springframework.validation.BindingResult.member'].fieldErrors[0].defaultMessage}");
+    	</script>
+	</c:if>
+
+	<script src="${contextPath}/resources/js/register.js"></script>
+
 	<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 </body>
 </html>

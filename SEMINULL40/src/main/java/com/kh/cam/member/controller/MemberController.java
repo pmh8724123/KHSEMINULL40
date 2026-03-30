@@ -1,11 +1,8 @@
 package com.kh.cam.member.controller;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,10 +21,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.kh.cam.common.model.vo.Department;
 import com.kh.cam.member.model.service.MemberService;
 import com.kh.cam.member.model.validator.MemberValidator;
-import com.kh.cam.member.model.vo.CustomUserDetails;
 import com.kh.cam.member.model.vo.Member;
 import com.kh.cam.mypage.model.service.AttendanceService;
-import com.kh.cam.mypage.model.vo.Attendance;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,12 +36,17 @@ public class MemberController {
 	private final BCryptPasswordEncoder pwEncoder;
 	private final MemberService mService;
 	private final AttendanceService attService;
+	private final MemberValidator mValidator;
 	
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 	
 	// 회원가입 페이지 이동
 	@GetMapping("/register")
-	public String enroll(@ModelAttribute Member member, Model model) {
+	public String enroll(Model model) {
+		if(!model.containsAttribute("member")) {
+	        model.addAttribute("member", new Member());
+	    }
+		
 		model.addAttribute("uniList", mService.selectUniList());
 		return "member/register";
 	}
@@ -59,19 +59,21 @@ public class MemberController {
 	
 	@InitBinder("member")
 	public void initBinder(WebDataBinder binder) {
-		binder.addValidators(new MemberValidator());
+		binder.addValidators(mValidator);
 	}
 	
 	@PostMapping("/register")
-	public String register(@Validated @ModelAttribute Member member, BindingResult bindingResult, Model model,  RedirectAttributes ra) {
+	public String register(@Validated @ModelAttribute("member") Member member, BindingResult bindingResult, Model model,  RedirectAttributes ra) {
 		// 유효성 검사 실패
 		if(bindingResult.hasErrors()) {
 			model.addAttribute("uniList", mService.selectUniList());
+			System.out.println("error : " + bindingResult);
 			return "member/register";
 		}
 		
 		// 유효성 검사 성공시 비밀번호 암오화하여 회원가입
 		member.setMemPw(pwEncoder.encode(member.getMemPw()));
+		member.setStudentNo(Integer.parseInt(member.getStrStudentNo()));
 		mService.insertMember(member);
 		
 		// 회원 출석정보 추가

@@ -18,14 +18,15 @@ public class Member{
 	private String memId;
 	private String memPw;
 	private String memName;
-	private int deptNo;
+	private Integer deptNo;
+	private String strStudentNo;
 	private int studentNo;
 	private String phone;
 	private Date createDate;
 	private char status;
 	
 	// 대학 정보
-	private int uniNo;
+	private Integer uniNo;
 	private String uniName;
 	
 	// 학과 정보

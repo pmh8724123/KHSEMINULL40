@@ -18,4 +18,6 @@ public interface MemberService extends UserDetailsService {
 
 	String selectMemId(Member m);
 
+	Member selectMemById(String memId);
+
 }
