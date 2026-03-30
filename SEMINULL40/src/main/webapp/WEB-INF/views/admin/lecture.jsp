@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -33,21 +34,26 @@
             </div>
 		
 		<!-- 모달 -->
-				<button type="button" onclick="openModal('lectureModal')">학과추가</button>
+				<button type="button" onclick="openModal('lectureModal')">강의추가</button>
 
-				<div id="lectureModal" class="modal">
+				<div id="lectureInsertModal" class="modal">
 					<div class="modal-content">
 
-						<h3>학과 추가</h3>
+						<h3>강의 추가</h3>
 
 						<form action="${pageContext.request.contextPath}/admin/lecture/insert" method="post">
     
 						    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
 						    
    						    강의명: <input type="text" name="lectureName"><br>
+   						    교수명: <input type="text" name="professorName"><br>
+   						    강의요일: <input type="text" name="days"><br>
+   						    시작시간: <input type="text" name="startTime"><br>
+   						    종료시간: <input type="text" name="endTime"><br>
+   						    강의실: <input type="text" name="lectureRoom"><br>
 						
 						    <button type="submit" class="insert-btn">등록</button>
-							<button type="button" onclick="closeModal('lectureModal')" class="exit-btn">취소</button>
+							<button type="button" onclick="closeModal('lectureInsertModal')" class="exit-btn">취소</button>
 						</form>
 
 					</div>
@@ -59,9 +65,9 @@
 				<thead>
 					<tr>
 						<th>강의번호</th>
-						<th>강의번호</th>
 						<th>강의명</th>
 						<th>교수명</th>
+						<th>요일</th>
 						<th>시작시간</th>
 						<th>종료시간</th>
 						<th>강의실</th>
@@ -74,13 +80,14 @@
 					<tr>
 						<td>${l.lectureNo}</td>
 						<td>${l.lectureName}</td>
-						<td>${l.professor}</td>
-						<td>${l.startTime}</td>
-						<td>${l.endTime}</td>
+						<td>${l.professorName}</td>
+						<td><fmt:formatDate value="${l.days}" pattern="EEEE"/></td>
+						<td><fmt:formatDate value="${l.startTime}" pattern="HH:mm"/></td>
+						<td><fmt:formatDate value="${l.endTime}" pattern="HH:mm"/></td>
 						<td>${l.lectureRoom}</td>
 						<td>
 							<button class="btn btn-approve">수정</button>
-							<button class="btn btn-reject">삭제</button>
+							<button class="btn btn-delete">삭제</button>
 						</td>
 					</tr>
 					</c:forEach>
