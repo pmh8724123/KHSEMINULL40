@@ -4,8 +4,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
-import org.springframework.security.core.AuthenticatedPrincipal;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.kh.cam.admin.model.service.AdminService;
@@ -32,12 +31,6 @@ public class AdminController {
 
 	private final AdminService adminService;
 
-	// 관리자 로그인
-	@GetMapping("")
-	public String adminLogin() {
-		return "admin/adminLogin";
-	}
-
 	// 관리자 메인
 	@GetMapping("/main")
 	public String adminMain() {
@@ -47,10 +40,18 @@ public class AdminController {
 // ---------------------회원관리----------------------------------
 	// 회원 상태 관리 조회
 	@GetMapping("/memberStatus")
-	public String memberStatus(Model model) {
-		List<Member> list = adminService.selectMemberList();
+	public String memberStatus(
+			@RequestParam(value="condition", required=false) String condition,
+	        @RequestParam(value="keyword", required=false) String keyword,
+	        Model model
+			) {
+		
+		
+		List<Member> list = adminService.selectMemberList(condition, keyword);
 
 		model.addAttribute("list", list);
+	    model.addAttribute("condition", condition);
+	    model.addAttribute("keyword", keyword);
 
 		return "admin/memberStatus";
 	}
@@ -65,12 +66,27 @@ public class AdminController {
 			ra.addFlashAttribute("msg", "회원이 활성화되었습니다.");
 			ra.addFlashAttribute("type", "success");
 		} else {
-			ra.addFlashAttribute("msg", "회원이 탈퇴 처리되었습니다.");
+			ra.addFlashAttribute("msg", "회원이 정지되었습니다.");
 			ra.addFlashAttribute("type", "error");
 		}
 
 		return "redirect:/admin/memberStatus";
 	}
+	
+	// 회원 삭제
+	@PostMapping("/member/delete")
+	public String deleteMember(int memNo, RedirectAttributes ra) {
+
+	    adminService.deleteMember(memNo);
+
+	    ra.addFlashAttribute("msg", "회원이 삭제되었습니다.");
+	    ra.addFlashAttribute("type", "error");
+
+	    return "redirect:/admin/memberStatus";
+	}
+	
+
+// ---------------------회원승인관리----------------------------------
 
 	// 회원 가입 승인관리 조회
 	@GetMapping("/memberJoin")
@@ -82,32 +98,52 @@ public class AdminController {
 		return "admin/memberJoin";
 	}
 
-	// 회원 가입 승인 변경
-	@PostMapping("member/join")
-	public String updateMemberJoin(int memNo, String status, RedirectAttributes ra) {
+	// 회원 가입 승인
+	@PostMapping("member/join/approve")
+	public String approveMemberJoin(int memNo, String status, RedirectAttributes ra) {
 
-		adminService.updateMemberJoin(memNo, status);
+		adminService.updateMemberJoin(memNo, "Y");
 
-		if ("Y".equals(status)) {
 			ra.addFlashAttribute("msg", "승인처리완료");
 			ra.addFlashAttribute("type", "success");
-		} else {
-			ra.addFlashAttribute("msg", "승인거절!!!");
-			ra.addFlashAttribute("type", "error");
-		}
 
 		return "redirect:/admin/memberJoin";
 	}
+	
+	// 회원 가입 거절/삭제
+		@PostMapping("member/join/reject")
+		public String rejectMemberJoin(int memNo, String status, RedirectAttributes ra) {
+
+			adminService.deleteMember(memNo);
+
+			ra.addFlashAttribute("msg", "승인거절");
+			ra.addFlashAttribute("type", "error");
+
+			return "redirect:/admin/memberJoin";
+		}
+	
 
 // ---------------------학교관리----------------------------------
+		/*
+		 * // 학과 관리 조회
+		 * 
+		 * @GetMapping("/department") public String DepartmentList(Model
+		 * model, @AuthenticationPrincipal CustomUserDetails user) {
+		 * 
+		 * int uniNo = user.getMember().getUniNo(); System.out.print(uniNo);
+		 * List<Department> list = adminService.selectDepartmentList(uniNo);
+		 * 
+		 * model.addAttribute("list", list);
+		 * 
+		 * return "admin/department"; }
+		 */
+		
 	// 학과 관리 조회
 	@GetMapping("/department")
-	public String DepartmentList(Model model, @AuthenticationPrincipal CustomUserDetails user) {
+	public String DepartmentList(Model model) {
 		
-		int uniNo = user.getMember().getUniNo();
+		List<Department> list = adminService.selectDepartmentList();
 		
-		List<Department> list = adminService.selectDepartmentList(uniNo);
-
 		model.addAttribute("list", list);
 
 		return "admin/department";
@@ -115,7 +151,7 @@ public class AdminController {
 
 	// 학과 추가
 	@PostMapping("/department/insert")
-	public String insertDepartment(@ModelAttribute Department dept, HttpSession session) {
+	public String insertDepartment(@ModelAttribute Department dept) {
 		
 		dept.setUniNo(1); // 테스트
 		System.out.println("deptName: " + dept.getDeptName()); // 테스트
@@ -127,17 +163,40 @@ public class AdminController {
 	}
 	
 	// 학과 수정
-		@PostMapping("/department/update")
-		public String updateDepartment(@ModelAttribute Department dept) {
-			
-			dept.setUniNo(1); // 테스트
-			System.out.println("deptName: " + dept.getDeptName()); // 테스트
-			System.out.println("uniNo: " + dept.getUniNo()); // 테스트
+	@PostMapping("/department/update")
+	public String updateDepartment(Department dept,RedirectAttributes ra) {
+		
+		int result = adminService.updateDepartment(dept);
+		
+		System.out.println("asdasdasd" + dept);
+		
+		if(result > 0) {
+	        ra.addFlashAttribute("msg", "수정 완료");
+	        ra.addFlashAttribute("type", "success");
+	    } else {
+	        ra.addFlashAttribute("msg", "수정 실패");
+	        ra.addFlashAttribute("type", "error");
+	    }
 
-			adminService.insertDepartment(dept);
-			
-			return "redirect:/admin/department";
+		return "redirect:/admin/department";
+	}
+	
+	// 학과 삭제
+	@PostMapping("/department/delete")
+	public String deleteDepartment(Department deptNo, RedirectAttributes ra) {
+		
+		int result = adminService.deleteDepartment(deptNo);
+		
+		if(result > 0) {
+			ra.addFlashAttribute("msg", "삭제 완료");
+			ra.addFlashAttribute("type", "error");
+		} else {
+			ra.addFlashAttribute("msg", "삭제 실패");
+			ra.addFlashAttribute("type", "success");
 		}
+		
+		return "redirect:/admin/department";
+	}
 
 	// 수업 관리
 	@GetMapping("/lecture")

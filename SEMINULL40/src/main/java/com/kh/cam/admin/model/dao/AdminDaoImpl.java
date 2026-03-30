@@ -20,9 +20,10 @@ public class AdminDaoImpl implements AdminDao{
 	
 	private final SqlSessionTemplate session;
 
+	// 회원 상태 관리
 	@Override
-	public List<Member> selectMemberList(int uniNo) {
-		return session.selectList("admin.selectMemberList");
+	public List<Member> selectMemberList(Map<String, Object> map) {
+	    return session.selectList("admin.selectMemberList", map);
 	}
 	
 	@Override
@@ -31,6 +32,19 @@ public class AdminDaoImpl implements AdminDao{
                 Map.of("memNo", memNo, "status", status));
 	}
 	
+	@Override
+	public int deleteMember(int memNo) {
+		int result = session.delete("admin.deleteMember", memNo);
+
+		if(result > 0) {
+		    // 성공
+		} else {
+		    // 실패 처리
+		}
+		return result;
+	}
+	
+	// 회원 승인관리	
 	@Override
 	public List<Member> selectMemberJoinList() {
 		return session.selectList("admin.selectMemberJoinList");
@@ -41,7 +55,7 @@ public class AdminDaoImpl implements AdminDao{
 		return session.update("admin.updateMemberJoin",
                 Map.of("memNo", memNo, "status", status));
 	}
-
+	// 학과관리
 	@Override
 	public List<Department> selectDepartmentList() {
 		return session.selectList("admin.selectDepartmentList");
@@ -53,6 +67,17 @@ public class AdminDaoImpl implements AdminDao{
 	}
 	
 	@Override
+	public int updateDepartment(Department dept) {
+		return session.update("admin.updateDepartment", dept);
+	}
+	
+	@Override
+	public int deleteDepartment(Department deptNo) {
+		return session.delete("admin.deleteDepartment", deptNo);
+	}
+	
+	// 강의관리	
+	@Override
 	public List<Lecture> selectLectureList() {
 		return session.selectList("admin.selectLectureList");
 	}
@@ -61,6 +86,11 @@ public class AdminDaoImpl implements AdminDao{
 	public int insertLecture(Lecture lec) {
 		return session.insert("admin.insertLecture", lec);
 	}
+
+	
+
+
+	
 	
 	
 	

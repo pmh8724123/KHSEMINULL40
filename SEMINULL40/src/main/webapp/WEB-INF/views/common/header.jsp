@@ -66,6 +66,15 @@
 	cursor: pointer;
 }
 
+.adminMove {
+	padding: 5px 10px;
+	border: 1px solid #aaa;
+	background: #fff;
+	color: red;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
 /* 🔥 추가 (빠져있던 부분) */
 .search-box {
 	margin: 15px auto;
@@ -115,8 +124,6 @@
 		<!-- 접속 권한이 관리자일때  -->
 		
 		
-		
-		
 		<!-- 접속 권한이 회원일때 -->
 		<!-- 접속 권한 : 회원일때 보이게 하고 그에 맞는 데이터 갖고오기 -->
 		<div class="right">
@@ -124,9 +131,15 @@
 				<sec:authentication property="principal.member.memName"/>님 /
 				<sec:authentication property="principal.member.uniName"/>
 			</span>
+			
+			<form:form action="${contextPath}/admin/main" method="get">
+				<button type="submit" class="adminMove">관리자페이지</button>			
+			</form:form>
+			
 			<form:form action="${contextPath}/member/logout" method="post">
 				<button type="submit" class="logout">로그아웃</button>			
 			</form:form>
+			
 		</div>
 	</div>
 

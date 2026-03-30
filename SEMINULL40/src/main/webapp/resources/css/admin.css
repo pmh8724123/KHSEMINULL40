@@ -173,13 +173,18 @@ table th:first-child, table td:first-child {
 }
 
 table th:last-child, table td:last-child {
-	width: 120px;
+	width: 200px;
 }
 
 /* 셀 */
 th, td {
 	padding: 12px;
 	text-align: center;
+}
+
+td form {
+    display: inline-block;
+    margin-left: 5px;
 }
 
 /* 줄 스타일 */
@@ -212,13 +217,34 @@ tbody tr:hover {
 }
 
 .btn-reject {
+    background: #ffff80;
+    color: #000000;
+}
+
+.btn-reject:hover {
+    background: #ffff00;
+    transform: scale(1.05);
+}
+
+.btn-delete {
     background: #e74c3c;
     color: white;
 }
 
-.btn-reject:hover {
+.btn-delete:hover {
     background: #c0392b;
     transform: scale(1.05);
+}
+
+.action-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px; 
+}
+
+.action-box form {
+    margin: 0;
 }
 
 /* 🔥 카드 */
@@ -345,17 +371,17 @@ tbody tr:hover {
     color: #fff;
 }
 
-/* 성공 */
+/* 성공 / 수정 */
 #toast-box.success {
     background: #2ecc71;
 }
 
-/* 실패 / 탈퇴 */
+/* 실패 / 탈퇴 / 삭제*/
 #toast-box.error {
     background: #e74c3c;
 }
 
-/* 🔥 애니메이션 */
+/* 애니메이션 */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -408,7 +434,16 @@ tbody tr:hover {
     background: #c0392b;
 }
 
-.modal-content .insert-btn {
+.modal-content .insert-btn{
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.modal-content .update-btn{
     background: #3498db;
     color: white;
     border: none;
@@ -418,6 +453,10 @@ tbody tr:hover {
 }
 
 .modal-content .insert-btn:hover {
+    background: #4a79e8;
+}
+
+.modal-content .update-btn:hover {
     background: #4a79e8;
 }
 
