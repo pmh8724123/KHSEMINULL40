@@ -1,6 +1,5 @@
 package com.kh.cam.member.controller;
 
-import java.security.Provider.Service;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -23,6 +22,7 @@ import com.kh.cam.common.model.vo.Department;
 import com.kh.cam.member.model.service.MemberService;
 import com.kh.cam.member.model.validator.MemberValidator;
 import com.kh.cam.member.model.vo.Member;
+import com.kh.cam.mypage.model.service.AttendanceService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,46 +35,79 @@ public class MemberController {
 
 	private final BCryptPasswordEncoder pwEncoder;
 	private final MemberService mService;
+	private final AttendanceService attService;
+	private final MemberValidator mValidator;
+	
+	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 	
 	// 회원가입 페이지 이동
 	@GetMapping("/register")
-	public String enroll(@ModelAttribute Member member, Model model) {
+	public String enroll(Model model) {
+		if(!model.containsAttribute("member")) {
+	        model.addAttribute("member", new Member());
+	    }
+		
 		model.addAttribute("uniList", mService.selectUniList());
 		return "member/register";
 	}
 	
-	@GetMapping("deptList")
+	@GetMapping("/deptList")
 	@ResponseBody
 	public List<Department> deptList(@RequestParam int uniNo) {
 		return mService.selectDeptList(uniNo);
 	}
 	
-	@InitBinder
+	@InitBinder("member")
 	public void initBinder(WebDataBinder binder) {
-		binder.addValidators(new MemberValidator());
-		
-//		SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMdd");
-//		dateFormat.setLenient(false);
+		binder.addValidators(mValidator);
 	}
 	
 	@PostMapping("/register")
-	public String register(@Validated @ModelAttribute Member member, BindingResult bindingResult, Model model,  RedirectAttributes ra) {
+	public String register(@Validated @ModelAttribute("member") Member member, BindingResult bindingResult, Model model,  RedirectAttributes ra) {
 		// 유효성 검사 실패
 		if(bindingResult.hasErrors()) {
 			model.addAttribute("uniList", mService.selectUniList());
+			System.out.println("error : " + bindingResult);
 			return "member/register";
 		}
 		
 		// 유효성 검사 성공시 비밀번호 암오화하여 회원가입
 		member.setMemPw(pwEncoder.encode(member.getMemPw()));
+		member.setStudentNo(Integer.parseInt(member.getStrStudentNo()));
 		mService.insertMember(member);
-		log.debug("Member : {}", member);
 		
-		// 유효성 검사 성공시 비밀번호 암호화하여 회원가입
-		String encryptedPassword = pwEncoder.encode(member.getMemPw());
-		member.setMemPw(encryptedPassword);
+		// 회원 출석정보 추가
+		attService.insertAtt(member.getMemNo());
 		
 		return "redirect:/";
 	}
 	
+	@GetMapping("/waiting")
+	public String waiting() {
+		return "common/waiting";
+	}
+	
+	@GetMapping("/findIdPw")
+	public String findIdPw() {
+		return "member/findIdPw";
+	}
+	
+	@PostMapping("/findIdPw")
+	public String findMember(@ModelAttribute Member m, @RequestParam String type, Model model) {		
+		String result;
+		System.out.println(m.getMemName() + " / " +  m.getPhone());
+		switch(type) {
+		case "id" :
+			result = mService.selectMemId(m);
+			System.out.println(result);
+			model.addAttribute("idResult", mService.selectMemId(m));
+			break;
+		case "pw" :
+			result = "";
+			break;
+		}
+		
+		return "member/findIdPw";
+	}
+
 }

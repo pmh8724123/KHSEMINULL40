@@ -3,7 +3,6 @@ package com.kh.cam.member.model.service;
 import java.util.List;
 
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class MemberServiceImpl implements MemberService, UserDetailsService {
+public class MemberServiceImpl implements MemberService {
 
 	private final MemberDao mDao;
 	
@@ -43,8 +42,18 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 		if(member == null) {
 			throw new UsernameNotFoundException("존재하지 않는 사용자 : " + username);
 		}
-		
+		System.out.println(member);
 		return new CustomUserDetails(member);
+	}
+
+	@Override
+	public String selectMemId(Member m) {
+		return mDao.selectMemId(m);
+	}
+
+	@Override
+	public Member selectMemById(String memId) {
+		return mDao.loadUserByUsername(memId);
 	}
 
 }

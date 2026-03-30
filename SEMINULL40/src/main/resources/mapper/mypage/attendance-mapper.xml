@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="attendance">
+	<insert id="insertAtt">
+		INSERT INTO attendance VALUES(#{memNo}, NULL, DEFAULT)
+	</insert>
+	
+	<select id="selectAtt" resultType="Attendance">
+		SELECT * FROM attendance WHERE mem_no = #{userNo}
+	</select>
+	
+	<update id="updateAtt">
+		UPDATE attendance SET attend_days = SYSDATE, count = count + 1 WHERE mem_no = #{memNo}
+	</update>
+</mapper>

@@ -6,8 +6,8 @@ import java.util.Map;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.kh.cam.common.model.vo.DepartmentDTO;
-import com.kh.cam.member.model.vo.MemberDTO;
+import com.kh.cam.common.model.vo.Department;
+import com.kh.cam.member.model.vo.Member;
 import com.kh.cam.mypage.model.vo.Lecture;
 
 import lombok.RequiredArgsConstructor;
@@ -20,9 +20,10 @@ public class AdminDaoImpl implements AdminDao{
 	
 	private final SqlSessionTemplate session;
 
+	// 회원 상태 관리
 	@Override
-	public List<MemberDTO> selectMemberList() {
-		return session.selectList("admin.selectMemberList");
+	public List<Member> selectMemberList(Map<String, Object> map) {
+	    return session.selectList("admin.selectMemberList", map);
 	}
 	
 	@Override
@@ -32,7 +33,20 @@ public class AdminDaoImpl implements AdminDao{
 	}
 	
 	@Override
-	public List<MemberDTO> selectMemberJoinList() {
+	public int deleteMember(int memNo) {
+		int result = session.delete("admin.deleteMember", memNo);
+
+		if(result > 0) {
+		    // 성공
+		} else {
+		    // 실패 처리
+		}
+		return result;
+	}
+	
+	// 회원 승인관리	
+	@Override
+	public List<Member> selectMemberJoinList() {
 		return session.selectList("admin.selectMemberJoinList");
 	}
 
@@ -41,16 +55,43 @@ public class AdminDaoImpl implements AdminDao{
 		return session.update("admin.updateMemberJoin",
                 Map.of("memNo", memNo, "status", status));
 	}
-
+	// 학과관리
 	@Override
-	public List<DepartmentDTO> selectDepartmentList() {
+	public List<Department> selectDepartmentList() {
 		return session.selectList("admin.selectDepartmentList");
 	}
 
 	@Override
+	public int insertDepartment(Department dept) {
+		return session.insert("admin.insertDepartment", dept);
+	}
+	
+	@Override
+	public int updateDepartment(Department dept) {
+		return session.update("admin.updateDepartment", dept);
+	}
+	
+	@Override
+	public int deleteDepartment(Department deptNo) {
+		return session.delete("admin.deleteDepartment", deptNo);
+	}
+	
+	// 강의관리	
+	@Override
 	public List<Lecture> selectLectureList() {
 		return session.selectList("admin.selectLectureList");
 	}
+
+	@Override
+	public int insertLecture(Lecture lec) {
+		return session.insert("admin.insertLecture", lec);
+	}
+
+	
+
+
+	
+	
 	
 	
 

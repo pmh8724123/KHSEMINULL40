@@ -11,7 +11,7 @@
 			SELECT SEQ_MEM.NEXTVAL FROM DUAL
 		</selectKey>
 		
-		INSERT INTO member VALUES(SEQ_MEM.CURRVAL, #{memId}, #{memPw}, NULL, #{memName}, #{deptNo}, NULL, DEFAULT, DEFAULT)
+		INSERT INTO member VALUES(SEQ_MEM.CURRVAL, #{memId}, #{memPw}, #{studentNo}, #{memName}, #{deptNo}, #{phone}, DEFAULT, DEFAULT)
 	</insert>
 	
 	<select id="selectUniList" resultType="University">
@@ -30,6 +30,8 @@
 		LEFT JOIN authorities a ON m.mem_no = a.mem_no
 		WHERE m.mem_id = #{userName}
 	</select>
+
+
 	<resultMap type="Member" id="memberInfo">
 		<id property="memNo" column="mem_no"/>
 		<result property="memId" column="mem_id"/>
@@ -55,14 +57,7 @@
 		WHERE MEM_NO = #{memNo}
 	</select>
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	<select id="selectMemId" resultType="String">
+		SELECT mem_id FROM member WHERE mem_name = #{memName} AND phone = #{phone}
+	</select>
 </mapper>

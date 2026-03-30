@@ -22,6 +22,7 @@ DROP TABLE CHAT_MESSAGE CASCADE CONSTRAINTS;
 DROP TABLE CHAT CASCADE CONSTRAINTS;
 DROP TABLE CHAT_JOIN CASCADE CONSTRAINTS;
 DROP TABLE FILES CASCADE CONSTRAINTS;
+DROP TABLE persistent_logins CONSTRAINTS;
 
 DROP SEQUENCE SEQ_MEM;
 DROP SEQUENCE SEQ_UNI;
@@ -256,6 +257,14 @@ CREATE TABLE FILES(
     CHANGE_NAME VARCHAR2(20),
     TARGET_TYPE VARCHAR2(20) NOT NULL,
     TARGET_NO   NUMBER NOT NULL
+);
+
+/* 로그인 유지(remember-me) */
+CREATE TABLE persistent_logins (
+  username        VARCHAR(64)  NOT NULL,
+  series          VARCHAR(64)  PRIMARY KEY,
+  token           VARCHAR(64)  NOT NULL,
+  last_used       TIMESTAMP    NOT NULL
 );
 
 --------------------------------------------------------------------------------
