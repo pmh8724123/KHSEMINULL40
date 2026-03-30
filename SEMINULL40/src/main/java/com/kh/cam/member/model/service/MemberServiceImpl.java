@@ -51,4 +51,9 @@ public class MemberServiceImpl implements MemberService {
 		return mDao.selectMemId(m);
 	}
 
+	@Override
+	public Member selectMemById(String memId) {
+		return mDao.loadUserByUsername(memId);
+	}
+
 }

@@ -2,9 +2,7 @@ package com.kh.cam.admin.controller;
 
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
 
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +14,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.kh.cam.admin.model.service.AdminService;
 import com.kh.cam.common.model.vo.Department;
-import com.kh.cam.member.model.vo.CustomUserDetails;
 import com.kh.cam.member.model.vo.Member;
 import com.kh.cam.mypage.model.vo.Lecture;
 
@@ -151,13 +148,19 @@ public class AdminController {
 
 	// 학과 추가
 	@PostMapping("/department/insert")
-	public String insertDepartment(@ModelAttribute Department dept) {
+	public String insertDepartment(@ModelAttribute Department dept, RedirectAttributes ra) {
 		
 		dept.setUniNo(1); // 테스트
-		System.out.println("deptName: " + dept.getDeptName()); // 테스트
-		System.out.println("uniNo: " + dept.getUniNo()); // 테스트
 
-		adminService.insertDepartment(dept);
+		int result = adminService.insertDepartment(dept);
+		
+		if(result > 0) {
+			ra.addFlashAttribute("msg", "추가 성공");
+			ra.addFlashAttribute("type", "success");
+		} else {
+			ra.addFlashAttribute("msg", "추가 실패");
+			ra.addFlashAttribute("type", "error");
+		}
 		
 		return "redirect:/admin/department";
 	}
@@ -210,7 +213,7 @@ public class AdminController {
 
 	// 강의 추가
 	@PostMapping("/lecture/insert")
-	public String insertLecture(@ModelAttribute Lecture lec) {
+	public String insertLecture(@ModelAttribute Lecture lec, RedirectAttributes ra) {
 
 		adminService.insertLecture(lec);
 

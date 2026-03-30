@@ -27,6 +27,7 @@
 		<security:intercept-url pattern="/attendance/**" access="hasRole('USER')"/>
 	
 		<security:intercept-url pattern="/security/accessDenied" access="permitAll"/>
+		
 		<security:intercept-url pattern="/admin" access="hasRole('ADMIN', 'MASTER')"/>
 		
 		<security:form-login login-page="/" login-processing-url="/member/loginProcess" username-parameter="memId" password-parameter="memPw" default-target-url="/board/list"/>
@@ -39,6 +40,8 @@
 	<context:component-scan base-package="com.kh.cam.member">	
 		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
 	</context:component-scan>
+	
+	<!-- <context:component-scan base-package="com.kh.cam"/> -->
 	
 
 	<security:authentication-manager>
