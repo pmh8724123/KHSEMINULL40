@@ -71,6 +71,11 @@ public class AdminDaoImpl implements AdminDao{
 		return session.update("admin.updateDepartment", dept);
 	}
 	
+	@Override
+	public int deleteDepartment(Department deptNo) {
+		return session.delete("admin.deleteDepartment", deptNo);
+	}
+	
 	// 강의관리	
 	@Override
 	public List<Lecture> selectLectureList() {
@@ -81,6 +86,8 @@ public class AdminDaoImpl implements AdminDao{
 	public int insertLecture(Lecture lec) {
 		return session.insert("admin.insertLecture", lec);
 	}
+
+	
 
 
 	

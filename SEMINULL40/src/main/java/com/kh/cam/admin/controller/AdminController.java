@@ -163,14 +163,38 @@ public class AdminController {
 	}
 	
 	// 학과 수정
-	@PostMapping("member/department/update")
+	@PostMapping("/department/update")
 	public String updateDepartment(Department dept,RedirectAttributes ra) {
-
-		adminService.updateDepartment(dept);
 		
-		ra.addFlashAttribute("msg", "수정완료");
-		ra.addFlashAttribute("type", "error");
+		int result = adminService.updateDepartment(dept);
+		
+		System.out.println("asdasdasd" + dept);
+		
+		if(result > 0) {
+	        ra.addFlashAttribute("msg", "수정 완료");
+	        ra.addFlashAttribute("type", "success");
+	    } else {
+	        ra.addFlashAttribute("msg", "수정 실패");
+	        ra.addFlashAttribute("type", "error");
+	    }
 
+		return "redirect:/admin/department";
+	}
+	
+	// 학과 삭제
+	@PostMapping("/department/delete")
+	public String deleteDepartment(Department deptNo, RedirectAttributes ra) {
+		
+		int result = adminService.deleteDepartment(deptNo);
+		
+		if(result > 0) {
+			ra.addFlashAttribute("msg", "삭제 완료");
+			ra.addFlashAttribute("type", "error");
+		} else {
+			ra.addFlashAttribute("msg", "삭제 실패");
+			ra.addFlashAttribute("type", "success");
+		}
+		
 		return "redirect:/admin/department";
 	}
 

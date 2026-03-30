@@ -61,6 +61,11 @@ public class AdminServiceImpl implements AdminService{
 		return adminDao.updateDepartment(dept);
 	}
 	
+	@Override
+	public int deleteDepartment(Department deptNo) {
+		return adminDao.deleteDepartment(deptNo);
+	}
+	
 	/*
 	 * // 학과 관리
 	 * 
@@ -83,6 +88,8 @@ public class AdminServiceImpl implements AdminService{
 	public int insertLecture(Lecture lec) {
 		return adminDao.insertLecture(lec);
 	}
+
+	
 
 	
 

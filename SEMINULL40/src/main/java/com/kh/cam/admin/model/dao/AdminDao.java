@@ -28,10 +28,14 @@ public interface AdminDao {
 	
 	int updateDepartment(Department dept);
 	
+	int deleteDepartment(Department deptNo);
+	
 	// 강의관리
 	List<Lecture> selectLectureList();
 
 	int insertLecture(Lecture lec);
+
+	
 
 
 
