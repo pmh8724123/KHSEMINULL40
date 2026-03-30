@@ -42,6 +42,7 @@
 	        B.BOARD_NO,
 	        B.BOARD_TITLE,
 	        B.BOARD_WRITER,
+	        M.MEM_NAME AS "boardWriterName",
 	        B.CREATE_DATE,
 	        B.VIEW_COUNT AS "viewCount",
 	        BT.BTYPE_NAME AS "categoryName",
@@ -49,6 +50,7 @@
 	    FROM BOARD B
 	    LEFT JOIN UNI_BOARD_TYPE UBT ON (B.UBTYPE_NO = UBT.UNI_NO)
 	    LEFT JOIN BOARD_TYPE BT ON (UBT.BTYPE_NO = BT.BTYPE_NO)
+	    LEFT JOIN MEMBER M ON (B.BOARD_WRITER = M.MEM_NO)
 	    WHERE B.STATUS = 'Y'
 	    
 	    <if test="category != null and !category.equals('all')">
@@ -81,16 +83,18 @@
 	<!-- 상세 조회 -->
     <select id="selectBoard" parameterType="_int" resultType="Board">
         SELECT 
-            BOARD_NO, 
-            UBTYPE_NO, 
-            BOARD_TITLE, 
-            BOARD_CONTENT, 
-            BOARD_WRITER, 
-            VIEW_COUNT AS "viewCount",
-            CREATE_DATE AS "createDate"
-        FROM BOARD
-        WHERE BOARD_NO = #{boardNo} 
-          AND STATUS = 'Y'
+            B.BOARD_NO, 
+            B.UBTYPE_NO, 
+            B.BOARD_TITLE, 
+            B.BOARD_CONTENT, 
+            B.BOARD_WRITER, 
+            M.MEM_NAME AS "boardWriterName",
+            B.VIEW_COUNT AS "viewCount",
+            B.CREATE_DATE AS "createDate"
+        FROM BOARD B
+        LEFT JOIN MEMBER M ON (B.BOARD_WRITER = M.MEM_NO)
+        WHERE B.BOARD_NO = #{boardNo} 
+          AND B.STATUS = 'Y'
     </select>
 
 	<!-- 게시글 수정 쿼리 추가 -->

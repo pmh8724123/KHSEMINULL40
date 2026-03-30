@@ -5,6 +5,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name = "_csrf_header" content="${_csrf.headerName}"/>
 <title>${not empty b ? '게시글 수정' : '새 게시글 작성'}</title>
 <style>
     body{ 
@@ -129,8 +130,10 @@
     <div class="write-wrapper">
         <div class="write-title">${not empty b ? '게시글 수정' : '새 게시글 작성'}</div>
         
-        <form action="${pageContext.request.contextPath}/board/${not empty b ? 'update.bo' : 'insert.bo'}" 
+        <form action="${pageContext.request.contextPath}/board/${not empty b ? 'update.bo' : 'insert.bo'}?${_csrf.parameterName}=${csrf.token}" 
               method="post" enctype="multipart/form-data">
+            
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
             
             <%-- 2. 수정 시에만 boardNo 전송 (JSTL 선언 덕분에 이제 정상 작동합니다) --%>
             <c:if test="${not empty b}">
@@ -145,7 +148,7 @@
 			        <option value="">카테고리를 선택하세요</option>
 			        <option value="1" ${(b.ubtypeNo == 1)? 'selected' : ''}>자유게시판</option>
 			        <option value="2" ${(b.ubtypeNo == 2)? 'selected' : ''}>질문답변</option>
-			        <option value="3" ${(b.ubtypeNo == 3)? 'selected' : ''}>공지사항</option>
+			        <option value="3" ${(b.ubtypeNo == 3)? 'selected' : ''}>사건사고</option>
 			    </select>
 			</div>
 

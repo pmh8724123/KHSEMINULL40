@@ -10,7 +10,7 @@
 <title>Insert title here</title>
 <style>
 
-/* 푸터 */
+/* 푸터 css */
 * {
 	margin: 0;
 	padding: 0;

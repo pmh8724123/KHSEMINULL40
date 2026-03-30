@@ -49,9 +49,9 @@ body {
 	margin-bottom: 10px;
 	overflow: hidden;
 }
-/*실제 이미지가 있다면 아래 주석 해제
+
 .logo-circle img { width: 100%; height: 100%; object-fit: cover; }
-*/
+
 
 .logo-section h1 {
 	font-size: 32px;

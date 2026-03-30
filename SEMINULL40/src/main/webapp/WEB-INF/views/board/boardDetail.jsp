@@ -1,9 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="_csrf" content="${_csrf.token}"/>
+<meta name="_csrf_header" content="${_csrf.headerName}"/>
 <title>게시글 상세 보기</title>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <style>
@@ -169,23 +172,28 @@
 <body>
     <jsp:include page="/WEB-INF/views/common/header.jsp" />
     
+    <!-- Spring Security에서 로그인한 유저 정보를 가져와 loginUser 변수에 담음 -->
+    <sec:authorize access="isAuthenticated()">
+        <sec:authentication property="principal.member" var="loginUser" />
+    </sec:authorize>
+    
     <div class="detail-wrapper">
         <div class="post-section">
 			<div class="post-header">
 			    <h2 class="post-title">${b.boardTitle}</h2>
-			    <div class="btns">
-			        <%-- 나중에 로그인 구현 시: <c:if test="${loginUser.memNo eq b.boardWriter}"> --%>
-			        <button class="edit-btn" onclick="location.href='${pageContext.request.contextPath}/board/updateForm?boardno=${b.boardNo}'">수정</button>
-			        <button class="edit-btn" style="background-color: #ff4d4d; margin-left: 5px;" onclick="deleteBoard();">삭제</button>
-			        <%-- </c:if> --%>
-			    </div>
+				<div class="btns">
+				    <!-- 작성자 본인에게만 수정/삭제 버튼 노출 -->
+				    <c:if test="${not empty loginUser and loginUser.memNo eq b.boardWriter}">
+				        <button class="edit-btn" onclick="location.href='${pageContext.request.contextPath}/board/updateForm?boardno=${b.boardNo}'">수정</button>
+				        <button class="edit-btn" style="background-color: #ff4d4d; margin-left: 5px;" onclick="deleteBoard();">삭제</button>
+				    </c:if>
+				</div>
 			</div>       
             <div class="post-info">
-                작성자 <b>${b.boardWriter}</b> &nbsp;|&nbsp; 조회수 <b>${b.viewCount}</b> &nbsp;|&nbsp; 작성일 <b>${b.createDate}</b>
+                작성자 <b>${b.boardWriterName}</b> &nbsp;|&nbsp; 조회수 <b>${b.viewCount}</b> &nbsp;|&nbsp; 작성일 <b>${b.createDate}</b>
             </div>
             
             <div class="post-content">
-                <!-- [본문 이미지 출력] -->
                 <c:if test="${not empty list}">
                     <div class="content-img-area">
                         <c:forEach var="f" items="${list}">
@@ -196,8 +204,6 @@
                         </c:forEach>
                     </div>
                 </c:if>
-
-                <!-- [본문 텍스트 출력] -->
                 <div class="text-area">${b.boardContent}</div>
             </div>
         </div>
@@ -207,7 +213,6 @@
             <button class="action-btn-report">신고</button>
         </div>
         
-        <!-- 댓글 영역 -->
         <div class="reply-section">
              <div class="reply-count">댓글 <span id="rcount">0</span></div>
             <div class="reply-write-box">
@@ -219,10 +224,22 @@
             <div id="replyListArea"></div>
         </div>
     </div>
-
+	<jsp:include page="/WEB-INF/views/common/footer.jsp" /> 
     <script>
-        // 나중에 로그인 구현 시 실제 세션 값으로 바꿀 부분
-        const currentTestUserNo = 1; 
+        // AJAX CSRF 설정 (Spring Security 필수)
+        const token = $("meta[name='_csrf']").attr("content");
+        const header = $("meta[name='_csrf_header']").attr("content");
+
+        $.ajaxSetup({
+            beforeSend: function(xhr) {
+                if (header && token) {
+                    xhr.setRequestHeader(header, token);
+                }
+            }
+        });
+
+        // 로그인 유저의 번호를 할당 (비로그인시 0)
+        const currentLoginUserNo = "${not empty loginUser ? loginUser.memNo : 0}";
 
         $(function() {
             selectReplyList();
@@ -235,8 +252,7 @@
                 window.open(url, "reportPopup", "width=500,height=650,top=100,left=500");
             });
         });
-
-        // 댓글 목록 조회
+		// 댓글 목록
         function selectReplyList() {
             $.ajax({
                 url: "${pageContext.request.contextPath}/reply/list",
@@ -251,7 +267,7 @@
                                         <div class='reply-writer'>\${r.userName || '익명'} <span style='font-size:11px; color:#999;'>(\${r.createDate})</span></div>
                                         <div class='reply-text'>\${r.replyContent}</div>
                                         <div style='font-size:12px; color:#888;'>
-                                            <span onclick='deleteReply(\${r.replyNo})' style='color:red; cursor:pointer;'>삭제</span>
+                                            \${currentLoginUserNo == r.replyWriter ? `<span onclick='deleteReply(\${r.replyNo})' style='color:red; cursor:pointer;'>삭제</span>` : ''}
                                         </div>
                                      </div>`;
                         });
@@ -262,29 +278,39 @@
                 }
             });
         }
-
-        // 댓글 등록
+		// 댓글 추가
         function addReply() {
+            // 로그인 체크
+            if (currentLoginUserNo == 0) {
+                alert("로그인 후 이용 가능합니다.");
+                return;
+            }
+
             const content = $("#replyContent").val();
-            if (!content.trim()) return;
+            if (!content.trim()) {
+                alert("내용을 입력해주세요.");
+                return;
+            }
+
             $.ajax({
                 url: "${pageContext.request.contextPath}/reply/insert",
                 type: "post",
                 data: { 
                     boardNo: "${b.boardNo}", 
                     replyContent: content, 
-                    replyWriter: currentTestUserNo // 하드코딩된 유저번호 사용
+                    replyWriter: currentLoginUserNo 
                 },
                 success: function(result) {
                     if (result === "success") {
                         $("#replyContent").val("");
                         selectReplyList();
+                    } else {
+                        alert("댓글 등록 실패");
                     }
                 }
             });
         }
-
-        // 좋아요 개수 조회
+		// 좋아요 카운트
         function getLikeCount() {
             $.ajax({
                 url: "${pageContext.request.contextPath}/board/likeCount",
@@ -292,15 +318,18 @@
                 success: function(count) { $("#likeCount").text(count); }
             });
         }
-
-        // 좋아요 업데이트
+		// 좋아요 업데이트
         function updateLike() {
+            if (currentLoginUserNo == 0) {
+                alert("로그인 후 이용 가능합니다.");
+                return;
+            }
             $.ajax({
                 url: "${pageContext.request.contextPath}/board/like",
                 type: "post",
                 data: { 
                     boardNo: "${b.boardNo}", 
-                    memNo: currentTestUserNo // 하드코딩된 유저번호 사용
+                    memNo: currentLoginUserNo 
                 },
                 success: function(result) {
                     getLikeCount();
@@ -308,7 +337,6 @@
                 }
             });
         }
-        
         // 댓글 삭제
         function deleteReply(replyNo) {
             if(confirm("정말로 이 댓글을 삭제하시겠습니까?")) {
@@ -323,23 +351,16 @@
                         } else {
                             alert("댓글 삭제에 실패했습니다.");
                         }
-                    },
-                    error: function() {
-                        console.log("댓글 삭제 통신 에러");
                     }
                 });
             }
         }
-        
-        // 게시글 삭제 함수
+        // 게시글 삭제
         function deleteBoard(){
-        	if(confirm("정말로 이 게시글을 삭제하시겠습니까?")){
-        		// GET 방식으로 boardNo 넘겨서 삭제 요청
-        	    location.href = "${pageContext.request.contextPath}/board/delete?boardno=${b.boardNo}";
-        	}
+            if(confirm("정말로 이 게시글을 삭제하시겠습니까?")){
+                location.href = "${pageContext.request.contextPath}/board/delete?boardno=${b.boardNo}";
+            }
         }
-        
-        
     </script>
 </body>
 </html>

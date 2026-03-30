@@ -19,6 +19,7 @@ public class Board {
 	private String boardTitle;
 	private String boardContent;
 	private int boardWriter;
+	private String boardWriterName;
 	private int viewCount;
 	private Date createDate;
 	private String status;

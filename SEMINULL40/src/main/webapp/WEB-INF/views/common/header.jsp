@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
@@ -17,9 +16,10 @@
 }
 
 
+
 .header {
 	background: #fff;
-	border: 2px solid #4a90e2;
+	border: 2px solid #4A90E2;
 	border-radius: 20px;
 	padding: 15px;
 }
@@ -44,7 +44,7 @@
 	border-radius: 50%;
 	background-image: url('${path}/resources/images/logoImg.png');
 	background-size: cover;
-    background-position: center;
+    background-position: center;
 }
 
 .logo {
@@ -66,7 +66,7 @@
 	cursor: pointer;
 }
 
-/* 🔥 추가 (빠져있던 부분) */
+/* :fire: 추가 (빠져있던 부분) */
 .search-box {
 	margin: 15px auto;
 	display: flex;
@@ -76,14 +76,14 @@
 .search-box input {
 	width: 300px;
 	padding: 10px;
-	border: 1px solid #4a90e2;
+	border: 1px solid #4A90E2;
 	border-radius: 20px 0 0 20px;
 	outline: none;
 }
 
 .search-box button {
 	padding: 10px;
-	border: 1px solid #4a90e2;
+	border: 1px solid #4A90E2;
 	border-left: none;
 	border-radius: 0 20px 20px 0;
 	cursor: pointer;
@@ -112,7 +112,7 @@
 			</span>
 		</div>
 		
-		<!-- 접속 권한이 관리자일때  -->
+		<!-- 접속 권한이 관리자일때  -->
 		
 		
 		
