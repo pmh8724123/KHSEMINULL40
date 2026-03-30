@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Notice {
 	private int noticeNo;
-	private int ubtypeNo;
 	private String boardTitle;
 	private String boardContent;
 	private int boardWriter;
