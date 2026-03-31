@@ -18,10 +18,6 @@ public class MypageServiceImpl implements MypageService{
 
     private final MypageDao mypageDao;
 
-	@Override
-	public List<Friends> selectFriendList(int memNo) {
-		return mypageDao.selectFriendList(memNo);
-	}
 
 
 }

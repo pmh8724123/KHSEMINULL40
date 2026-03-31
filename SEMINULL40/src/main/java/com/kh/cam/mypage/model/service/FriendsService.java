@@ -6,7 +6,7 @@ import com.kh.cam.mypage.model.vo.Friends;
 
 public interface FriendsService {
 
-	List<Friends> getFriendList(int memNo);
+	List<Friends> selectFriendList(int memNo);
 
 	// 이름으로 회원 검색
 	List<Friends> searchMember(int senderNo, String keyword);
@@ -27,4 +27,6 @@ public interface FriendsService {
 	// 친구 거절
 	// 반환값: "ok"(성공), "fail"(실패)
 	String rejectFriend(int senderNo, int receiverNo);
+
+	String deleteFriend(int senderNo, int receiverNo);
 }

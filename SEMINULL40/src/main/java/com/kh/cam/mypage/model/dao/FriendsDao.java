@@ -7,7 +7,7 @@ import com.kh.cam.mypage.model.vo.Friends;
 public interface FriendsDao {
 
 	// 수락된 친구 목록 조회 (내가 보낸 + 받은 요청 모두 포함)
-	public List<Friends> getFriendList(int memNo);
+	List<Friends> selectFriendList(int memNo);
 
 
 	// 이름(keyword)으로 회원 검색
@@ -33,4 +33,7 @@ public interface FriendsDao {
 	// 친구 거절
 	// FRIEND 테이블에서 해당 요청 DELETE
 	int rejectFriend(int senderNo, int receiverNo);
+
+
+	int deleteFriend(int senderNo, int receiverNo);
 }
