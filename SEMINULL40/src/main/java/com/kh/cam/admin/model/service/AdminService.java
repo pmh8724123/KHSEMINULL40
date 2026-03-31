@@ -9,7 +9,7 @@ import com.kh.cam.mypage.model.vo.Lecture;
 public interface AdminService {
 
 	// 회원 상태 관리
-	List<Member> selectMemberList(String condition, String keyword);
+	List<Member> selectMemberList(int uniNo, String condition, String keyword);
 	
 	int updateMemberStatus(int memNo, String status);
 	
@@ -36,7 +36,9 @@ public interface AdminService {
 	// 강의 관리
 	List<Lecture> selectLectureList();
 
-	int insertLecture(Lecture lec);
+	int insertLecture(Lecture lecture);
+
+	int deleteLecture(Lecture lecNo);
 
 
 

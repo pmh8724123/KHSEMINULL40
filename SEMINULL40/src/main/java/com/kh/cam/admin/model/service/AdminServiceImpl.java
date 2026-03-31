@@ -4,10 +4,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.kh.cam.admin.model.dao.AdminDao;
 import com.kh.cam.common.model.vo.Department;
+import com.kh.cam.member.model.vo.CustomUserDetails;
 import com.kh.cam.member.model.vo.Member;
 import com.kh.cam.mypage.model.vo.Lecture;
 
@@ -21,10 +24,19 @@ public class AdminServiceImpl implements AdminService{
 	
 	// 회원 상태 관리
 	@Override
-	public List<Member> selectMemberList(String condition, String keyword) {
+	public List<Member> selectMemberList(int uniNo, String condition, String keyword) {
+		
 	    Map<String, Object> map = new HashMap<>();
-	    map.put("condition", condition);
-	    map.put("keyword", keyword);
+	    map.put("uniNo", uniNo);
+	    
+	    if(condition != null && !condition.isEmpty()) {
+	        map.put("condition", condition);
+	    }
+
+	    if(keyword != null && !keyword.isEmpty()) {
+	        map.put("keyword", keyword);
+	    }
+	    
 
 	    return adminDao.selectMemberList(map);
 	}
@@ -85,8 +97,13 @@ public class AdminServiceImpl implements AdminService{
 
 	// 강의 관리
 	@Override
-	public int insertLecture(Lecture lec) {
-		return adminDao.insertLecture(lec);
+	public int insertLecture(Lecture lecture) {
+		return adminDao.insertLecture(lecture);
+	}
+
+	@Override
+	public int deleteLecture(Lecture lectureNo) {
+		return adminDao.deleteLecture(lectureNo);
 	}
 
 	

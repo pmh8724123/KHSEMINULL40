@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <!DOCTYPE html>
 <html>
@@ -126,22 +127,26 @@
 <body>
     <jsp:include page="/WEB-INF/views/common/header.jsp" />
     
+    <c:set var="contextPath" value="${pageContext.request.contextPath}" />
+        
     <div class="board-wrapper">
         
         <header class="board-header">
             <h1>게시판</h1>
             <%-- 상세 페이지 이동을 위해 location.href 사용 시 boardno 소문자 권장 (Controller와 맞춤) --%>
-            <button class="write-btn" onclick="location.href='write?category=${cur}'">글쓰기</button>
+            <sec:authorize access="hasRole('ADMIN')">
+	            <button class="write-btn" onclick="location.href='write'">글쓰기</button>        
+            </sec:authorize>
         </header>
 
         <div class="post-container">
             <%-- 컨트롤러에서 담아준 boardList를 순회함 --%>
             <c:forEach var="post" items="${noticeList}">
-                <a href="detail?noticeno=${post.noticeNo}" class="post-item">
+                <a href="detail?noticeNo=${post.noticeNo}" class="post-item">
                     <h2>${post.noticeTitle}</h2>
                     <div class="post-info">
                         <%-- readCount 대신 VO 필드명인 viewCount 사용 --%>
-                        <span class="tag-stats">조회수 ${post.viewCount} &nbsp; 👍 ${post.likeCount}</span>
+                        <%-- <span class="tag-stats">조회수 ${post.viewCount} &nbsp; 👍 ${post.likeCount}</span> --%>
                     </div>
                 </a>
             </c:forEach>

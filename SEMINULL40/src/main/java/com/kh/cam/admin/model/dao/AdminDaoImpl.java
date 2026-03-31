@@ -83,8 +83,13 @@ public class AdminDaoImpl implements AdminDao{
 	}
 
 	@Override
-	public int insertLecture(Lecture lec) {
-		return session.insert("admin.insertLecture", lec);
+	public int insertLecture(Lecture lecture) {
+		return session.insert("admin.insertLecture", lecture);
+	}
+
+	@Override
+	public int deleteLecture(Lecture lectureNo) {
+		return session.delete("admin.deleteLecture", lectureNo);
 	}
 
 	

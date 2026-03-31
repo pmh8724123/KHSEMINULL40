@@ -1,8 +1,10 @@
 package com.kh.cam.admin.controller;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+
 import java.util.List;
 
-
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +16,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.kh.cam.admin.model.service.AdminService;
 import com.kh.cam.common.model.vo.Department;
+import com.kh.cam.member.model.service.MemberService;
+import com.kh.cam.member.model.vo.CustomUserDetails;
 import com.kh.cam.member.model.vo.Member;
 import com.kh.cam.mypage.model.vo.Lecture;
 
@@ -43,12 +47,16 @@ public class AdminController {
 	        Model model
 			) {
 		
-		
-		List<Member> list = adminService.selectMemberList(condition, keyword);
+		CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    	int uniNo = user.getMember().getUniNo();
+    	System.out.println("로그인한 관리자 uniNo : " + uniNo);
+    	
+    	List<Member> list = adminService.selectMemberList(uniNo, condition, keyword);
 
 		model.addAttribute("list", list);
 	    model.addAttribute("condition", condition);
 	    model.addAttribute("keyword", keyword);
+	    model.addAttribute("loginUser", user.getMember());
 
 		return "admin/memberStatus";
 	}
@@ -201,7 +209,7 @@ public class AdminController {
 		return "redirect:/admin/department";
 	}
 
-	// 수업 관리
+	// 강의 관리
 	@GetMapping("/lecture")
 	public String adminLecture(Model model) {
 		List<Lecture> list = adminService.selectLectureList();
@@ -213,12 +221,29 @@ public class AdminController {
 
 	// 강의 추가
 	@PostMapping("/lecture/insert")
-	public String insertLecture(@ModelAttribute Lecture lec, RedirectAttributes ra) {
+	public String insertLecture(@ModelAttribute Lecture lecture, RedirectAttributes ra) {
 
-		adminService.insertLecture(lec);
+		int result = adminService.insertLecture(lecture);
+		
+		if(result > 0) {
+			ra.addFlashAttribute("msg", "추가 성공");
+			ra.addFlashAttribute("type", "success");
+		} else {
+			ra.addFlashAttribute("msg", "추가 실패");
+			ra.addFlashAttribute("type", "error");
+		}
 
 		return "redirect:/admin/lecture";
 	}
+	
+	// 강의 삭제
+		@PostMapping("/lecture/delete")
+		public String deleteLecture(@ModelAttribute Lecture lectureNo, RedirectAttributes ra) {
+			
+			int result = adminService.deleteLecture(lectureNo);
+
+			return "redirect:/admin/lecture";
+		}
 
 // ---------------------게시판 관리----------------------------------
 	// 공지사항
