@@ -33,7 +33,9 @@ public interface AdminDao {
 	// 강의관리
 	List<Lecture> selectLectureList();
 
-	int insertLecture(Lecture lec);
+	int insertLecture(Lecture lecture);
+
+	int deleteLecture(Lecture lectureNo);
 
 	
 

@@ -91,14 +91,18 @@
 												<h3>학과 수정</h3>
 
 												<form
-													action="${pageContext.request.contextPath}/admin/department/update" method="post">
+													action="${pageContext.request.contextPath}/admin/department/update"
+													method="post">
 
-													<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
-													<input type="hidden" name="deptNo" value="${d.deptNo}"> 학과명: 
-													<input type="text" name="deptName" value="${d.deptName}"><br>
+													<input type="hidden" name="${_csrf.parameterName}"
+														value="${_csrf.token}"> <input type="hidden"
+														name="deptNo" value="${d.deptNo}"> 학과명: <input
+														type="text" name="deptName" value="${d.deptName}"><br>
 
 													<button type="submit" class="btn btn-approve">수정</button>
-													<button type="button" onclick="closeModal('departmentUpdateModal${d.deptNo}')" class="exit-btn">취소</button>
+													<button type="button"
+														onclick="closeModal('departmentUpdateModal${d.deptNo}')"
+														class="exit-btn">취소</button>
 												</form>
 
 											</div>
