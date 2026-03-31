@@ -6,7 +6,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>${not empty b ? '게시글 수정' : '새 게시글 작성'}</title>
+<title>${not empty notice ? '공지 수정' : '새 공지 작성'}</title>
 <style>
     body{ 
     	background-color: #f2f7ff; 
@@ -124,43 +124,30 @@
 </style>
 </head>
 <body>
-
-    <jsp:include page="/WEB-INF/views/common/header.jsp" /> 
+    <jsp:include page="/WEB-INF/views/common/header.jsp" />
+    
+    <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
     
     <div class="write-wrapper">
-        <div class="write-title">${not empty b ? '게시글 수정' : '새 게시글 작성'}</div>
+        <div class="write-title">${not empty notice ? '공지 수정' : '새 공지 작성'}</div>
         
-        <form:form action="${pageContext.request.contextPath}/board/${not empty b ? 'update.bo' : 'insert.bo'}" 
-              method="post" enctype="multipart/form-data">
+        <form:form action="${contextPath}/notice/${not empty notice ? 'updateNotice' : 'insertNotice'}" method="post" enctype="multipart/form-data">
             
             <%-- 2. 수정 시에만 boardNo 전송 (JSTL 선언 덕분에 이제 정상 작동합니다) --%>
-            <c:if test="${not empty b}">
-                <input type="hidden" name="boardNo" value="${b.boardNo}">
+            <c:if test="${not empty notice}">
+                <input type="hidden" name="noticeNo" value="${notice.noticeNo}">
             </c:if>
-
-            <!-- 카테고리 선택 -->
-			<div class="form-group">
-			    <label>카테고리</label>
-			    <!-- name을 category로 변경, value를 문자열로 변경 -->
-			    <select class="input-style" name="ubtypeNo" required>
-			        <option value="">카테고리를 선택하세요</option>
-			        <option value="1" ${(b.ubtypeNo == 1)? 'selected' : ''}>자유게시판</option>
-			        <option value="2" ${(b.ubtypeNo == 2)? 'selected' : ''}>질문답변</option>
-			        <option value="3" ${(b.ubtypeNo == 3)? 'selected' : ''}>공지사항</option>
-			    </select>
-			</div>
 
             <!-- 제목 입력 (name을 VO 필드명인 boardTitle로 변경) -->
             <div class="form-group">
                 <label>제목</label>
-                <input type="text" class="input-style" name="boardTitle" 
-                       value="${b.boardTitle}" placeholder="제목을 입력하세요" required>
+                <input type="text" class="input-style" name="noticeTitle" value="${notice.noticeTitle}" placeholder="제목을 입력하세요" required>
             </div>
 
             <!-- 내용 입력 (name을 VO 필드명인 boardContent로 변경) -->
             <div class="form-group">
                 <label>내용</label>
-                <textarea class="input-style" name="boardContent" placeholder="내용을 입력하세요" required>${b.boardContent}</textarea>
+                <textarea class="input-style" name="noticeContent" placeholder="내용을 입력하세요" required>${notice.noticeContent}</textarea>
             </div>
 
 			<!-- 첨부파일 -->
@@ -202,7 +189,7 @@
 
             <div class="btn-group">
                 <button type="button" class="btn" onclick="history.back();">취소</button>
-                <button type="submit" class="btn">${not empty b ? '수정하기' : '게시하기'}</button>
+                <button type="submit" class="btn">${not empty notice ? '수정하기' : '게시하기'}</button>
             </div>
         </form:form>
     </div>

@@ -46,8 +46,6 @@ public class BoardController {
 		CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		System.out.println(user.getMember().getMemName()+"/"+user.getAuthorities());
 		
-		
-		
 		List<Board> list = boardService.selectBoardList(category);
 		model.addAttribute("boardList", list);
 		model.addAttribute("cur", category);
