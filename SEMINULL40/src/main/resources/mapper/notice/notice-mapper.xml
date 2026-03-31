@@ -2,9 +2,33 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="notice">
 	<select id="selectNoticeList" resultType="Notice">
-		SELECT notice_title, notice_content, create_date 
+		SELECT notice_no, notice_title, notice_content, create_date 
 		FROM notice
 		WHERE uni_no = #{uniNo} AND status = 'Y'
 		ORDER BY notice_no
 	</select>
+	
+	<insert id="insertNotice">
+		<selectKey keyProperty="targetNo" resultType="int" order="BEFORE">
+			SELECT SEQ_NOTICE.NEXTVAL FROM DUAL
+		</selectKey>
+		
+		INSERT INTO notice VALUES(SEQ_NOTICE.CURRVAL, #{uniNo}, #{noticeTitle}, #{noticeContent}, SYSDATE, DEFAULT)
+	</insert>
+	
+	<select id="selectNotice" resultType="Notice">
+		SELECT notice_no, notice_title, notice_content, create_date FROM notice WHERE notice_no = #{notice_no} AND status = 'Y'
+	</select>
+	
+	<update id="updateNotice">
+		UPDATE notice
+		SET notice_title = #{noticeTitle}, notice_content = #{noticeContent}
+		WHERE notice_no = #{noticeNo}
+	</update>
+	
+	<update id="deleteNotice">
+		UPDATE notice
+		SET status = 'N'
+		WHERE notice_no = #{noticeNo}
+	</update>
 </mapper>
