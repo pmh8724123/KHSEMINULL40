@@ -132,14 +132,13 @@
 				<sec:authentication property="principal.member.uniName"/>
 			</span>
 			
-			<form:form action="${contextPath}/admin/main" method="get">
+			<form:form action="${path}/admin/main" method="get">
 				<button type="submit" class="adminMove">관리자페이지</button>			
 			</form:form>
 			
-			<form:form action="${contextPath}/member/logout" method="post">
+			<form:form action="${path}/member/logout" method="post">
 				<button type="submit" class="logout">로그아웃</button>			
 			</form:form>
-			
 		</div>
 	</div>
 
@@ -157,6 +156,6 @@
 		<a href="${path}/rating">평가</a>
 		<a href="${path}/timetable">시간표</a>
 		<a href="${path}/mypage">마이페이지</a>
-		<a href="${path}/notice">공지사항</a>
+		<a href="${path}/notice/list">공지사항</a>
 	</nav>
 </header>
