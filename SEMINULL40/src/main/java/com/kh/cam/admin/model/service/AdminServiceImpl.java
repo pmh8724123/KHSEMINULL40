@@ -4,13 +4,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kh.cam.admin.model.dao.AdminDao;
 import com.kh.cam.common.model.vo.Department;
-import com.kh.cam.member.model.vo.CustomUserDetails;
 import com.kh.cam.member.model.vo.Member;
 import com.kh.cam.mypage.model.vo.Lecture;
 
@@ -42,8 +40,26 @@ public class AdminServiceImpl implements AdminService{
 	}
 	
 	@Override
-	public int updateMemberStatus(int memNo, String status) {
-		return adminDao.updateMemberStatus(memNo, status);
+	@Transactional
+	public int updateMemberStatus(int memNo, String status, int uniNo) {
+	    
+	    int result = adminDao.updateMemberStatus(memNo, status, uniNo);
+	    
+	    if (result <= 0) {
+	        return result;
+	    }
+
+	    if ("Y".equals(status)) {
+	        int count = adminDao.countAuthority(memNo, "ROLE_USER", uniNo);
+
+	        if (count == 0) {
+	            adminDao.insertAuthority(memNo, "ROLE_USER", uniNo);
+	        }
+	    } else if ("B".equals(status) || "N".equals(status)) {
+	        adminDao.deleteAuthority(memNo, "ROLE_USER", uniNo);
+	    }
+
+	    return result;
 	}
 	
 	@Override
@@ -51,15 +67,28 @@ public class AdminServiceImpl implements AdminService{
 		return adminDao.deleteMember(memNo);
 	}
 	
-	// 회원 승인 관리
+	// 회원 승인관리 리스트
 	@Override
-	public List<Member> selectMemberJoinList() {
-		return adminDao.selectMemberJoinList();
+	public List<Member> selectMemberJoinList(int uniNo, String condition, String keyword) {
+		Map<String, Object> map = new HashMap<>();
+		
+		map.put("uniNo", uniNo);
+	    map.put("condition", condition);
+	    map.put("keyword", keyword);
+
+	    return adminDao.selectMemberJoinList(map);
 	}
 
 	@Override
-	public int updateMemberJoin(int memNo, String status) {
-		return adminDao.updateMemberJoin(memNo, status);
+	@Transactional
+	public int approveMember(int memNo, int uniNo) {
+
+	    // 중복 체크
+	    if(adminDao.countAuthority(memNo, "ROLE_USER", uniNo) > 0) {
+	        return 0;
+	    }
+
+	    return adminDao.insertAuthority(memNo, "ROLE_USER", uniNo);
 	}
 	
 	// 학과 관리
@@ -106,6 +135,7 @@ public class AdminServiceImpl implements AdminService{
 		return adminDao.deleteLecture(lectureNo);
 	}
 
+	
 	
 
 	

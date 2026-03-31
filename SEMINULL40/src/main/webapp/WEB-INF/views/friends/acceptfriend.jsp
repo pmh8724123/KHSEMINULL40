@@ -13,6 +13,11 @@
 <title>친구 수락</title>
 
 <link rel="stylesheet" href="${path}/resources/css/addfriend.css">
+
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+
+<meta name="_csrf" content="${_csrf.token}" />
+<meta name="_csrf_header" content="${_csrf.headerName}" />
 </head>
 <body>
 
@@ -54,11 +59,14 @@
 	</div>
 
 	<script>
+		var token = $("meta[name='_csrf']").attr("content");
+		var header = $("meta[name='_csrf_header']").attr("content");
+	
 	function handleRequest(senderNo, action, btn) {
 
 	    $.ajax({
 	        // /acceptfriend/accept 또는 /acceptfriend/reject로 요청
-	        url  : '${path}/acceptfriend/' + action,
+	        url  : '${path}/friends/acceptfriend/' + action,
 	        type : 'POST',
 	        // 서버로 보내는 데이터 형식 지정
 	        contentType: 'application/json',

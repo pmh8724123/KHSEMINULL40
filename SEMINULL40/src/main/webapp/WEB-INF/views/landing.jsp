@@ -7,7 +7,7 @@
 <head>
 <meta charset="UTF-8">
 <title>캠둘기 - 로그인</title>
-<link rel="stylesheet" type="text/css" href="style.css">
+
 <style>
 /* 기본 초기화 */
 * {
