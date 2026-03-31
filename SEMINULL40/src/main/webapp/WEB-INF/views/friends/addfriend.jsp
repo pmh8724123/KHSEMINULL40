@@ -12,6 +12,8 @@
 
 <link rel="stylesheet" href="${path}/resources/css/addfriend.css">
 
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+
 <meta name="_csrf" content="${_csrf.token}" />
 <meta name="_csrf_header" content="${_csrf.headerName}" />
 
@@ -48,7 +50,7 @@ const header = document.querySelector('meta[name="_csrf_header"]').content;
         const keyword = document.getElementById('searchInput').value.trim();
         if (!keyword) return;
 
-        fetch('${path}/addfriend/search?keyword=' + encodeURIComponent(keyword))
+        fetch('${path}/friends/addfriend/search?keyword=' + encodeURIComponent(keyword))
             .then(res => res.json())
             .then(data => {
                 const list = document.getElementById('resultList');
@@ -72,7 +74,7 @@ const header = document.querySelector('meta[name="_csrf_header"]').content;
     }
 
     function sendRequest(receiverNo, btn) {
-        fetch('${path}/addfriend/request', {
+        fetch('${path}/friends/addfriend/request', {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
@@ -82,7 +84,7 @@ const header = document.querySelector('meta[name="_csrf_header"]').content;
         })
         .then(res => res.json())
         .then(data => {
-            if (data.result === 'ok') {
+            if (data.result === 'success') {
                 btn.textContent = '신청됨';
                 btn.classList.add('sent');
                 btn.disabled = true;

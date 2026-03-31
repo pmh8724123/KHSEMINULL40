@@ -122,3 +122,26 @@
 	background: #f1f5f9;
 	color: #aaa;
 }
+
+.friend-item {
+    display: flex;
+    justify-content: space-between; /* 이름과 버튼을 양 끝으로 배치 */
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.friend-delete-btn {
+    background: #E24B4A;
+    color: white;
+    border: none;
+    padding: 5px 15px;
+    cursor: pointer;
+    border-radius: 20px;
+    font-size: 13px;
+    transition: background 0.3s;
+}
+
+.friend-delete-btn:hover {
+    background: #c13b3a; /* 마우스 올렸을 때 약간 어둡게 */
+}

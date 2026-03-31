@@ -17,11 +17,19 @@ public class FriendsDaoImpl implements FriendsDao {
 	private SqlSessionTemplate sqlSession;
 
 	@Override
-	public List<Friends> getFriendList(int memNo) {
-		return sqlSession.selectList("friends.getFriendList", memNo);
+	public List<Friends> selectFriendList(int memNo) {
+		return sqlSession.selectList("friends.selectFriendList", memNo);
 	}
-
-
+	
+	@Override
+	public int deleteFriend(int senderNo, int receiverNo) {
+	    Map<String, Object> map = new HashMap<>();
+	    map.put("senderNo",   senderNo);   // 요청 보낸 사람 memNo
+	    map.put("receiverNo", receiverNo); // 요청 받은 사람 memNo (내 memNo)
+		
+		return sqlSession.delete("friends.deleteFriend", map);
+	}
+	
 	
 	// 수락 대기 중인 친구 요청 목록 조회
 	// FRIEND 테이블에서 receiverNo = 내 memNo, status = 'N'인 목록
@@ -81,7 +89,16 @@ public class FriendsDaoImpl implements FriendsDao {
 		Map<String, Object> map = new HashMap<>();
 		map.put("senderNo", senderNo); // 요청 보내는 사람 memNo
 		map.put("receiverNo", receiverNo); // 요청 받는 사람 memNo
-		return sqlSession.selectOne("friends.checkAlreadyRequested", map);
+		
+		
+		// 1. 결과를 Integer 객체로 받습니다.
+	    Integer result = sqlSession.selectOne("friends.checkAlreadyRequested", map);
+
+	    // 2. 만약 결과가 null이면 0(신청 이력 없음)을 반환합니다.
+	    return (result != null) ? result : 0;
+		
+		
 	}
+
 
 }

@@ -6,19 +6,19 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.kh.cam.member.model.service.MemberService;
-import com.kh.cam.member.model.vo.Member;
+import com.kh.cam.member.model.vo.CustomUserDetails;
 import com.kh.cam.mypage.model.service.FriendsService;
 import com.kh.cam.mypage.model.vo.Friends;
 
@@ -28,20 +28,18 @@ import lombok.extern.slf4j.Slf4j;
 @Controller
 @Slf4j
 @RequiredArgsConstructor
+@RequestMapping("/friends")
 public class FriendsController {
-	
-	
+
 	private final FriendsService fService;
 	private final MemberService mService;
-	
-	
+
 	private int getMemNo() {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		String memName = auth.getName();
-		int result = mService.getMemNo(memName);
-		log.info("친구 값 : {}", result);
-		
-		
+		CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
+
+		int result = user.getUserno();
+
 		return result;
 	}
 
@@ -55,6 +53,29 @@ public class FriendsController {
 //		}
 		return "friends/addfriend";
 	}
+	
+	@PostMapping("/delete")
+	@ResponseBody
+	public Map<String, String> deleteFriend(@RequestBody Map<String, Integer> body) {
+		int senderNo = getMemNo(); // 로그인한 내 번호
+		// body.get("friendNo")가 null일 경우를 대비해 Integer로 받은 후 처리
+		Integer friendNoObj = body.get("friendNo");
+		int receiverNo = (friendNoObj != null) ? friendNoObj : 0;
+
+		Map<String, String> response = new HashMap<>();
+
+		if (senderNo == 0 || receiverNo == 0) {
+			response.put("result", "fail");
+			return response;
+		}
+
+		// 서비스 호출 (양방향 삭제 로직이 구현된 fService.deleteFriend)
+		String result = fService.deleteFriend(senderNo, receiverNo);
+		response.put("result", result);
+		
+		return response;
+	}
+	
 
 	// 회원 검색 (Ajax GET)
 	// MEMBER 테이블의 memName 컬럼 LIKE 검색 후 JSON 반환
@@ -73,34 +94,45 @@ public class FriendsController {
 	@ResponseBody
 	public Map<String, String> friendRequest(@RequestBody Map<String, Integer> body, HttpSession session) {
 
-		// 세션에서 로그인한 사람의 memNo를 senderNo로 사용
-		// Member loginUser = (Member) session.getAttribute("loginUser");
-
-		// body에서 receiverNo(요청 받는 사람 memNo) 꺼내서 전달
-		String result = fService.insertFriendRequest(getMemNo(), body.get("receiverNo"));
-
 		Map<String, String> response = new HashMap<>();
-		response.put("result", result);
 
-		// 중복 신청인 경우 메시지 추가
-		if ("already".equals(result)) {
-			response.put("message", "이미 친구 신청을 보냈습니다.");
-		}
-		return response;
+		try {
+			int senderNo = getMemNo();
+			int receiverNo = Integer.parseInt(body.get("receiverNo").toString());
+			
+			// 서비스 호출 전 최종 방어
+			String result = fService.insertFriendRequest(senderNo, receiverNo);
+			
+			response.put("result", result);
+			
+	        if ("already".equals(result)) {
+	            response.put("message", "이미 신청 중이거나 친구 상태입니다.");
+	        } else {
+	            response.put("message", "친구 신청을 보냈습니다.");
+	        }
+
+	    } catch (DuplicateKeyException e) {
+	        // 2. DB 제약조건 위반 시 발생하는 예외를 따로 잡아서 처리
+	        log.warn("중복된 친구 신청 발생: {}", e.getMessage());
+	        response.put("result", "already");
+	        response.put("message", "이미 신청했거나 친구 관계입니다.");
+	    } catch (Exception e) {
+	        log.error("친구 신청 중 예상치 못한 에러 발생: ", e);
+	        response.put("result", "error");
+	        response.put("message", "서버 오류가 발생했습니다.");
+	    }
+
+	    return response;
 	}
 
-	
-	
-	
-	
 	// 친구 수락 페이지 이동
 	// FRIEND 테이블에서 내가 받은 대기 중인 요청 목록 조회 후 전달
 	@GetMapping("/acceptfriend")
 	public String acceptFriend(HttpSession session, Model model) {
 
-		//if (session.getAttribute("loginUser") == null) {
-		//	return "redirect:/";
-		//}
+		// if (session.getAttribute("loginUser") == null) {
+		// return "redirect:/";
+		// }
 
 		// Member loginUser = (Member) session.getAttribute("loginUser");
 
