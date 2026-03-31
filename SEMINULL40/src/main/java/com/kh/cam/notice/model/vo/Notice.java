@@ -9,13 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Notice {
 	private int noticeNo;
-	private String boardTitle;
-	private String boardContent;
-	private int boardWriter;
-	private int viewCount;
+	private int uniNo;
+	private String noticeTitle;
+	private String noticeContent;
 	private Date createDate;
-	private String status;
-	
-	private String categoryName;
-	private int likeCount;
+	private char status;
 }

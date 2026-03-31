@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelExtensionsKt;
@@ -25,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.kh.cam.board.model.service.BoardService;
 import com.kh.cam.board.model.vo.Attachment;
 import com.kh.cam.board.model.vo.Board;
+import com.kh.cam.member.model.vo.CustomUserDetails;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,6 +43,11 @@ public class BoardController {
 	public String boardList(
 			@RequestParam(value="category", required=false, defaultValue="all") String category,
 			Model model) {
+		CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		System.out.println(user.getMember().getMemName()+"/"+user.getAuthorities());
+		
+		
+		
 		List<Board> list = boardService.selectBoardList(category);
 		model.addAttribute("boardList", list);
 		model.addAttribute("cur", category);
