@@ -2,62 +2,316 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="admin">
 
-<!--☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ 멤버 START ☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆-->
-	<select id="selectMemberList" resultType="com.kh.cam.member.model.vo.MemberDTO">
-	    SELECT 
-	    	M.*,
-	    	D.DEPT_NAME AS deptName,
-	    	U.UNI_NAME AS uniName
-	    FROM MEMBER M
-	    LEFT JOIN DEPARTMENT D ON M.DEPT_NO = D.DEPT_NO
-	    LEFT JOIN UNIVERSITY U ON D.UNI_NO = U.UNI_NO
-	</select>
-	
-	<update id="updateMemberStatus">
-		UPDATE MEMBER
-		SET STATUS = #{status}
-		WHERE MEM_NO = #{memNo}
-	</update>
-	
-	<select id="selectMemberJoinList" resultType="com.kh.cam.member.model.vo.MemberDTO">
-	    SELECT 
-	    	M.*,
-	    	D.DEPT_NAME AS deptName,
-	    	U.UNI_NAME AS uniName
-	    FROM MEMBER M
-	    LEFT JOIN DEPARTMENT D ON M.DEPT_NO = D.DEPT_NO
-	    LEFT JOIN UNIVERSITY U ON D.UNI_NO = U.UNI_NO
-	    WHERE STATUS = 'N'
-	</select>
-	
-	<update id="updateMemberJoin">
-		UPDATE MEMBER
-		SET STATUS = #{status}
-		WHERE MEM_NO = #{memNo}
-	</update>
-<!--★★★★★★★★★★★★★★★★★ 멤버 END ★★★★★★★★★★★★★★★★★-->
+	<!--☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ 멤버 START ☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ -->
+	<select id="selectMemberList" parameterType="map"
+		resultType="Member">
+		SELECT
+		M.MEM_NO,
+		M.MEM_ID,
+		M.STUDENT_NO,
+		M.MEM_NAME,
+		D.DEPT_NAME,
+		U.UNI_NAME,
+		M.PHONE,
+		M.CREATE_DATE,
+		M.STATUS
+		FROM MEMBER M
+		LEFT JOIN
+		DEPARTMENT D ON M.DEPT_NO = D.DEPT_NO
+		LEFT JOIN UNIVERSITY U ON
+		D.UNI_NO = U.UNI_NO
+		WHERE M.MEM_NO != 0
 
-<!--☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ 학과 START ☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆-->
-	<select id="selectDepartmentList" resultType="com.kh.cam.common.model.vo.DepartmentDTO">
-		SELECT 
-			D.DEPT_NO,
-			D.DEPT_NAME,
-			M.MEM_NAME AS memName
+		<if test="uniNo != null and uniNo != 0">
+			AND U.UNI_NO = #{uniNo}
+		</if>
+
+		AND (
+		(
+		M.STATUS = 'Y'
+		AND EXISTS (
+		SELECT 1
+		FROM AUTHORITIES A
+		WHERE
+		A.MEM_NO = M.MEM_NO
+		AND A.AUTHORITY = 'ROLE_USER'
+		)
+		)
+		OR M.STATUS = 'B'
+		OR
+		M.STATUS = 'N'
+		)
+
+		<if test="keyword != null and keyword != ''">
+			AND
+			<choose>
+				<when test="condition == 'all'">
+					(
+					M.MEM_ID LIKE '%' || #{keyword} || '%'
+					OR M.MEM_NAME
+					LIKE '%' ||
+					#{keyword} || '%'
+					OR M.STUDENT_NO LIKE '%' || #{keyword}
+					|| '%'
+					OR
+					M.PHONE LIKE '%' || #{keyword} || '%'
+					OR M.STATUS LIKE '%'
+					||
+					#{keyword} || '%'
+					)
+				</when>
+				<when test="condition == 'memId'">
+					M.MEM_ID LIKE '%' || #{keyword} || '%'
+				</when>
+				<when test="condition == 'memName'">
+					M.MEM_NAME LIKE '%' || #{keyword} || '%'
+				</when>
+				<when test="condition == 'studentNo'">
+					M.STUDENT_NO LIKE '%' || #{keyword} || '%'
+				</when>
+				<when test="condition == 'phone'">
+					M.PHONE LIKE '%' || #{keyword} || '%'
+				</when>
+				<when test="condition == 'status'">
+					M.STATUS = #{keyword}
+				</when>
+			</choose>
+		</if>
+
+		ORDER BY M.MEM_NO
+	</select>
+
+	<update id="updateMemberStatus" parameterType="map">
+		UPDATE MEMBER
+		SET STATUS = #{status}
+		WHERE MEM_NO = #{memNo}
+		<if test="uniNo != 0">
+			AND DEPT_NO IN (
+			SELECT DEPT_NO
+			FROM DEPARTMENT
+			WHERE UNI_NO
+			= #{uniNo}
+			)
+		</if>
+	</update>
+
+	<insert id="insertAuthority" parameterType="map">
+		INSERT INTO
+		AUTHORITIES (MEM_NO, AUTHORITY, UNI_NO)
+		SELECT #{memNo}, #{authority},
+		D.UNI_NO
+		FROM MEMBER M
+		JOIN DEPARTMENT D ON M.DEPT_NO = D.DEPT_NO
+		WHERE
+		M.MEM_NO = #{memNo}
+	</insert>
+
+	<select id="countAuthority" parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM AUTHORITIES
+		WHERE MEM_NO = #{memNo}
+		AND AUTHORITY =
+		#{authority}
+		<if test="uniNo != 0">
+			AND UNI_NO = #{uniNo}
+		</if>
+	</select>
+
+	<delete id="deleteAuthority" parameterType="map">
+		DELETE FROM AUTHORITIES
+		WHERE MEM_NO = #{memNo}
+		AND AUTHORITY =
+		#{authority}
+		<if test="uniNo != 0">
+			AND UNI_NO = #{uniNo}
+		</if>
+	</delete>
+
+	<!-- <delete id="deleteMember"> DELETE FROM MEMBER WHERE MEM_NO = #{memNo}
+		</delete> -->
+
+	<select id="selectMemberJoinList" parameterType="map"
+		resultType="Member">
+		SELECT
+		M.MEM_NO,
+		M.MEM_ID,
+		M.STUDENT_NO,
+		M.MEM_NAME,
+		D.DEPT_NAME,
+		U.UNI_NAME,
+		M.PHONE,
+		M.CREATE_DATE,
+		M.STATUS
+		FROM MEMBER M
+		LEFT JOIN
+		DEPARTMENT D ON M.DEPT_NO = D.DEPT_NO
+		LEFT JOIN UNIVERSITY U ON
+		D.UNI_NO = U.UNI_NO
+		<where>
+			M.MEM_NO != 0
+
+			<if test="uniNo != null and uniNo != 0">
+				AND U.UNI_NO = #{uniNo}
+			</if>
+
+			AND M.STATUS = 'Y'
+			AND NOT EXISTS (
+			SELECT 1
+			FROM AUTHORITIES A
+			WHERE
+			A.MEM_NO = M.MEM_NO
+			AND
+			A.AUTHORITY = 'ROLE_USER'
+			)
+
+			<if test="keyword != null and keyword != ''">
+				AND
+				<choose>
+					<when test="condition == 'all'">
+						(
+						M.MEM_ID LIKE '%' || #{keyword} || '%'
+						OR
+						M.MEM_NAME LIKE '%' ||
+						#{keyword} || '%'
+						OR TO_CHAR(M.STUDENT_NO)
+						LIKE '%' || #{keyword}
+						|| '%'
+						OR M.PHONE LIKE '%' || #{keyword} ||
+						'%'
+						)
+					</when>
+					<when test="condition == 'memId'">
+						M.MEM_ID LIKE '%' || #{keyword} || '%'
+					</when>
+					<when test="condition == 'memName'">
+						M.MEM_NAME LIKE '%' || #{keyword} || '%'
+					</when>
+					<when test="condition == 'studentNo'">
+						TO_CHAR(M.STUDENT_NO) LIKE '%' || #{keyword} || '%'
+					</when>
+					<when test="condition == 'phone'">
+						M.PHONE LIKE '%' || #{keyword} || '%'
+					</when>
+					<otherwise>
+						(
+						M.MEM_ID LIKE '%' || #{keyword} || '%'
+						OR M.MEM_NAME
+						LIKE '%' ||
+						#{keyword} || '%'
+						OR TO_CHAR(M.STUDENT_NO) LIKE '%' ||
+						#{keyword}
+						|| '%'
+						OR M.PHONE LIKE '%' || #{keyword} || '%'
+						)
+					</otherwise>
+				</choose>
+			</if>
+		</where>
+		ORDER BY M.MEM_NO
+	</select>
+
+	<update id="updateMemberJoin" parameterType="map">
+		UPDATE MEMBER
+		SET STATUS = #{status}
+		WHERE MEM_NO = #{memNo}
+		<if test="uniNo != 0">
+			AND DEPT_NO IN (
+			SELECT DEPT_NO
+			FROM DEPARTMENT
+			WHERE UNI_NO
+			= #{uniNo}
+			)
+		</if>
+	</update>
+
+	<update id="rejectMemberJoin" parameterType="int">
+		UPDATE MEMBER
+		SET STATUS = 'N'
+		WHERE MEM_NO = #{memNo}
+	</update>
+	<!--★★★★★★★★★★★★★★★★★ 멤버 END ★★★★★★★★★★★★★★★★★ -->
+
+	<!--☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ 학과 START ☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ -->
+	<select id="selectDepartmentList" parameterType="map"
+		resultType="Department">
+		SELECT
+		D.DEPT_NO,
+		D.DEPT_NAME,
+		D.UNI_NO,
+		U.UNI_NAME
 		FROM DEPARTMENT D
-		LEFT JOIN MEMBER M ON D.DEPT_NO = M.DEPT_NO
+		JOIN
+		UNIVERSITY U ON D.UNI_NO = U.UNI_NO
+		<where>
+			<if test="uniNo != 0">
+				D.UNI_NO = #{uniNo}
+			</if>
+
+			<if test="keyword != null and keyword != ''">
+				AND
+				<choose>
+					<when test="condition == 'deptName'">
+						D.DEPT_NAME LIKE '%' || #{keyword} || '%'
+					</when>
+					<when test="condition == 'uniName'">
+						U.UNI_NAME LIKE '%' || #{keyword} || '%'
+					</when>
+				</choose>
+			</if>
+		</where>
+		ORDER BY D.DEPT_NAME ASC
 	</select>
-	
-	
-	
-<!--★★★★★★★★★★★★★★★★★ 학과 END ★★★★★★★★★★★★★★★★★-->
-	
-	<select id="selectLectureList" resultType="com.kh.cam.mypage.model.vo.Lecture">
-		SELECT *
-		FROM CLASS
+
+	<insert id="insertDepartment">
+		INSERT INTO DEPARTMENT
+		VALUES(
+		SEQ_DEPT.NEXTVAL,
+		#{uniNo},
+		#{deptName}
+		)
+	</insert>
+
+	<update id="updateDepartment">
+		UPDATE DEPARTMENT
+		SET DEPT_NAME = #{deptName}
+		WHERE
+		DEPT_NO = #{deptNo}
+	</update>
+
+	<delete id="deleteDepartment">
+		DELETE FROM DEPARTMENT
+		WHERE DEPT_NO = #{deptNo}
+	</delete>
+
+
+
+
+	<!--★★★★★★★★★★★★★★★★★ 학과 END ★★★★★★★★★★★★★★★★★ -->
+
+	<!--☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ 강의 START ☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ -->
+	<select id="selectLectureList" resultType="Lecture">
+		SELECT
+		L.*,
+		SL.*
+		FROM
+		LECTURE L
+		LEFT JOIN SEMESTER_LECTURE SL ON L.LECTURE_NO = SL.LECTURE_NO
 	</select>
-	
-	
-	
-	
-	
-    </mapper>
+
+	<insert id="insertLecture">
+		INSERT INTO LECTURE
+		VALUES(
+		SEQ_LECTURE.NEXTVAL,
+		#{deptNo},
+		#{lectureName},
+		#{professorName}
+		)
+	</insert>
+
+	<delete id="deleteLecture">
+		DELETE FROM LECTURE
+		WHERE LECTURE_NO = #{lectureNo}
+	</delete>
+
+
+</mapper>
