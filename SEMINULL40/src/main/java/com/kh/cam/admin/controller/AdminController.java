@@ -1,7 +1,5 @@
 package com.kh.cam.admin.controller;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-
 import java.util.List;
 
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,7 +14,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.kh.cam.admin.model.service.AdminService;
 import com.kh.cam.common.model.vo.Department;
-import com.kh.cam.member.model.service.MemberService;
 import com.kh.cam.member.model.vo.CustomUserDetails;
 import com.kh.cam.member.model.vo.Member;
 import com.kh.cam.mypage.model.vo.Lecture;
@@ -86,19 +83,6 @@ public class AdminController {
 		return "redirect:/admin/memberStatus";
 	}
 
-	/*
-	 * // 회원 삭제
-	 * 
-	 * @PostMapping("/member/delete") public String deleteMember(int memNo,
-	 * RedirectAttributes ra) {
-	 * 
-	 * adminService.deleteMember(memNo);
-	 * 
-	 * ra.addFlashAttribute("msg", "회원이 삭제되었습니다."); ra.addFlashAttribute("type",
-	 * "error");
-	 * 
-	 * return "redirect:/admin/memberStatus"; }
-	 */
 
 // ---------------------회원승인관리----------------------------------
 
@@ -143,9 +127,9 @@ public class AdminController {
 
 	// 회원 가입 거절/삭제
 	@PostMapping("member/join/reject")
-	public String rejectMember(@RequestParam("memNo") int memNo, RedirectAttributes ra) {
+	public String rejectMemberJoin(@RequestParam("memNo") int memNo, RedirectAttributes ra) {
 
-		int result = adminService.deleteMemberJoin(memNo);
+		int result = adminService.rejectMemberJoin(memNo);
 
 		if(result > 0) {
 			ra.addFlashAttribute("msg", "가입 거절 완료");
@@ -159,27 +143,22 @@ public class AdminController {
 	}
 
 // ---------------------학교관리----------------------------------
-	/*
-	 * // 학과 관리 조회
-	 * 
-	 * @GetMapping("/department") public String DepartmentList(Model
-	 * model, @AuthenticationPrincipal CustomUserDetails user) {
-	 * 
-	 * int uniNo = user.getMember().getUniNo(); System.out.print(uniNo);
-	 * List<Department> list = adminService.selectDepartmentList(uniNo);
-	 * 
-	 * model.addAttribute("list", list);
-	 * 
-	 * return "admin/department"; }
-	 */
 
 	// 학과 관리 조회
 	@GetMapping("/department")
-	public String DepartmentList(Model model) {
-
-		List<Department> list = adminService.selectDepartmentList();
+	public String DepartmentList(@RequestParam(value = "condition", required = false) String condition,
+								 @RequestParam(value = "keyword", required = false) String keyword, 
+								 Model model) {
+		CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+		int uniNo = user.getMember().getUniNo();
+		
+		List<Department> list = adminService.selectDepartmentList(uniNo, condition, keyword);
 
 		model.addAttribute("list", list);
+		model.addAttribute("condition", condition);
+		model.addAttribute("keyword", keyword);
+		model.addAttribute("loginUser", user.getMember());
 
 		return "admin/department";
 	}

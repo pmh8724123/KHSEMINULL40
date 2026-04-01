@@ -21,10 +21,10 @@ public interface AdminService {
 	
 	int approveMember(int memNo, int uniNo);
 	
-	int deleteMemberJoin(int memNo);
+	int rejectMemberJoin(int memNo);
 
 	// 학과 관리
-	List<Department> selectDepartmentList();
+	List<Department> selectDepartmentList(int uniNo, String condition, String keyword);
 
 	int insertDepartment(Department dept);
 	
