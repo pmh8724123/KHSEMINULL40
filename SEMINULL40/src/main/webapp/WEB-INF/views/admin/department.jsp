@@ -29,21 +29,25 @@
 
 			<div class="filter-box">
 				<div class="filter-left">
-
-					<select>
-						<option value="all" ${condition == 'all' ? 'selected' : ''}>전체</option>
-						<option value="deptName"
-							${condition == 'deptName' ? 'selected' : ''}>학과이름</option>
-						<option value="uniName"
-							${condition == 'uniName' ? 'selected' : ''}>대학이름</option>
-					</select> <input type="text" name="keyword" value="${keyword}"
-						placeholder="검색어 입력">
-					<button type="submit">검색</button>
+					<form action="${pageContext.request.contextPath}/admin/department"
+						method="get">
+						<select name="condition">
+							<option value="all" ${condition == 'all' ? 'selected' : ''}>전체</option>
+							<option value="deptName"
+								${condition == 'deptName' ? 'selected' : ''}>학과이름</option>
+							<option value="uniName"
+								${condition == 'uniName' ? 'selected' : ''}>대학이름</option>
+						</select> <input type="text" name="keyword" value="${keyword}"
+							placeholder="검색어 입력">
+						<button type="submit">검색</button>
+					</form>
 				</div>
 
 				<!-- 모달 -->
+				<c:if test="${loginUser.uniNo != 0}">
 				<button type="button" onclick="openModal('departmentInsertModal')">학과추가</button>
-
+				</c:if>
+				
 				<div id="departmentInsertModal" class="modal">
 					<div class="modal-content">
 
@@ -72,6 +76,9 @@
 					<thead>
 						<tr>
 							<th>NO</th>
+							<c:if test="${loginUser.uniNo == 0}">
+								<th>대학교명</th>
+							</c:if>
 							<th>학과이름</th>
 							<th>처리</th>
 						</tr>
@@ -81,6 +88,9 @@
 						<c:forEach var="d" items="${list}" varStatus="status">
 							<tr>
 								<td>${status.index + 1}</td>
+								<c:if test="${loginUser.uniNo == 0}">
+									<td>${d.uniName}</td>
+								</c:if>
 								<td>${d.deptName}</td>
 								<td>
 									<div class="action-box">

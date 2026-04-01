@@ -20,5 +20,8 @@ public class Lecture {
 	private Date endTime;
 	private String lectureRoom;
 	
+	private String deptName;
+	private String uniName;
+	
 	
 }

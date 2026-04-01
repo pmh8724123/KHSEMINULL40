@@ -166,9 +166,10 @@ public class AdminController {
 	// 학과 추가
 	@PostMapping("/department/insert")
 	public String insertDepartment(@ModelAttribute Department dept, RedirectAttributes ra) {
-
-		dept.setUniNo(1); // 테스트
-
+		
+		CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		dept.setUniNo(user.getMember().getUniNo());
+		
 		int result = adminService.insertDepartment(dept);
 
 		if (result > 0) {
@@ -220,10 +221,22 @@ public class AdminController {
 
 	// 강의 관리
 	@GetMapping("/lecture")
-	public String adminLecture(Model model) {
-		List<Lecture> list = adminService.selectLectureList();
-
+	public String adminLecture(@RequestParam(value = "condition", required = false) String condition,
+								 @RequestParam(value = "keyword", required = false) String keyword, 
+								 Model model) {
+		
+		CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		int uniNo = user.getMember().getUniNo();
+		
+		List<Lecture> list = adminService.selectLectureList(uniNo, condition, keyword);
+		
+		List<Department> deptList = adminService.selectDepartmentList(uniNo, null, null);
+		
 		model.addAttribute("list", list);
+		model.addAttribute("deptList", deptList);
+		model.addAttribute("condition", condition);
+		model.addAttribute("keyword", keyword);
+		model.addAttribute("loginUser", user.getMember());
 
 		return "admin/lecture";
 	}
@@ -232,8 +245,17 @@ public class AdminController {
 	@PostMapping("/lecture/insert")
 	public String insertLecture(@ModelAttribute Lecture lecture, RedirectAttributes ra) {
 
-		int result = adminService.insertLecture(lecture);
+		CustomUserDetails user =
+				(CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
+			if(user.getMember().getUniNo() == 0) {
+				ra.addFlashAttribute("msg", "마스터는 강의를 추가할 수 없습니다.");
+				ra.addFlashAttribute("type", "error");
+				return "redirect:/admin/lecture";
+			}
+		
+		int result = adminService.insertLecture(lecture);
+		
 		if (result > 0) {
 			ra.addFlashAttribute("msg", "추가 성공");
 			ra.addFlashAttribute("type", "success");
@@ -244,12 +266,46 @@ public class AdminController {
 
 		return "redirect:/admin/lecture";
 	}
+	
+	// 강의 변경
+	@PostMapping("/lecture/update")
+	public String updateLecture(@ModelAttribute Lecture lecture, RedirectAttributes ra) {
+		CustomUserDetails user =
+				(CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
+			if(user.getMember().getUniNo() == 0) {
+				ra.addFlashAttribute("msg", "마스터는 강의를 수정할 수 없습니다.");
+				ra.addFlashAttribute("type", "error");
+				return "redirect:/admin/lecture";
+			}
+		
+		
+		int result = adminService.updateLecture(lecture);
+
+		if (result > 0) {
+			ra.addFlashAttribute("msg", "수정 성공");
+			ra.addFlashAttribute("type", "success");
+		} else {
+			ra.addFlashAttribute("msg", "수정 실패");
+			ra.addFlashAttribute("type", "error");
+		}
+
+		return "redirect:/admin/lecture";
+	}
+	
 	// 강의 삭제
 	@PostMapping("/lecture/delete")
-	public String deleteLecture(@ModelAttribute Lecture lectureNo, RedirectAttributes ra) {
-
+	public String deleteLecture(int lectureNo, RedirectAttributes ra) {
+		
 		int result = adminService.deleteLecture(lectureNo);
+
+		if (result > 0) {
+			ra.addFlashAttribute("msg", "삭제 성공");
+			ra.addFlashAttribute("type", "success");
+		} else {
+			ra.addFlashAttribute("msg", "삭제 실패");
+			ra.addFlashAttribute("type", "error");
+		}
 
 		return "redirect:/admin/lecture";
 	}

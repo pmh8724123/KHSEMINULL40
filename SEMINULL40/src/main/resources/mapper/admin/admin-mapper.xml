@@ -25,7 +25,6 @@
 		<if test="uniNo != null and uniNo != 0">
 			AND U.UNI_NO = #{uniNo}
 		</if>
-
 		AND (
 		(
 		M.STATUS = 'Y'
