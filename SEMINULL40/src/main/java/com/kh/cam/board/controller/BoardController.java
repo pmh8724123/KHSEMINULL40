@@ -9,13 +9,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelExtensionsKt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +30,7 @@ import com.kh.cam.board.model.service.BoardService;
 import com.kh.cam.board.model.vo.Attachment;
 import com.kh.cam.board.model.vo.Board;
 import com.kh.cam.member.model.vo.CustomUserDetails;
+import com.kh.cam.member.model.vo.Member;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,77 +41,110 @@ public class BoardController {
 	
 	@Autowired
 	private BoardService boardService; 
-
-	// 게시글 목록 조회
+	
 	@GetMapping("/list")
 	public String boardList(
-			@RequestParam(value="category", required=false, defaultValue="all") String category,
-			Model model) {
-		CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		System.out.println(user.getMember().getMemName()+"/"+user.getAuthorities());
-		
-		List<Board> list = boardService.selectBoardList(category);
-		model.addAttribute("boardList", list);
-		model.addAttribute("cur", category);
-		return "board/board";
+	        @RequestParam(value="category", required=false, defaultValue="all") String category,
+	        Model model) {
+	    
+	    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    int uniNo = 0;
+	    if (auth != null && auth.getPrincipal() instanceof CustomUserDetails) {
+	        uniNo = ((CustomUserDetails)auth.getPrincipal()).getMember().getUniNo();
+	    }
+
+	    Map<String, Object> params = new HashMap<>();
+	    params.put("category", category);
+	    params.put("uniNo", uniNo);
+
+	    List<Board> list = boardService.selectBoardList(params);
+	    model.addAttribute("boardList", list);
+	    model.addAttribute("cur", category);
+	    
+	    return "board/board";
 	}
 	
-	// 글쓰기 페이지 이동
 	@GetMapping("/write")
 	public String writeForm(@RequestParam(value="category", required=false) String category) {
 		return "board/writeBoard";
 	}
 	
-	// 게시글 등록
+	// [등록] 카테고리 로직 보강
 	@PostMapping("/insert.bo")
-	public String insertBoard(Board b, MultipartFile[] upfiles, HttpSession session) {
-	    // b.getUbtypeNo()에 JSP에서 선택한 1, 2, 3이 자동으로 들어옵니다.
-	    b.setBoardWriter(1); // 로그인 기능 구현 전 테스트용
+	public String insertBoard(Board b, 
+	                          @RequestParam(value="category", defaultValue="free") String category, 
+	                          @RequestParam(value="upfiles", required=false) MultipartFile[] upfiles, 
+	                          HttpSession session) {
+	    
+	    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    if(auth != null && auth.getPrincipal() instanceof CustomUserDetails) {
+	        CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+	        b.setBoardWriter(userDetails.getMember().getMemNo()); 
+	        b.setUniNo(userDetails.getMember().getUniNo()); 
+	        
+	        // 카테고리 매핑
+	        String categoryName = "자유게시판"; 
+	        if("qna".equals(category)) categoryName = "질문답변";
+	        else if("accident".equals(category)) categoryName = "사건사고";
+	        b.setCategoryName(categoryName);
+	    } else {
+	        return "redirect:/member/login.me"; 
+	    }
 
 	    List<Attachment> list = new ArrayList<>();
 	    if(upfiles != null) {
 	        String savePath = session.getServletContext().getRealPath("/resources/upload_files/");
-	        makeDirectory(savePath); // 폴더 생성 공통 메서드 호출
-
-		    for(MultipartFile f : upfiles) {
-		        if(!f.getOriginalFilename().equals("")) {
-		            String changeName = saveFile(f, savePath); 
-		            Attachment at = new Attachment();
-		            at.setOriginName(f.getOriginalFilename());
-		            at.setChangeName(changeName);
-		            at.setTargetType("BOARD");
-		            list.add(at);
-		        }
-		    }
+	        makeDirectory(savePath);
+	        for(MultipartFile f : upfiles) {
+	            if(f != null && !f.getOriginalFilename().equals("")) {
+	                String changeName = saveFile(f, savePath);
+	                Attachment at = new Attachment();
+	                at.setOriginName(f.getOriginalFilename());
+	                at.setChangeName(changeName);
+	                at.setTargetType("BOARD");
+	                list.add(at);
+	            }
+	        }
 	    }
 
 	    int result = boardService.insertBoard(b, list);
-	    return (result > 0) ? "redirect:/board/list" : "common/errorPage";
+	    return (result > 0) ? "redirect:/board/list?category=" + category : "common/errorPage";
 	}
 
-	// 수정페이지 이동
 	@GetMapping("/updateForm")
 	public String updateForm(@RequestParam("boardno") int boardNo, Model model) {
 		model.addAttribute("b", boardService.selectBoard(boardNo));
-		
-		model.addAttribute("list",boardService.selectAttachmentList(boardNo));
+		model.addAttribute("list", boardService.selectAttachmentList(boardNo));
 		return "board/writeBoard";		
 	}
 	
-	// 게시글 수정
+	// [수정] 카테고리 및 학교정보 로직 추가
 	@PostMapping("/update.bo")
-	public String updateBoard(Board b, MultipartFile[] upfiles,
-			  String deleteFileNos
-			, HttpSession session) {
+	public String updateBoard(Board b, 
+	                          @RequestParam(value="category", defaultValue="free") String category, // category 파라미터 추가
+                              @RequestParam(value="upfiles", required=false) MultipartFile[] upfiles, 
+			                  @RequestParam(value="deleteFileNos", required=false) String deleteFileNos, 
+			                  HttpSession session) {
 		
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if(auth != null && auth.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+            b.setBoardWriter(userDetails.getMember().getMemNo());
+            b.setUniNo(userDetails.getMember().getUniNo()); // 매퍼 서브쿼리용 학교번호
+            
+            // 카테고리 매핑 (수정 시에도 필수)
+            String categoryName = "자유게시판"; 
+            if("qna".equals(category)) categoryName = "질문답변";
+            else if("accident".equals(category)) categoryName = "사건사고";
+            b.setCategoryName(categoryName);
+        }
+
 		List<Attachment> list = new ArrayList<>();
-		
-		// 새로운 첨부파일이 있는지 확인
-		if(upfiles !=null) {
-			String savePath = session.getServletContext().getRealPath("resources/upload_files/");
+		if(upfiles != null) {
+			String savePath = session.getServletContext().getRealPath("/resources/upload_files/");
 			for(MultipartFile f : upfiles) {
 				if(!f.getOriginalFilename().equals("")) {
-					String changeName = saveFile(f,savePath);
+					String changeName = saveFile(f, savePath);
 					Attachment at = new Attachment();
 					at.setOriginName(f.getOriginalFilename());
 					at.setChangeName(changeName);
@@ -116,54 +153,66 @@ public class BoardController {
 					list.add(at);
 				}
 			}
-		 }	
-		// JSP에서 <select name="ubtypeNo"> 값을 보내므로 b.ubtypeNo에 자동 매핑됨
+		}	
+
 		int result = boardService.updateBoard(b, list, deleteFileNos);
 		return (result > 0) ? "redirect:/board/detail?boardno=" + b.getBoardNo() : "common/errorPage";
 	}
 	
-	// 게시글 삭제
-	@GetMapping("/delete")
-	public String deleteBoard(@RequestParam("boardno")int boardNo, HttpSession session, Model model) {
-		
-		// 1. 로그인 유저와 작성자 비교 로직 (나중)
-		/*
-		 * Member loginUser = (Member)session.getAttribute("loginUser");
-		 * Board b = boardService.selectBoard(boardNo);
-		 * if(loginUser == null || loginUser.getMemno() != b.getBoardWriter()){
-		 * 	model.addAttribute("erroMsg", "삭제 권한이 없습니다.");
-		 * 	return "common/errorPage";
-		 * }
-		 */
-		
-		// 2. 삭제 서비스 호출
-		int result = boardService.deleteBoard(boardNo);
-		
-		if(result > 0) {
-			// 삭제 성공시 리스트 페이지로 이동
-			return "redirect:/board/list";
-		}else {
-			model.addAttribute("errorMsg","게시글 삭제 실패");
-			return "common/errorPage";
-		}
+	@PostMapping("/delete")
+	public String deleteBoard(@RequestParam("boardno") int boardNo, Model model) {
+	    // 여기서 넘겨주는 boardNo가 매퍼의 #{boardNo}와 연결됩니다.
+	    int result = boardService.deleteBoard(boardNo); 
+	    
+	    if(result > 0) return "redirect:/board/list";
+	    else {
+	        model.addAttribute("errorMsg", "게시글 삭제 실패");
+	        return "common/errorPage";
+	    }
 	}
 	
-	
-	
-	// 게시글 상세보기
 	@GetMapping("/detail")
-	public String boardDetail(@RequestParam("boardno") int boardNo, Model model) {
-		if(boardService.increaseCount(boardNo) > 0) {
-			model.addAttribute("b", boardService.selectBoard(boardNo));
-			model.addAttribute("list", boardService.selectAttachmentList(boardNo));
-			return "board/boardDetail";
-		} else {
-			model.addAttribute("errorMsg", "게시글 조회 실패");
+	public String boardDetail(@RequestParam("boardno") int boardNo, HttpServletRequest request, HttpServletResponse response, Model model) {
+		Board b = boardService.selectBoard(boardNo);
+		List<Attachment> list = boardService.selectAttachmentList(boardNo);
+		
+		if(b == null) {
+			model.addAttribute("errorMsg", "존재하지 않는 게시글입니다.");
 			return "common/errorPage";
 		}
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		int loginUserNo = 0;
+		if(auth != null && auth.getPrincipal() instanceof CustomUserDetails) {
+			loginUserNo = ((CustomUserDetails)auth.getPrincipal()).getMember().getMemNo();
+		}
+		
+		if(loginUserNo != b.getBoardWriter()) {
+			Cookie[] cookies = request.getCookies();
+			Cookie viewCookie = null;
+			if(cookies != null) {
+				for(Cookie c : cookies) {
+					if(c.getName().equals("view_board_" + boardNo)) {
+						viewCookie = c;
+						break;
+					}
+				}
+			}
+			if(viewCookie == null) {
+				int result = boardService.increaseCount(boardNo);
+				if(result > 0) {
+					b.setViewCount(b.getViewCount() + 1);
+					Cookie newCookie = new Cookie("view_board_" + boardNo, "true");
+					newCookie.setMaxAge(24 * 60 * 60);
+					newCookie.setPath("/");
+					response.addCookie(newCookie);
+				}
+			}
+		}
+		model.addAttribute("b", b);
+		model.addAttribute("list", list);
+		return "board/boardDetail";		
 	}
-
-	// --- 공통 메서드 (중복 제거) ---
 
 	private void makeDirectory(String path) {
 	    File dir = new File(path);
@@ -175,7 +224,6 @@ public class BoardController {
 	    String currentTime = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
 	    int ranNum = (int)(Math.random() * 90000 + 10000);
 	    String ext = originName.substring(originName.lastIndexOf("."));
-	    
 	    String changeName = currentTime + ranNum + ext;
 	    try {
 	        upfile.transferTo(new File(savePath + changeName));
@@ -185,15 +233,12 @@ public class BoardController {
 	    return changeName;
 	}
 
-	// --- Ajax 응답 메서드들 ---
-
 	@ResponseBody
 	@PostMapping(value = "/like", produces = "text/html; charset=UTF-8")
 	public String boardLike(int boardNo, int memNo) {
 		Map<String, Object> map = new HashMap<>();
 		map.put("boardNo", boardNo);
 		map.put("memNo", memNo);
-		
 		if(boardService.checkLike(map) > 0) {
 			boardService.deleteLike(map);
 			return "delete";
@@ -212,13 +257,23 @@ public class BoardController {
 	@GetMapping("/report")
 	public String report(@RequestParam("boardNo") int boardNo, Model model) {
 		model.addAttribute("boardNo", boardNo);
-		return "board/report";		
+		return "board/boardReport";		
 	}
 	
 	@ResponseBody
 	@PostMapping(value = "/report", produces = "text/html; charset=UTF-8")
-	public String insertReport(@RequestParam Map<String, Object> map) {
-	    map.put("reportMem", 1); // 테스트용 유저 번호
+	public String insertReport(@RequestParam Map<String, Object> map, HttpSession session) {
+	    
+	    // 세션에서 로그인 유저 객체를 꺼내오는 방식 (본인 프로젝트의 세션 키값을 확인하세요)
+	    // 보통 loginUser나 member 등의 이름으로 저장되어 있습니다.
+	    Member loginUser = (Member)session.getAttribute("loginUser");
+	    
+	    if(loginUser != null) {
+	        map.put("reportMem", loginUser.getMemNo()); // 로그인한 사람의 진짜 번호 넣기
+	    } else {
+	        map.put("reportMem", 1); // 로그인 안 되어있으면 임시로 1번 (테스트용)
+	    }
+
 	    return (boardService.insertReport(map) > 0) ? "success" : "fail";
 	}
 }

@@ -15,7 +15,8 @@ public interface BoardDao {
 
 	int insertFiles(SqlSessionTemplate sqlSession, Attachment at);
 
-	List<Board> selectBoardList(SqlSessionTemplate sqlSession, String category);
+	// 기존 String category에서 Map으로 변경
+	List<Board> selectBoardList(SqlSessionTemplate sqlSession, Map<String, Object> params);
 
 	int increaseCount(SqlSessionTemplate sqlSession, int boardNo);
 

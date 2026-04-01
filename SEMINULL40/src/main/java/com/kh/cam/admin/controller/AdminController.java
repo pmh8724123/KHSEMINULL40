@@ -86,17 +86,19 @@ public class AdminController {
 		return "redirect:/admin/memberStatus";
 	}
 
-	// 회원 삭제
-	@PostMapping("/member/delete")
-	public String deleteMember(int memNo, RedirectAttributes ra) {
-		
-		adminService.deleteMember(memNo);
-
-		ra.addFlashAttribute("msg", "회원이 삭제되었습니다.");
-		ra.addFlashAttribute("type", "error");
-
-		return "redirect:/admin/memberStatus";
-	}
+	/*
+	 * // 회원 삭제
+	 * 
+	 * @PostMapping("/member/delete") public String deleteMember(int memNo,
+	 * RedirectAttributes ra) {
+	 * 
+	 * adminService.deleteMember(memNo);
+	 * 
+	 * ra.addFlashAttribute("msg", "회원이 삭제되었습니다."); ra.addFlashAttribute("type",
+	 * "error");
+	 * 
+	 * return "redirect:/admin/memberStatus"; }
+	 */
 
 // ---------------------회원승인관리----------------------------------
 
@@ -141,12 +143,17 @@ public class AdminController {
 
 	// 회원 가입 거절/삭제
 	@PostMapping("member/join/reject")
-	public String rejectMemberJoin(int memNo, String status, RedirectAttributes ra) {
+	public String rejectMember(@RequestParam("memNo") int memNo, RedirectAttributes ra) {
 
-		adminService.deleteMember(memNo);
+		int result = adminService.deleteMemberJoin(memNo);
 
-		ra.addFlashAttribute("msg", "승인거절");
-		ra.addFlashAttribute("type", "error");
+		if(result > 0) {
+			ra.addFlashAttribute("msg", "가입 거절 완료");
+			ra.addFlashAttribute("type", "error");
+		} else {
+			ra.addFlashAttribute("msg", "가입 거절 실패");
+			ra.addFlashAttribute("type", "error");
+		}
 
 		return "redirect:/admin/memberJoin";
 	}
