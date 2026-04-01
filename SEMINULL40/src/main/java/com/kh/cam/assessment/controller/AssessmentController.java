@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,17 +25,34 @@ public class AssessmentController {
     @Autowired
     private AssessmentService assessmentService;
 
-    // 강의 평가 메인 목록
     @GetMapping("")
     public String assessmentList(
-        @RequestParam(value="keyword", required=false) String keyword, // 검색어 파라미터 추가
+        @RequestParam(value="keyword", required=false) String keyword,
         Model model) {
         
-        // 서비스 호출 시 검색어를 전달합니다.
-        List<Assessment> list = assessmentService.selectLectureList(keyword);
+        // 직접 SecurityContext에서 유저 정보 꺼내기
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        CustomUserDetails userDetails = null;
+        
+        if (principal instanceof CustomUserDetails) {
+            userDetails = (CustomUserDetails) principal;
+        }
+
+        System.out.println("==== 직접 꺼낸 유저 정보 ====");
+        System.out.println("userDetails: " + userDetails);
+        if(userDetails != null) {
+            System.out.println("member: " + userDetails.getMember());
+        }
+
+        if (userDetails == null || userDetails.getMember() == null) {
+            return "redirect:/member/login.me"; 
+        }
+
+        int uniNo = userDetails.getMember().getUniNo();
+        List<Assessment> list = assessmentService.selectLectureList(uniNo, keyword);
         
         model.addAttribute("lectureList", list);
-        model.addAttribute("keyword", keyword); // 검색창에 검색어 유지를 위해 추가
+        model.addAttribute("keyword", keyword);
         
         return "board/assessment"; 
     }
