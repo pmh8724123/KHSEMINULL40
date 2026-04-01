@@ -2,69 +2,76 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="board">
 	
+	<!-- 게시글 등록 -->
 	<insert id="insertBoard" parameterType="Board">
 		<!-- insert 실행 전 시퀀스 번호를 가져와서 Board 객체의 boardNo에 담아줌 -->
 		<selectKey keyProperty="boardNo" resultType="_int" order="BEFORE">
 			SELECT SEQ_BOARD.NEXTVAL FROM DUAL
 		</selectKey>
-		INSERT INTO BOARD(
-			BOARD_NO, 
-			UBTYPE_NO, 
-			BOARD_TITLE, 
-			BOARD_CONTENT,
-			BOARD_WRITER
-		)VALUES(
-			#{boardNo}, 
-			#{ubtypeNo}, 
-			#{boardTitle}, 
-			#{boardContent}, 
-			#{boardWriter}		
-		)
+	    INSERT INTO BOARD(
+	        BOARD_NO, 
+	        UBTYPE_NO, 
+	        BOARD_TITLE, 
+	        BOARD_CONTENT,
+	        BOARD_WRITER
+	    ) VALUES (
+	        #{boardNo}, 
+	        <!-- 아래 쿼리가 NULL을 반환하지 않도록 NVL로 기본값(자유게시판) 처리 -->
+	        NVL(
+	            (SELECT UBTYPE_NO 
+	             FROM UNI_BOARD_TYPE UBT
+	             JOIN BOARD_TYPE BT ON (UBT.BTYPE_NO = BT.BTYPE_NO)
+	             WHERE UBT.UNI_NO = #{uniNo} 
+	               AND BT.BTYPE_NAME = #{categoryName}),
+	            (SELECT UBTYPE_NO FROM UNI_BOARD_TYPE WHERE UNI_NO = #{uniNo} AND BTYPE_NO = 1)
+	        ),
+	        #{boardTitle}, 
+	        #{boardContent}, 
+	        #{boardWriter}
+	    )
 	</insert>
 	
+	<!-- 첨부파일 등록 (시퀀스 이름 수정) -->
 	<insert id="insertFiles" parameterType="Attachment">
-		INSERT INTO FILES(
-		FILE_NO, 
-		ORIGIN_NAME, 
-		CHANGE_NAME, 
-		TARGET_TYPE, 
-		TARGET_NO) VALUES(
-			SEQ_FNO.NEXTVAL,
-			#{originName},
-			#{changeName},
-			#{targetType},
-			#{targetNo}
-		)
+	    INSERT INTO FILES(
+	    FILE_NO, 
+	    ORIGIN_NAME, 
+	    CHANGE_NAME, 
+	    TARGET_TYPE, 
+	    TARGET_NO) VALUES(
+	        SEQ_FILE.NEXTVAL, -- SEQ_FNO에서 변경
+	        #{originName},
+	        #{changeName},
+	        #{targetType},
+	        #{targetNo}
+	    )
 	</insert>
 	
-	<select id="selectBoardList" resultType="Board">
+	<!-- 2. 게시글 리스트 조회: JOIN 조건 수정 (B.UBTYPE_NO = UBT.UBTYPE_NO) -->
+	<select id="selectBoardList" resultType="Board" parameterType="hashmap">
 	    SELECT
 	        B.BOARD_NO,
 	        B.BOARD_TITLE,
 	        B.BOARD_WRITER,
+	        M.MEM_NAME AS "boardWriterName",
 	        B.CREATE_DATE,
 	        B.VIEW_COUNT AS "viewCount",
 	        BT.BTYPE_NAME AS "categoryName",
 	        (SELECT COUNT(*) FROM BOARD_LIKE L WHERE L.BOARD_NO = B.BOARD_NO) AS "likeCount"
 	    FROM BOARD B
-	    LEFT JOIN UNI_BOARD_TYPE UBT ON (B.UBTYPE_NO = UBT.UNI_NO)
+	    JOIN MEMBER M ON (B.BOARD_WRITER = M.MEM_NO)
+	    JOIN DEPARTMENT D ON (M.DEPT_NO = D.DEPT_NO)
+	    -- [수정됨] UNI_NO가 아니라 UBTYPE_NO로 조인해야 합니다.
+	    LEFT JOIN UNI_BOARD_TYPE UBT ON (B.UBTYPE_NO = UBT.UBTYPE_NO) 
 	    LEFT JOIN BOARD_TYPE BT ON (UBT.BTYPE_NO = BT.BTYPE_NO)
 	    WHERE B.STATUS = 'Y'
+	      AND D.UNI_NO = #{uniNo}
 	    
 	    <if test="category != null and !category.equals('all')">
 	        <choose>
-	            <when test="category.equals('free')">
-	                AND BT.BTYPE_NAME = '자유게시판'
-	            </when>
-	            <when test="category.equals('qna')">
-	                AND BT.BTYPE_NAME = '질문답변'
-	            </when>
-	            <when test="category.equals('accident')">
-	                AND BT.BTYPE_NAME = '사건사고'
-	            </when>
-	            <when test="category.equals('notice')">
-	                AND BT.BTYPE_NAME = '공지사항'
-	            </when>
+	            <when test="category.equals('free')"> AND BT.BTYPE_NAME = '자유게시판' </when>
+	            <when test="category.equals('qna')"> AND BT.BTYPE_NAME = '질문답변' </when>
+	            <when test="category.equals('accident')"> AND BT.BTYPE_NAME = '사건사고' </when>
 	        </choose>
 	    </if>
 	    ORDER BY B.BOARD_NO DESC
@@ -81,24 +88,30 @@
 	<!-- 상세 조회 -->
     <select id="selectBoard" parameterType="_int" resultType="Board">
         SELECT 
-            BOARD_NO, 
-            UBTYPE_NO, 
-            BOARD_TITLE, 
-            BOARD_CONTENT, 
-            BOARD_WRITER, 
-            VIEW_COUNT AS "viewCount",
-            CREATE_DATE AS "createDate"
-        FROM BOARD
-        WHERE BOARD_NO = #{boardNo} 
-          AND STATUS = 'Y'
+            B.BOARD_NO, 
+            B.UBTYPE_NO, 
+            B.BOARD_TITLE, 
+            B.BOARD_CONTENT, 
+            B.BOARD_WRITER, 
+            M.MEM_NAME AS "boardWriterName",
+            B.VIEW_COUNT AS "viewCount",
+            B.CREATE_DATE AS "createDate"
+        FROM BOARD B
+        LEFT JOIN MEMBER M ON (B.BOARD_WRITER = M.MEM_NO)
+        WHERE B.BOARD_NO = #{boardNo} 
+          AND B.STATUS = 'Y'
     </select>
 
-	<!-- 게시글 수정 쿼리 추가 -->
+	<!-- 게시글 수정 (컨트롤러에서 넘겨준 uniNo와 categoryName으로 UBTYPE_NO를 갱신) -->
 	<update id="updateBoard" parameterType="Board">
 	    UPDATE BOARD 
 	       SET BOARD_TITLE = #{boardTitle},
 	           BOARD_CONTENT = #{boardContent},
-	           UBTYPE_NO = #{ubtypeNo}
+	           UBTYPE_NO = (SELECT UBTYPE_NO 
+	                        FROM UNI_BOARD_TYPE UBT
+	                        JOIN BOARD_TYPE BT ON (UBT.BTYPE_NO = BT.BTYPE_NO)
+	                        WHERE UBT.UNI_NO = #{uniNo}
+	                          AND BT.BTYPE_NAME = #{categoryName})
 	     WHERE BOARD_NO = #{boardNo} 
 	       AND STATUS = 'Y'
 	</update>
@@ -152,22 +165,23 @@
 	</select>
 	
 	
+	<!-- 신고 등록 (시퀀스 이름 수정) -->
 	<insert id="insertReport" parameterType="hashmap">
-		INSERT INTO REPORT(
-			REPORT_NO,
-			REPORT_MEM,
-			REASON_NO,
-			REASON_CONTENT,
-			TARGET_TYPE,
-			TARGET_NO
-		) VALUES(
-			SEQ_REPORT_NO.NEXTVAL,
-			#{reportMem},
-			#{reasonNo},
-			#{reasonContent},
-			#{targetType},
-			#{targetNo}
-		)
+	    INSERT INTO REPORT(
+	        REPORT_NO,
+	        REPORT_MEM,
+	        REASON_NO,
+	        REASON_CONTENT,
+	        TARGET_TYPE,
+	        TARGET_NO
+	    ) VALUES(
+	        SEQ_REPORT.NEXTVAL, -- SEQ_REPORT_NO에서 변경
+	        #{reportMem},
+	        #{reasonNo},
+	        #{reasonContent},
+	        #{targetType},
+	        #{targetNo}
+	    )
 	</insert>
 	
 

@@ -13,7 +13,7 @@ public interface AdminService {
 	
 	int updateMemberStatus(int memNo, String status, int uniNo);
 	
-	int deleteMember(int memNo);
+	/* int deleteMember(int memNo); */
 	
 	
 	// 회원 승인 관리
@@ -21,9 +21,9 @@ public interface AdminService {
 	
 	int approveMember(int memNo, int uniNo);
 	
+	int deleteMemberJoin(int memNo);
 
 	// 학과 관리
-	// List<Department> selectDepartmentList(int uniNo);
 	List<Department> selectDepartmentList();
 
 	int insertDepartment(Department dept);
@@ -38,6 +38,7 @@ public interface AdminService {
 	int insertLecture(Lecture lecture);
 
 	int deleteLecture(Lecture lecNo);
+
 
 
 

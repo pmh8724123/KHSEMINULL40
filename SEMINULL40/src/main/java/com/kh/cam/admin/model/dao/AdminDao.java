@@ -16,12 +16,14 @@ public interface AdminDao {
 
 	int updateMemberStatus(@Param("memNo") int memNo, @Param("status") String status, @Param("uniNo") int uniNo);
 	
-	int deleteMember(int memNo);
+	/* int deleteMember(int memNo); */
 	
 	// 회원 승인관리
 	List<Member> selectMemberJoinList(Map<String, Object> map);
 
-	int updateMemberJoin(int memNo, String status);
+	int updateMemberJoin(@Param("memNo") int memNo, @Param("status") String status, @Param("uniNo") int uniNo);
+	
+	int deleteMemberJoin(int memNo);
 	
 	// 권한관리
 	int insertAuthority(@Param("memNo") int memNo, @Param("authority") String authority, @Param("uniNo") int uniNo);
@@ -46,6 +48,7 @@ public interface AdminDao {
 	int insertLecture(Lecture lecture);
 
 	int deleteLecture(Lecture lectureNo);
+
 
 
 

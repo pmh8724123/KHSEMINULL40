@@ -62,10 +62,10 @@ public class AdminServiceImpl implements AdminService{
 	    return result;
 	}
 	
-	@Override
-	public int deleteMember(int memNo) {
-		return adminDao.deleteMember(memNo);
-	}
+	/*
+	 * @Override public int deleteMember(int memNo) { return
+	 * adminDao.deleteMember(memNo); }
+	 */
 	
 	// 회원 승인관리 리스트
 	@Override
@@ -91,6 +91,11 @@ public class AdminServiceImpl implements AdminService{
 	    return adminDao.insertAuthority(memNo, "ROLE_USER", uniNo);
 	}
 	
+	@Override
+	public int deleteMemberJoin(int memNo) {
+		return adminDao.deleteMemberJoin(memNo);
+	}
+	
 	// 학과 관리
 	@Override
 	public List<Department> selectDepartmentList() {
@@ -106,13 +111,6 @@ public class AdminServiceImpl implements AdminService{
 	public int deleteDepartment(Department deptNo) {
 		return adminDao.deleteDepartment(deptNo);
 	}
-	
-	/*
-	 * // 학과 관리
-	 * 
-	 * @Override public List<Department> selectDepartmentList(int uniNo) { return
-	 * adminDao.selectDepartmentList(); }
-	 */
 	
 	@Override
 	public int insertDepartment(Department dept) {
@@ -134,6 +132,8 @@ public class AdminServiceImpl implements AdminService{
 	public int deleteLecture(Lecture lectureNo) {
 		return adminDao.deleteLecture(lectureNo);
 	}
+
+	
 
 	
 	

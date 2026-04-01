@@ -70,17 +70,12 @@ public class AdminDaoImpl implements AdminDao {
 		return session.delete("admin.deleteAuthority", map);
 	}
 
-	@Override
-	public int deleteMember(int memNo) {
-		int result = session.delete("admin.deleteMember", memNo);
-
-		if (result > 0) {
-			// 성공
-		} else {
-			// 실패 처리
-		}
-		return result;
-	}
+	/*
+	 * @Override public int deleteMember(int memNo) { int result =
+	 * session.delete("admin.deleteMember", memNo);
+	 * 
+	 * if (result > 0) { // 성공 } else { // 실패 처리 } return result; }
+	 */
 
 	// 회원 승인관리
 	@Override
@@ -89,8 +84,18 @@ public class AdminDaoImpl implements AdminDao {
 	}
 
 	@Override
-	public int updateMemberJoin(int memNo, String status) {
-		return session.update("admin.updateMemberJoin", Map.of("memNo", memNo, "status", status));
+	public int updateMemberJoin(int memNo, String status, int uniNo) {
+	    Map<String, Object> map = new HashMap<>();
+	    map.put("memNo", memNo);
+	    map.put("status", status);
+	    map.put("uniNo", uniNo);
+
+	    return session.update("admin.updateMemberJoin", map);
+	}
+	
+	@Override
+	public int deleteMemberJoin(int memNo) {
+		return session.delete("admin.deleteMemberJoin", memNo);
 	}
 
 	// 학과관리
@@ -129,5 +134,7 @@ public class AdminDaoImpl implements AdminDao {
 	public int deleteLecture(Lecture lectureNo) {
 		return session.delete("admin.deleteLecture", lectureNo);
 	}
+
+	
 
 }

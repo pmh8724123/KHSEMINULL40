@@ -34,10 +34,10 @@ public class BoardServiceImpl implements BoardService {
         return result;
     }
 
-	@Override
-	public List<Board> selectBoardList(String category) {
-		return boardDao.selectBoardList(sqlSession, category);
-	}
+    @Override
+    public List<Board> selectBoardList(Map<String, Object> params) {
+        return boardDao.selectBoardList(sqlSession, params);
+    }
 	
 	@Override
 	public int deleteBoard(int boardNo) {
