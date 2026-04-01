@@ -9,7 +9,7 @@ import com.kh.cam.assessment.model.vo.Assessment;
 import com.kh.cam.assessment.model.vo.LectureVO;
 
 public interface AssessmentDao {
-    List<Assessment> selectLectureList(SqlSessionTemplate sqlSession, String keyword);
+	List<Assessment> selectLectureList(SqlSessionTemplate sqlSession, Map<String, Object> map);
     Assessment getLectureInfo(SqlSessionTemplate sqlSession, int lectureNo);
     List<Assessment> selectLectureListByKeyword(SqlSessionTemplate sqlSession, Map<String, Object> map);
     int insertAssessment(SqlSessionTemplate sqlSession, Assessment asse);

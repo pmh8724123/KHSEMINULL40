@@ -8,7 +8,7 @@ import com.kh.cam.assessment.model.vo.LectureVO;
 public interface AssessmentService {
     Assessment getLectureInfo(int lectureNo);
     List<Assessment> selectLectureListByKeyword(String keyword, int uniNo);
-    List<Assessment> selectLectureList(String keyword);
+    List<Assessment> selectLectureList(int uniNo, String keyword);
     int insertAssessment(Assessment asse);
 
     // [추가] 실시간 검색용 메서드
