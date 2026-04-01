@@ -13,7 +13,7 @@ public interface BoardService {
 
 	int insertBoard(Board b, List<Attachment> list);
 
-	List<Board> selectBoardList(@Param("category")String category);
+	List<Board> selectBoardList(Map<String, Object> params);
 
 	int increaseCount(int boardNo);
 

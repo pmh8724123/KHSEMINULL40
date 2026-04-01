@@ -356,10 +356,31 @@
             }
         }
         // 게시글 삭제
-        function deleteBoard(){
-            if(confirm("정말로 이 게시글을 삭제하시겠습니까?")){
-                location.href = "${pageContext.request.contextPath}/board/delete?boardno=${b.boardNo}";
-            }
+		function deleteBoard(){
+        	if(confirm("정말로 이 게시글을 삭제하시겠습니까?")){
+        		// 1. 동적 form 생성
+        		const form = document.createElement('form');
+        		form.method = 'POST';
+        		form.action = "${pageContext.request.contextPath}/board/delete";
+        		
+        		// 2. 게시글 번호 추가
+        		const boardNoInput = document.createElement('input');
+        		boardNoInput.type = 'hidden';
+        		boardNoInput.name = 'boardno';
+        		boardNoInput.value = "${b.boardNo}";
+        		form.appendChild(boardNoInput);
+        		
+        		// 3. CSRF 토큰 추가
+        		const csrfInput = document.createElement('input');
+        		csrfInput.type = 'hidden';
+        		csrfInput.name = "${_csrf.parameterName}";
+        		csrfInput.value = "${_csrf.token}";
+        		form.appendChild(csrfInput);
+        		
+        		// 4. form을 문서에 붙여서 전송
+        		document.body.appendChild(form);
+        		form.submit();
+        	}
         }
     </script>
 </body>

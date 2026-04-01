@@ -24,8 +24,8 @@ public class BoardDaoImpl implements BoardDao {
 	}
 
 	@Override
-	public List<Board> selectBoardList(SqlSessionTemplate sqlSession, String category) {
-		return sqlSession.selectList("board.selectBoardList", category);
+	public List<Board> selectBoardList(SqlSessionTemplate sqlSession, Map<String, Object> params) {
+	    return sqlSession.selectList("board.selectBoardList", params);
 	}
 
 	@Override

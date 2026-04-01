@@ -1,60 +1,94 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="assessment">
-	
-	<!-- 강의 평가 목록 조회 -->
-	<select id="selectLectureList" resultType="assessment">
-		SELECT
-			L.LECTURE_NO AS lectureNo,
-			L.LECTURE_NAME AS lectureName,
-			L.PROFESSOR_NAME AS professorName,
-			NVL(AVG(A.TOTAL_SCORE), 0) AS avgScore,
-			COUNT(A.ASSE_NO) AS reviewCount,
-			ROUND(NVL(AVG(A.HOMEWORK), 0)) AS homework,
-			ROUND(NVL(AVG(A.GRADE), 0)) AS grade
-		FROM LECTURE L
-		LEFT JOIN LECTURE_ASSESSMENT A ON L.LECTURE_NO = A.LECTURE_NO
-		GROUP BY
-			L.LECTURE_NO,
-			L.LECTURE_NAME,
-			L.PROFESSOR_NAME
-		ORDER BY L.LECTURE_NO DESC	
+
+    <!-- 1. 강의 평가 목록 조회 (평가가 있는 강의만) -->
+    <select id="selectLectureList" resultType="assessment">
+        SELECT
+            L.LECTURE_NO AS lectureNo,
+            L.LECTURE_NAME AS lectureName,
+            L.PROFESSOR_NAME AS professorName,
+            NVL(AVG(A.TOTAL_SCORE), 0) AS avgScore,
+            COUNT(A.ASSE_NO) AS reviewCount,
+            ROUND(NVL(AVG(A.HOMEWORK), 0)) AS homework,
+            ROUND(NVL(AVG(A.GRADE), 0)) AS grade
+        FROM LECTURE L
+        LEFT JOIN LECTURE_ASSESSMENT A ON L.LECTURE_NO = A.LECTURE_NO
+        <where>
+        	<if test="keyword !=null and keyword !=''">
+        		(
+        			L.LECTURE_NAME LIKE '%' || #{keyword} || '%'
+        			OR
+        			L.PROFESSOR_NAME LIKE '%' || #{keyword} || '%'        		
+        		)
+        	</if>
+        </where>
+        GROUP BY L.LECTURE_NO, L.LECTURE_NAME, L.PROFESSOR_NAME
+        ORDER BY L.LECTURE_NO DESC
+    </select>
+
+    <!-- 2. 실시간 강의 검색 (로그인한 유저의 대학교 내에서) -->
+	<select id="selectLectureListByKeyword" resultType="assessment" parameterType="map">
+	    SELECT
+	        L.LECTURE_NO as "lectureNo",
+	        L.LECTURE_NAME as "lectureName",
+	        L.PROFESSOR_NAME as "professorName",
+	        U.UNI_NAME as "uniName"
+	    FROM LECTURE L
+	    JOIN DEPARTMENT D ON L.DEPT_NO = D.DEPT_NO
+	    JOIN UNIVERSITY U ON D.UNI_NO = U.UNI_NO
+	    WHERE U.UNI_NO = #{uniNo}
+	      AND (L.LECTURE_NAME LIKE '%' || #{keyword} || '%' 
+	           OR L.PROFESSOR_NAME LIKE '%' || #{keyword} || '%')
 	</select>
-	
-	<!-- 강의 검색 조회 -->
-	<select id="searchLectureList" resultType="assessment" parameterType="string">
-		SELECT
-			L.LECTURE_NO AS lectureNo,
-			L.LECTURE_NAME AS lectureName,
-			L.PROFESSOR_NAME AS professorName,
-			NVL(AVG(A.TOTAL_SCORE), 0) AS avgScore,
-			COUNT(A.ASSE_NO) AS reviewCount,
-			ROUND(NVL(AVG(A.HOMEWORK), 0)) AS homework,
-			ROUND(NVL(AVG(A.GRADE), 0)) AS grade
-		FROM LECTURE L
-		LEFT JOIN LECTURE_ASSESSMENT A ON L.LECTURE_NO = A.LECTURE_NO
-		WHERE L.LECTURE_NAME LIKE '%' || #{keyword} || '%'
-		   OR L.PROFESSOR_NAME LIKE '%' || #{keyword} || '%'
-		GROUP BY L.LECTURE_NO, L.LECTURE_NAME, L.PROFESSOR_NAME
-		ORDER BY L.LECTURE_NO DESC
+
+    <!-- 3. 강의 정보 단일 조회 (평가하기 버튼 클릭 시) -->
+    <select id="getLectureInfo" resultType="assessment" parameterType="_int">
+        SELECT
+            L.LECTURE_NO AS lectureNo,
+            L.LECTURE_NAME AS lectureName,
+            L.PROFESSOR_NAME AS professorName,
+            U.UNI_NAME AS uniName
+        FROM LECTURE L
+        JOIN DEPARTMENT D ON L.DEPT_NO = D.DEPT_NO
+        JOIN UNIVERSITY U ON D.UNI_NO = U.UNI_NO
+        WHERE L.LECTURE_NO = #{lectureNo}
+    </select>
+
+    <!-- 4. 강의 평가 저장 -->
+    <insert id="insertAssessment" parameterType="assessment">
+        INSERT INTO LECTURE_ASSESSMENT (
+            ASSE_NO,
+            MEM_NO,
+            LECTURE_NO,
+            HOMEWORK,
+            GRADE,
+            TOTAL_SCORE
+        ) VALUES (
+            SEQ_ASSE.NEXTVAL,
+            #{memNo},
+            #{lectureNo},
+            #{homework},
+            #{grade},
+            #{totalScore}
+        )
+    </insert>
+    
+	<select id="searchLectures" resultType="LectureVO">
+	    SELECT 
+	        L.LECTURE_NO as "lectureNo", 
+	        L.LECTURE_NAME as "lectureName", 
+	        L.PROFESSOR_NAME as "professorName",
+	        D.UNI_NO as "uniNo"
+	    FROM LECTURE L
+	    JOIN DEPARTMENT D ON (L.DEPT_NO = D.DEPT_NO)
+	    WHERE D.UNI_NO = #{uniNo}
+	    <if test="keyword != null and keyword != ''">
+	        AND (L.LECTURE_NAME LIKE '%' || #{keyword} || '%' 
+	             OR L.PROFESSOR_NAME LIKE '%' || #{keyword} || '%')
+	    </if>
+	    ORDER BY L.LECTURE_NAME ASC
 	</select>
-	
-	<!-- 강의 평가 작성 페이지용 -->
-	<select id="getLectureInfo" resultType="assessment" parameterType="_int">
-		SELECT
-			L.LECTURE_NO AS lectureNo,
-			L.LECTURE_NAME AS lectureName,
-			L.PROFESSOR_NAME AS professorName,
-			U.UNI_NAME AS uniName
-		FROM LECTURE L
-		JOIN DEPARTMENT D ON L.DEPT_NO = D.DEPT_NO
-		JOIN UNIVERSITY U ON D.UNI_NO = U.UNI_NO
-		WHERE L.LECTURE_NO = ${lectureNo}
-	</select>
-	
-	
-	
-	
+    
+
 </mapper>
