@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes; // 추가됨
 
 import com.kh.cam.board.model.service.BoardService;
 import com.kh.cam.board.model.vo.Attachment;
@@ -53,11 +54,9 @@ public class BoardController {
 	        uniNo = ((CustomUserDetails)auth.getPrincipal()).getMember().getUniNo();
 	    }
 
-	    // 1. 카테고리 목록 동적 조회 (화면 탭 구성용)
 	    List<Map<String, Object>> catList = boardService.selectCategoryList(uniNo);
 	    model.addAttribute("catList", catList);
 
-	    // 2. 게시글 목록 조회
 	    Map<String, Object> params = new HashMap<>();
 	    params.put("category", category);
 	    params.put("uniNo", uniNo);
@@ -69,31 +68,28 @@ public class BoardController {
 	    return "board/board";
 	}
 	
-	// 글쓰기 폼 전송
 	@GetMapping("/write")
 	public String writeForm(@RequestParam(value="category", required=false) String category, Model model) {
 	    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 	    int uniNo = ((CustomUserDetails)auth.getPrincipal()).getMember().getUniNo();
 	    
-	    // 카테고리 목록을 가져와서 select 박스에 뿌려줌
 	    model.addAttribute("catList", boardService.selectCategoryList(uniNo));
 	    return "board/writeBoard";
 	}
 	
-	// [등록] 카테고리 로직 보강
+	// [등록] RedirectAttributes 추가하여 한글 인코딩 문제 해결
 	@PostMapping("/insert.bo")
 	public String insertBoard(Board b, 
 	                          @RequestParam(value="category") String category, 
 	                          @RequestParam(value="upfiles", required=false) MultipartFile[] upfiles, 
-	                          HttpSession session) {
+	                          HttpSession session,
+	                          RedirectAttributes rdAttr) { // 파라미터 추가
 	    
 	    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 	    if(auth != null && auth.getPrincipal() instanceof CustomUserDetails) {
 	        CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
 	        b.setBoardWriter(userDetails.getMember().getMemNo()); 
 	        b.setUniNo(userDetails.getMember().getUniNo()); 
-	        
-	        // 중요: 화면에서 '자유게시판'이라는 글자가 직접 넘어오므로 바로 세팅
 	        b.setCategoryName(category); 
 	    } else {
 	        return "redirect:/member/login.me"; 
@@ -116,7 +112,14 @@ public class BoardController {
 	    }
 
 	    int result = boardService.insertBoard(b, list);
-	    return (result > 0) ? "redirect:/board/list?category=" + category : "common/errorPage";
+	    
+	    if(result > 0) {
+	        // RedirectAttributes를 사용하면 한글 인코딩을 자동으로 처리함
+	        rdAttr.addAttribute("category", category);
+	        return "redirect:/board/list";
+	    } else {
+	        return "common/errorPage";
+	    }
 	}
 
 	@GetMapping("/updateForm")
@@ -126,10 +129,9 @@ public class BoardController {
 		return "board/writeBoard";		
 	}
 	
-	// [수정] 카테고리 및 학교정보 로직 추가
 	@PostMapping("/update.bo")
 	public String updateBoard(Board b, 
-	                          @RequestParam(value="category", defaultValue="free") String category, // category 파라미터 추가
+	                          @RequestParam(value="category", defaultValue="free") String category,
                               @RequestParam(value="upfiles", required=false) MultipartFile[] upfiles, 
 			                  @RequestParam(value="deleteFileNos", required=false) String deleteFileNos, 
 			                  HttpSession session) {
@@ -138,9 +140,8 @@ public class BoardController {
         if(auth != null && auth.getPrincipal() instanceof CustomUserDetails) {
             CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
             b.setBoardWriter(userDetails.getMember().getMemNo());
-            b.setUniNo(userDetails.getMember().getUniNo()); // 매퍼 서브쿼리용 학교번호
+            b.setUniNo(userDetails.getMember().getUniNo()); 
             
-            // 카테고리 매핑 (수정 시에도 필수)
             String categoryName = "자유게시판"; 
             if("qna".equals(category)) categoryName = "질문답변";
             else if("accident".equals(category)) categoryName = "사건사고";
@@ -169,7 +170,6 @@ public class BoardController {
 	
 	@PostMapping("/delete")
 	public String deleteBoard(@RequestParam("boardno") int boardNo, Model model) {
-	    // 여기서 넘겨주는 boardNo가 매퍼의 #{boardNo}와 연결됩니다.
 	    int result = boardService.deleteBoard(boardNo); 
 	    
 	    if(result > 0) return "redirect:/board/list";
@@ -272,14 +272,12 @@ public class BoardController {
 	@PostMapping(value = "/report", produces = "text/html; charset=UTF-8")
 	public String insertReport(@RequestParam Map<String, Object> map, HttpSession session) {
 	    
-	    // 세션에서 로그인 유저 객체를 꺼내오는 방식 (본인 프로젝트의 세션 키값을 확인하세요)
-	    // 보통 loginUser나 member 등의 이름으로 저장되어 있습니다.
 	    Member loginUser = (Member)session.getAttribute("loginUser");
 	    
 	    if(loginUser != null) {
-	        map.put("reportMem", loginUser.getMemNo()); // 로그인한 사람의 진짜 번호 넣기
+	        map.put("reportMem", loginUser.getMemNo()); 
 	    } else {
-	        map.put("reportMem", 1); // 로그인 안 되어있으면 임시로 1번 (테스트용)
+	        map.put("reportMem", 1); 
 	    }
 
 	    return (boardService.insertReport(map) > 0) ? "success" : "fail";

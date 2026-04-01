@@ -12,10 +12,10 @@ import com.kh.cam.assessment.model.vo.LectureVO;
 @Repository
 public class AssessmentDaoImpl implements AssessmentDao {
 
-    @Override
-    public List<Assessment> selectLectureList(SqlSessionTemplate sqlSession, String keyword) {
-        return sqlSession.selectList("assessment.selectLectureList", keyword);
-    }
+	@Override
+	public List<Assessment> selectLectureList(SqlSessionTemplate sqlSession, Map<String, Object> map) {
+	    return sqlSession.selectList("assessment.selectLectureList", map);
+	}
 
     @Override
     public Assessment getLectureInfo(SqlSessionTemplate sqlSession, int lectureNo) {

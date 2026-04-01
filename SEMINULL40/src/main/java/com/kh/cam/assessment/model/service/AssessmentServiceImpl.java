@@ -22,8 +22,12 @@ public class AssessmentServiceImpl implements AssessmentService {
     private SqlSessionTemplate sqlSession;
     
     @Override
-    public List<Assessment> selectLectureList(String keyword) {
-        return assessmentDao.selectLectureList(sqlSession, keyword);
+    public List<Assessment> selectLectureList(int uniNo, String keyword) {
+        // Map에 담아서 DAO로 전달
+        Map<String, Object> map = new HashMap<>();
+        map.put("uniNo", uniNo);
+        map.put("keyword", keyword);
+        return assessmentDao.selectLectureList(sqlSession, map);
     }
 
     @Override
