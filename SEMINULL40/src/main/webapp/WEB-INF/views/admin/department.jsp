@@ -31,11 +31,14 @@
 				<div class="filter-left">
 
 					<select>
-						<option>전체</option>
-						<option>학과이름</option>
-						<option>작성자</option>
-					</select> <input type="text" placeholder="검색어 입력">
-					<button>검색</button>
+						<option value="all" ${condition == 'all' ? 'selected' : ''}>전체</option>
+						<option value="deptName"
+							${condition == 'deptName' ? 'selected' : ''}>학과이름</option>
+						<option value="uniName"
+							${condition == 'uniName' ? 'selected' : ''}>대학이름</option>
+					</select> <input type="text" name="keyword" value="${keyword}"
+						placeholder="검색어 입력">
+					<button type="submit">검색</button>
 				</div>
 
 				<!-- 모달 -->

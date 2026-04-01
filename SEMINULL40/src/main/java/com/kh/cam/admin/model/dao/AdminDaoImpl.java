@@ -94,14 +94,14 @@ public class AdminDaoImpl implements AdminDao {
 	}
 	
 	@Override
-	public int deleteMemberJoin(int memNo) {
-		return session.delete("admin.deleteMemberJoin", memNo);
+	public int rejectMemberJoin(int memNo) {
+		return session.update("admin.rejectMemberJoin", memNo);
 	}
 
 	// 학과관리
 	@Override
-	public List<Department> selectDepartmentList() {
-		return session.selectList("admin.selectDepartmentList");
+	public List<Department> selectDepartmentList(Map<String, Object> map) {
+		return session.selectList("admin.selectDepartmentList", map);
 	}
 
 	@Override

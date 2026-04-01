@@ -92,14 +92,25 @@ public class AdminServiceImpl implements AdminService{
 	}
 	
 	@Override
-	public int deleteMemberJoin(int memNo) {
+	public int rejectMemberJoin(int memNo) {
 		return adminDao.deleteMemberJoin(memNo);
 	}
 	
 	// 학과 관리
 	@Override
-	public List<Department> selectDepartmentList() {
-		return adminDao.selectDepartmentList();
+	public List<Department> selectDepartmentList(int uniNo, String condition, String keyword) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("uniNo", uniNo);
+		
+		 if(condition != null && !condition.isEmpty()) {
+		        map.put("condition", condition);
+		    }
+
+		    if(keyword != null && !keyword.isEmpty()) {
+		        map.put("keyword", keyword);
+		    }
+		
+		return adminDao.selectDepartmentList(map);
 	}
 	
 	@Override

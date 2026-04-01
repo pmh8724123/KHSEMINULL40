@@ -23,7 +23,7 @@ public interface AdminDao {
 
 	int updateMemberJoin(@Param("memNo") int memNo, @Param("status") String status, @Param("uniNo") int uniNo);
 	
-	int deleteMemberJoin(int memNo);
+	int rejectMemberJoin(int memNo);
 	
 	// 권한관리
 	int insertAuthority(@Param("memNo") int memNo, @Param("authority") String authority, @Param("uniNo") int uniNo);
@@ -34,7 +34,7 @@ public interface AdminDao {
 	
 	
 	// 학과관리
-	List<Department> selectDepartmentList();
+	List<Department> selectDepartmentList(Map<String, Object> map);
 	
 	int insertDepartment(Department dept);
 	
