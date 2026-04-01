@@ -83,4 +83,9 @@ public class BoardDaoImpl implements BoardDao {
 		return sqlSession.delete("board.deleteAttachment", fileNo);
 	}
 
+	@Override
+	public List<Map<String, Object>> selectCategoryList(SqlSessionTemplate sqlSession, int uniNo) {
+		return sqlSession.selectList("board.selectCategoryList",uniNo);
+	}
+
 }

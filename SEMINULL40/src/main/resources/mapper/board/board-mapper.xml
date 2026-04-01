@@ -47,7 +47,7 @@
 	    )
 	</insert>
 	
-	<!-- 2. 게시글 리스트 조회: JOIN 조건 수정 (B.UBTYPE_NO = UBT.UBTYPE_NO) -->
+	<!-- 2. 게시글 리스트 조회: 동적 카테고리 처리 -->
 	<select id="selectBoardList" resultType="Board" parameterType="hashmap">
 	    SELECT
 	        B.BOARD_NO,
@@ -61,21 +61,26 @@
 	    FROM BOARD B
 	    JOIN MEMBER M ON (B.BOARD_WRITER = M.MEM_NO)
 	    JOIN DEPARTMENT D ON (M.DEPT_NO = D.DEPT_NO)
-	    -- [수정됨] UNI_NO가 아니라 UBTYPE_NO로 조인해야 합니다.
 	    LEFT JOIN UNI_BOARD_TYPE UBT ON (B.UBTYPE_NO = UBT.UBTYPE_NO) 
 	    LEFT JOIN BOARD_TYPE BT ON (UBT.BTYPE_NO = BT.BTYPE_NO)
 	    WHERE B.STATUS = 'Y'
 	      AND D.UNI_NO = #{uniNo}
 	    
-	    <if test="category != null and !category.equals('all')">
-	        <choose>
-	            <when test="category.equals('free')"> AND BT.BTYPE_NAME = '자유게시판' </when>
-	            <when test="category.equals('qna')"> AND BT.BTYPE_NAME = '질문답변' </when>
-	            <when test="category.equals('accident')"> AND BT.BTYPE_NAME = '사건사고' </when>
-	        </choose>
+	    <!-- category가 'all'이 아니면 DB 필드와 직접 비교 -->
+	    <if test="category != null and category != '' and category != 'all'">
+	        AND BT.BTYPE_NAME = #{category}
 	    </if>
 	    ORDER BY B.BOARD_NO DESC
 	</select>
+	
+	<!-- 해당 학교의 카테고리 조회 -->
+	<select id="selectCategoryList" resultType="map" parameterType="_int">
+    SELECT BT.BTYPE_NAME
+    FROM UNI_BOARD_TYPE UBT
+    JOIN BOARD_TYPE BT ON (UBT.BTYPE_NO = BT.BTYPE_NO)
+    WHERE UBT.UNI_NO = #{uniNo}
+	</select>
+	
 	
 	<!-- 조회수 증가 -->
     <update id="increaseCount" parameterType="_int">
