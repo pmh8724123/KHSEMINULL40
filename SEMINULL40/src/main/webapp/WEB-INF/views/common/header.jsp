@@ -131,9 +131,12 @@
 				<sec:authentication property="principal.member.uniName"/>
 			</span>
 			
-			<form:form action="${path}/admin/main" method="get">
-				<button type="submit" class="adminMove">관리자페이지</button>			
-			</form:form>
+			<sec:authorize access="hasRole('ADMIN')">
+				<form:form action="${path}/admin/main" method="get">
+					<button type="submit" class="adminMove">관리자페이지</button>			
+				</form:form>
+			</sec:authorize>
+			
 			
 			<form:form action="${path}/member/logout" method="post">
 				<button type="submit" class="logout">로그아웃</button>			
