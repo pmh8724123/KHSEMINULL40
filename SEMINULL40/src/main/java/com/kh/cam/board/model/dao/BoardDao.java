@@ -40,5 +40,7 @@ public interface BoardDao {
 
 	int deleteBoard(SqlSessionTemplate sqlSession, int boardNo);
 
+	List<Map<String, Object>> selectCategoryList(SqlSessionTemplate sqlSession, int uniNo);
+
 
 }

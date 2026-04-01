@@ -85,6 +85,11 @@ public class BoardServiceImpl implements BoardService {
 	public ArrayList<Attachment> selectAttachmentList(int boardNo) {
 		return boardDao.selectAttachmentList(sqlSession, boardNo);
 	}
+	
+	@Override
+	public List<Map<String, Object>> selectCategoryList(int uniNo) {
+		return boardDao.selectCategoryList(sqlSession, uniNo);
+	}
 
 	@Override
 	@Transactional

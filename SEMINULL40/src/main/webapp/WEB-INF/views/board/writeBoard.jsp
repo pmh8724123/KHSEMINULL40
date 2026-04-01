@@ -144,12 +144,15 @@
 			<!-- 카테고리 선택 -->
 			<div class="form-group">
 			    <label>카테고리</label>
-			    <!-- name을 category로 변경 (컨트롤러 RequestParam과 일치) -->
 			    <select class="input-style" name="category" required>
 			        <option value="">카테고리를 선택하세요</option>
-			        <option value="free" ${(b.ubtypeNo == 1 || param.category == 'free') ? 'selected' : ''}>자유게시판</option>
-			        <option value="qna" ${(b.ubtypeNo == 2 || param.category == 'qna') ? 'selected' : ''}>질문답변</option>
-			        <option value="accident" ${(b.ubtypeNo == 3 || param.category == 'accident') ? 'selected' : ''}>사건사고</option>
+			        
+			        <c:forEach var="cat" items="${catList}">
+			            <option value="${cat.BTYPE_NAME}" 
+			                ${(b.categoryName == cat.BTYPE_NAME || param.category == cat.BTYPE_NAME) ? 'selected' : ''}>
+			                ${cat.BTYPE_NAME}
+			            </option>
+			        </c:forEach>
 			    </select>
 			</div>
 

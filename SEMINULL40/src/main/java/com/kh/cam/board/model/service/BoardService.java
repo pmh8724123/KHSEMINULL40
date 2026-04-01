@@ -35,6 +35,8 @@ public interface BoardService {
 
 	int deleteBoard(int boardNo);
 
+	List<Map<String, Object>> selectCategoryList(int uniNo);
+
 
 	
 }

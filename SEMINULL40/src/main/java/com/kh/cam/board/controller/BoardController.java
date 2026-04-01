@@ -53,6 +53,11 @@ public class BoardController {
 	        uniNo = ((CustomUserDetails)auth.getPrincipal()).getMember().getUniNo();
 	    }
 
+	    // 1. 카테고리 목록 동적 조회 (화면 탭 구성용)
+	    List<Map<String, Object>> catList = boardService.selectCategoryList(uniNo);
+	    model.addAttribute("catList", catList);
+
+	    // 2. 게시글 목록 조회
 	    Map<String, Object> params = new HashMap<>();
 	    params.put("category", category);
 	    params.put("uniNo", uniNo);
@@ -64,15 +69,21 @@ public class BoardController {
 	    return "board/board";
 	}
 	
+	// 글쓰기 폼 전송
 	@GetMapping("/write")
-	public String writeForm(@RequestParam(value="category", required=false) String category) {
-		return "board/writeBoard";
+	public String writeForm(@RequestParam(value="category", required=false) String category, Model model) {
+	    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    int uniNo = ((CustomUserDetails)auth.getPrincipal()).getMember().getUniNo();
+	    
+	    // 카테고리 목록을 가져와서 select 박스에 뿌려줌
+	    model.addAttribute("catList", boardService.selectCategoryList(uniNo));
+	    return "board/writeBoard";
 	}
 	
 	// [등록] 카테고리 로직 보강
 	@PostMapping("/insert.bo")
 	public String insertBoard(Board b, 
-	                          @RequestParam(value="category", defaultValue="free") String category, 
+	                          @RequestParam(value="category") String category, 
 	                          @RequestParam(value="upfiles", required=false) MultipartFile[] upfiles, 
 	                          HttpSession session) {
 	    
@@ -82,11 +93,8 @@ public class BoardController {
 	        b.setBoardWriter(userDetails.getMember().getMemNo()); 
 	        b.setUniNo(userDetails.getMember().getUniNo()); 
 	        
-	        // 카테고리 매핑
-	        String categoryName = "자유게시판"; 
-	        if("qna".equals(category)) categoryName = "질문답변";
-	        else if("accident".equals(category)) categoryName = "사건사고";
-	        b.setCategoryName(categoryName);
+	        // 중요: 화면에서 '자유게시판'이라는 글자가 직접 넘어오므로 바로 세팅
+	        b.setCategoryName(category); 
 	    } else {
 	        return "redirect:/member/login.me"; 
 	    }

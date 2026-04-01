@@ -177,13 +177,17 @@
                 </sec:authorize>
             </header>
 
-            <!-- 카테고리 필터 -->
-            <ul class="category-list">
-                <li onclick="location.href='list?category=all'" class="${cur == 'all' ? 'active' : ''}">전체</li>
-                <li onclick="location.href='list?category=free'" class="${cur == 'free' ? 'active' : ''}">자유게시판</li>
-                <li onclick="location.href='list?category=qna'" class="${cur == 'qna' ? 'active' : ''}">질문답변</li>
-                <li onclick="location.href='list?category=accident'" class="${cur == 'accident' ? 'active' : ''}">사건사고</li>
-            </ul>
+			<!-- 카테고리 필터 -->
+			<ul class="category-list">
+			    <li onclick="location.href='list?category=all'" class="${cur == 'all' ? 'active' : ''}">전체</li>
+			    
+			    <c:forEach var="cat" items="${catList}">
+			        <li onclick="location.href='list?category=${cat.BTYPE_NAME}'" 
+			            class="${cur == cat.BTYPE_NAME ? 'active' : ''}">
+			            ${cat.BTYPE_NAME}
+			        </li>
+			    </c:forEach>
+			</ul>
 
             <!-- 게시글 리스트 영역 -->
             <div class="post-container">
