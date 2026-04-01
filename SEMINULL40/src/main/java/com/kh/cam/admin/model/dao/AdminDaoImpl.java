@@ -121,19 +121,25 @@ public class AdminDaoImpl implements AdminDao {
 
 	// 강의관리
 	@Override
-	public List<Lecture> selectLectureList() {
-		return session.selectList("admin.selectLectureList");
+	public List<Lecture> selectLectureList(Map<String, Object> map) {
+		return session.selectList("admin.selectLectureList", map);
 	}
 
 	@Override
 	public int insertLecture(Lecture lecture) {
 		return session.insert("admin.insertLecture", lecture);
 	}
+	
+	@Override
+	public int updateLecture(Lecture lecture) {
+		return session.update("admin.updateLecture", lecture);
+	}
 
 	@Override
-	public int deleteLecture(Lecture lectureNo) {
+	public int deleteLecture(int lectureNo) {
 		return session.delete("admin.deleteLecture", lectureNo);
 	}
+
 
 	
 

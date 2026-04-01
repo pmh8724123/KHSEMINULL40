@@ -43,11 +43,15 @@ public interface AdminDao {
 	int deleteDepartment(Department deptNo);
 	
 	// 강의관리
-	List<Lecture> selectLectureList();
+	List<Lecture> selectLectureList(Map<String, Object> map);
 
 	int insertLecture(Lecture lecture);
 
-	int deleteLecture(Lecture lectureNo);
+	int updateLecture(Lecture lecture);
+	
+	int deleteLecture(int lectureNo);
+	
+
 
 
 

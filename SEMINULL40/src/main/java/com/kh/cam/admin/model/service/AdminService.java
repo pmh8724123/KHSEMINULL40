@@ -33,11 +33,14 @@ public interface AdminService {
 	int deleteDepartment(Department deptNo);
 	
 	// 강의 관리
-	List<Lecture> selectLectureList();
+	List<Lecture> selectLectureList(int uniNo, String condition, String keyword);
 
 	int insertLecture(Lecture lecture);
 
-	int deleteLecture(Lecture lecNo);
+	int updateLecture(Lecture lecture);
+	
+	int deleteLecture(int lectureNo);
+
 
 
 

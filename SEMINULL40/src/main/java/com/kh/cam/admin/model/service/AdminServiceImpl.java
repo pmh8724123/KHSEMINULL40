@@ -62,11 +62,6 @@ public class AdminServiceImpl implements AdminService{
 	    return result;
 	}
 	
-	/*
-	 * @Override public int deleteMember(int memNo) { return
-	 * adminDao.deleteMember(memNo); }
-	 */
-	
 	// 회원 승인관리 리스트
 	@Override
 	public List<Member> selectMemberJoinList(int uniNo, String condition, String keyword) {
@@ -93,7 +88,7 @@ public class AdminServiceImpl implements AdminService{
 	
 	@Override
 	public int rejectMemberJoin(int memNo) {
-		return adminDao.deleteMemberJoin(memNo);
+		return adminDao.rejectMemberJoin(memNo);
 	}
 	
 	// 학과 관리
@@ -128,9 +123,21 @@ public class AdminServiceImpl implements AdminService{
 		return adminDao.insertDepartment(dept);
 	}
 	
+	// 강의관리
 	@Override
-	public List<Lecture> selectLectureList() {
-		return adminDao.selectLectureList();
+	public List<Lecture> selectLectureList(int uniNo, String condition, String keyword) {
+		Map<String, Object> map = new HashMap<>();
+	    map.put("uniNo", uniNo);
+	    
+	    if(condition != null && !condition.isEmpty()) {
+	        map.put("condition", condition);
+	    }
+
+	    if(keyword != null && !keyword.isEmpty()) {
+	        map.put("keyword", keyword);
+	    }
+	    
+		return adminDao.selectLectureList(map);
 	}
 
 	// 강의 관리
@@ -138,11 +145,17 @@ public class AdminServiceImpl implements AdminService{
 	public int insertLecture(Lecture lecture) {
 		return adminDao.insertLecture(lecture);
 	}
+	
+	@Override
+	public int updateLecture(Lecture lecture) {
+		return adminDao.updateLecture(lecture);
+	}
 
 	@Override
-	public int deleteLecture(Lecture lectureNo) {
+	public int deleteLecture(int lectureNo) {
 		return adminDao.deleteLecture(lectureNo);
 	}
+
 
 	
 
