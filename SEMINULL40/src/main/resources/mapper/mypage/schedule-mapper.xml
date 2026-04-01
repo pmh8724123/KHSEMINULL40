@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="schedule">
+
+	<resultMap id="scheduleResultSet" type="Schedule">
+		<id column="SCHEDULE_NO" property="scheduleNo" />
+		<result column="MEM_NO" property="memNo" />
+		<result column="LECTURE_NO" property="lectureNo" />
+		<result column="SCHEDULE_TITLE" property="scheduleTitle" />
+		<result column="LECTURE_TITLE" property="lectureTitle" />
+		<result column="SCHEDULE_DAY" property="scheduleDay" />
+		<result column="START_SLOT" property="startSlot" />
+		<result column="END_SLOT" property="endSlot" />
+	</resultMap>
+
+
+	<select id="selectList" parameterType="_int"
+		resultMap="scheduleResultSet">
+		SELECT
+		S.*,
+		L.LECTURE_NAME
+		FROM SCHEDULE S
+		JOIN LECTURE L ON
+		(S.LECTURE_NO = L.LECTURE_NO)
+		WHERE
+		S.MEM_NO = #{memNo}
+		ORDER BY
+		S.SCHEDULE_DAY, S.START_SLOT
+	</select>
+
+
+
+	<select id="searchLecture" parameterType="string"
+		resultType="Lecture">
+		SELECT
+		LECTURE_NO,
+		LECTURE_NAME,
+		PROFESSOR_NAME
+		FROM LECTURE
+		WHERE
+		LECTURE_NAME LIKE '%' || #{keyword} || '%'
+		<![CDATA[
+    		AND ROWNUM <= 10
+    	]]>
+	</select>
+
+	<delete id="deleteSchedule" parameterType="Schedule">
+		DELETE FROM SCHEDULE
+		WHERE
+		MEM_NO = #{memNo}
+		AND SCHEDULE_TITLE = #{scheduleTitle}
+	</delete>
+
+	<insert id="insertSchedule" parameterType="Schedule">
+		INSERT INTO SCHEDULE (
+		SCHEDULE_NO, MEM_NO, LECTURE_NO, SCHEDULE_TITLE,
+		SCHEDULE_DAY, START_SLOT, END_SLOT)
+		VALUES (SEQ_SCH_NO.NEXTVAL, #{memNo},
+		#{lectureNo}, #{scheduleTitle},
+		#{scheduleDay}, #{startSlot},
+		#{endSlot})
+	</insert>
+
+</mapper>

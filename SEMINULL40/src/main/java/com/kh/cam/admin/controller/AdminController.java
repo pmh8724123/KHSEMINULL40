@@ -1,8 +1,10 @@
 package com.kh.cam.admin.controller;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+
 import java.util.List;
 
-
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +16,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.kh.cam.admin.model.service.AdminService;
 import com.kh.cam.common.model.vo.Department;
+import com.kh.cam.member.model.service.MemberService;
+import com.kh.cam.member.model.vo.CustomUserDetails;
 import com.kh.cam.member.model.vo.Member;
 import com.kh.cam.mypage.model.vo.Lecture;
 
@@ -37,18 +41,19 @@ public class AdminController {
 // ---------------------회원관리----------------------------------
 	// 회원 상태 관리 조회
 	@GetMapping("/memberStatus")
-	public String memberStatus(
-			@RequestParam(value="condition", required=false) String condition,
-	        @RequestParam(value="keyword", required=false) String keyword,
-	        Model model
-			) {
-		
-		
-		List<Member> list = adminService.selectMemberList(condition, keyword);
+	public String memberStatus(@RequestParam(value = "condition", required = false) String condition,
+			@RequestParam(value = "keyword", required = false) String keyword, Model model) {
+
+		CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
+		int uniNo = user.getMember().getUniNo();
+
+		List<Member> list = adminService.selectMemberList(uniNo, condition, keyword);
 
 		model.addAttribute("list", list);
-	    model.addAttribute("condition", condition);
-	    model.addAttribute("keyword", keyword);
+		model.addAttribute("condition", condition);
+		model.addAttribute("keyword", keyword);
+		model.addAttribute("loginUser", user.getMember());
 
 		return "admin/memberStatus";
 	}
@@ -57,90 +62,123 @@ public class AdminController {
 	@PostMapping("member/status")
 	public String updateMemberStatus(int memNo, String status, RedirectAttributes ra) {
 
-		adminService.updateMemberStatus(memNo, status);
+		CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
+		int uniNo = user.getMember().getUniNo();
+		int result = adminService.updateMemberStatus(memNo, status, uniNo);
 
-		if ("Y".equals(status)) {
-			ra.addFlashAttribute("msg", "회원이 활성화되었습니다.");
-			ra.addFlashAttribute("type", "success");
-		} else {
-			ra.addFlashAttribute("msg", "회원이 정지되었습니다.");
-			ra.addFlashAttribute("type", "error");
-		}
+		if (result > 0) {
+	        if ("Y".equals(status)) {
+	            ra.addFlashAttribute("msg", "회원이 정상 처리되었습니다.");
+	            ra.addFlashAttribute("type", "success");
+	        } else if ("B".equals(status)) {
+	            ra.addFlashAttribute("msg", "회원이 정지 처리되었습니다.");
+	            ra.addFlashAttribute("type", "error");
+	        } else if ("N".equals(status)) {
+	            ra.addFlashAttribute("msg", "회원이 탈퇴 처리되었습니다.");
+	            ra.addFlashAttribute("type", "error");
+	        }
+	    } else {
+	        ra.addFlashAttribute("msg", "해당 학교 관리자만 처리할 수 있습니다.");
+	        ra.addFlashAttribute("type", "error");
+	    }
 
 		return "redirect:/admin/memberStatus";
 	}
-	
-	// 회원 삭제
-	@PostMapping("/member/delete")
-	public String deleteMember(int memNo, RedirectAttributes ra) {
 
-	    adminService.deleteMember(memNo);
-
-	    ra.addFlashAttribute("msg", "회원이 삭제되었습니다.");
-	    ra.addFlashAttribute("type", "error");
-
-	    return "redirect:/admin/memberStatus";
-	}
-	
+	/*
+	 * // 회원 삭제
+	 * 
+	 * @PostMapping("/member/delete") public String deleteMember(int memNo,
+	 * RedirectAttributes ra) {
+	 * 
+	 * adminService.deleteMember(memNo);
+	 * 
+	 * ra.addFlashAttribute("msg", "회원이 삭제되었습니다."); ra.addFlashAttribute("type",
+	 * "error");
+	 * 
+	 * return "redirect:/admin/memberStatus"; }
+	 */
 
 // ---------------------회원승인관리----------------------------------
 
 	// 회원 가입 승인관리 조회
 	@GetMapping("/memberJoin")
-	public String adminMemberJoin(Model model) {
-		List<Member> list = adminService.selectMemberJoinList();
+	public String adminMemberJoin(@RequestParam(value = "condition", required = false) String condition,
+			@RequestParam(value = "keyword", required = false) String keyword, Model model) {
+		CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
+		int uniNo = user.getMember().getUniNo();
+
+		List<Member> list = adminService.selectMemberJoinList(uniNo, condition, keyword);
 
 		model.addAttribute("list", list);
+		model.addAttribute("condition", condition);
+		model.addAttribute("keyword", keyword);
+		model.addAttribute("loginUser", user.getMember());
 
 		return "admin/memberJoin";
 	}
 
-	// 회원 가입 승인
+	// 회원 가입 요청 승인
 	@PostMapping("member/join/approve")
-	public String approveMemberJoin(int memNo, String status, RedirectAttributes ra) {
+	public String approveMember(int memNo, RedirectAttributes ra) {
 
-		adminService.updateMemberJoin(memNo, "Y");
+		CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
+		int uniNo = user.getMember().getUniNo();
 
-			ra.addFlashAttribute("msg", "승인처리완료");
+		int result = adminService.approveMember(memNo, uniNo);
+
+		if (result > 0) {
+			ra.addFlashAttribute("msg", "회원 가입이 승인되었습니다.");
 			ra.addFlashAttribute("type", "success");
+		} else {
+			ra.addFlashAttribute("msg", "회원 가입 승인에 실패했습니다.");
+			ra.addFlashAttribute("type", "error");
+		}
 
 		return "redirect:/admin/memberJoin";
 	}
-	
+
 	// 회원 가입 거절/삭제
-		@PostMapping("member/join/reject")
-		public String rejectMemberJoin(int memNo, String status, RedirectAttributes ra) {
+	@PostMapping("member/join/reject")
+	public String rejectMember(@RequestParam("memNo") int memNo, RedirectAttributes ra) {
 
-			adminService.deleteMember(memNo);
+		int result = adminService.deleteMemberJoin(memNo);
 
-			ra.addFlashAttribute("msg", "승인거절");
+		if(result > 0) {
+			ra.addFlashAttribute("msg", "가입 거절 완료");
 			ra.addFlashAttribute("type", "error");
-
-			return "redirect:/admin/memberJoin";
+		} else {
+			ra.addFlashAttribute("msg", "가입 거절 실패");
+			ra.addFlashAttribute("type", "error");
 		}
-	
+
+		return "redirect:/admin/memberJoin";
+	}
 
 // ---------------------학교관리----------------------------------
-		/*
-		 * // 학과 관리 조회
-		 * 
-		 * @GetMapping("/department") public String DepartmentList(Model
-		 * model, @AuthenticationPrincipal CustomUserDetails user) {
-		 * 
-		 * int uniNo = user.getMember().getUniNo(); System.out.print(uniNo);
-		 * List<Department> list = adminService.selectDepartmentList(uniNo);
-		 * 
-		 * model.addAttribute("list", list);
-		 * 
-		 * return "admin/department"; }
-		 */
-		
+	/*
+	 * // 학과 관리 조회
+	 * 
+	 * @GetMapping("/department") public String DepartmentList(Model
+	 * model, @AuthenticationPrincipal CustomUserDetails user) {
+	 * 
+	 * int uniNo = user.getMember().getUniNo(); System.out.print(uniNo);
+	 * List<Department> list = adminService.selectDepartmentList(uniNo);
+	 * 
+	 * model.addAttribute("list", list);
+	 * 
+	 * return "admin/department"; }
+	 */
+
 	// 학과 관리 조회
 	@GetMapping("/department")
 	public String DepartmentList(Model model) {
-		
+
 		List<Department> list = adminService.selectDepartmentList();
-		
+
 		model.addAttribute("list", list);
 
 		return "admin/department";
@@ -149,59 +187,59 @@ public class AdminController {
 	// 학과 추가
 	@PostMapping("/department/insert")
 	public String insertDepartment(@ModelAttribute Department dept, RedirectAttributes ra) {
-		
+
 		dept.setUniNo(1); // 테스트
 
 		int result = adminService.insertDepartment(dept);
-		
-		if(result > 0) {
+
+		if (result > 0) {
 			ra.addFlashAttribute("msg", "추가 성공");
 			ra.addFlashAttribute("type", "success");
 		} else {
 			ra.addFlashAttribute("msg", "추가 실패");
 			ra.addFlashAttribute("type", "error");
 		}
-		
-		return "redirect:/admin/department";
-	}
-	
-	// 학과 수정
-	@PostMapping("/department/update")
-	public String updateDepartment(Department dept,RedirectAttributes ra) {
-		
-		int result = adminService.updateDepartment(dept);
-		
-		System.out.println("asdasdasd" + dept);
-		
-		if(result > 0) {
-	        ra.addFlashAttribute("msg", "수정 완료");
-	        ra.addFlashAttribute("type", "success");
-	    } else {
-	        ra.addFlashAttribute("msg", "수정 실패");
-	        ra.addFlashAttribute("type", "error");
-	    }
 
 		return "redirect:/admin/department";
 	}
-	
+
+	// 학과 수정
+	@PostMapping("/department/update")
+	public String updateDepartment(Department dept, RedirectAttributes ra) {
+
+		int result = adminService.updateDepartment(dept);
+
+		System.out.println("asdasdasd" + dept);
+
+		if (result > 0) {
+			ra.addFlashAttribute("msg", "수정 완료");
+			ra.addFlashAttribute("type", "success");
+		} else {
+			ra.addFlashAttribute("msg", "수정 실패");
+			ra.addFlashAttribute("type", "error");
+		}
+
+		return "redirect:/admin/department";
+	}
+
 	// 학과 삭제
 	@PostMapping("/department/delete")
 	public String deleteDepartment(Department deptNo, RedirectAttributes ra) {
-		
+
 		int result = adminService.deleteDepartment(deptNo);
-		
-		if(result > 0) {
+
+		if (result > 0) {
 			ra.addFlashAttribute("msg", "삭제 완료");
 			ra.addFlashAttribute("type", "error");
 		} else {
 			ra.addFlashAttribute("msg", "삭제 실패");
 			ra.addFlashAttribute("type", "success");
 		}
-		
+
 		return "redirect:/admin/department";
 	}
 
-	// 수업 관리
+	// 강의 관리
 	@GetMapping("/lecture")
 	public String adminLecture(Model model) {
 		List<Lecture> list = adminService.selectLectureList();
@@ -213,9 +251,26 @@ public class AdminController {
 
 	// 강의 추가
 	@PostMapping("/lecture/insert")
-	public String insertLecture(@ModelAttribute Lecture lec, RedirectAttributes ra) {
+	public String insertLecture(@ModelAttribute Lecture lecture, RedirectAttributes ra) {
 
-		adminService.insertLecture(lec);
+		int result = adminService.insertLecture(lecture);
+
+		if (result > 0) {
+			ra.addFlashAttribute("msg", "추가 성공");
+			ra.addFlashAttribute("type", "success");
+		} else {
+			ra.addFlashAttribute("msg", "추가 실패");
+			ra.addFlashAttribute("type", "error");
+		}
+
+		return "redirect:/admin/lecture";
+	}
+
+	// 강의 삭제
+	@PostMapping("/lecture/delete")
+	public String deleteLecture(@ModelAttribute Lecture lectureNo, RedirectAttributes ra) {
+
+		int result = adminService.deleteLecture(lectureNo);
 
 		return "redirect:/admin/lecture";
 	}

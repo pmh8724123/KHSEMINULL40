@@ -1,5 +1,6 @@
 package com.kh.cam.admin.model.dao;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,45 +17,87 @@ import lombok.extern.slf4j.Slf4j;
 @Repository
 @Slf4j
 @RequiredArgsConstructor
-public class AdminDaoImpl implements AdminDao{
-	
+public class AdminDaoImpl implements AdminDao {
+
 	private final SqlSessionTemplate session;
 
 	// 회원 상태 관리
 	@Override
 	public List<Member> selectMemberList(Map<String, Object> map) {
-	    return session.selectList("admin.selectMemberList", map);
-	}
-	
-	@Override
-	public int updateMemberStatus(int memNo, String status) {
-		return session.update("admin.updateMemberStatus",
-                Map.of("memNo", memNo, "status", status));
-	}
-	
-	@Override
-	public int deleteMember(int memNo) {
-		int result = session.delete("admin.deleteMember", memNo);
-
-		if(result > 0) {
-		    // 성공
-		} else {
-		    // 실패 처리
-		}
-		return result;
-	}
-	
-	// 회원 승인관리	
-	@Override
-	public List<Member> selectMemberJoinList() {
-		return session.selectList("admin.selectMemberJoinList");
+		return session.selectList("admin.selectMemberList", map);
 	}
 
 	@Override
-	public int updateMemberJoin(int memNo, String status) {
-		return session.update("admin.updateMemberJoin",
-                Map.of("memNo", memNo, "status", status));
+	public int updateMemberStatus(int memNo, String status, int uniNo) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("memNo", memNo);
+		map.put("status", status);
+		map.put("uniNo", uniNo);
+
+		return session.update("admin.updateMemberStatus", map);
 	}
+
+	// 권한관리
+
+	@Override
+	public int insertAuthority(int memNo, String authority, int uniNo) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("memNo", memNo);
+		map.put("authority", authority);
+		map.put("uniNo", uniNo);
+
+		return session.insert("admin.insertAuthority", map);
+	}
+
+	@Override
+	public int countAuthority(int memNo, String authority, int uniNo) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("memNo", memNo);
+		map.put("authority", authority);
+		map.put("uniNo", uniNo);
+
+		return session.selectOne("admin.countAuthority", map);
+	}
+
+	@Override
+	public int deleteAuthority(int memNo, String authority, int uniNo) {
+		Map<String, Object> map = new HashMap<>();
+
+		map.put("memNo", memNo);
+		map.put("authority", authority);
+		map.put("uniNo", uniNo);
+		
+		return session.delete("admin.deleteAuthority", map);
+	}
+
+	/*
+	 * @Override public int deleteMember(int memNo) { int result =
+	 * session.delete("admin.deleteMember", memNo);
+	 * 
+	 * if (result > 0) { // 성공 } else { // 실패 처리 } return result; }
+	 */
+
+	// 회원 승인관리
+	@Override
+	public List<Member> selectMemberJoinList(Map<String, Object> map) {
+		return session.selectList("admin.selectMemberJoinList", map);
+	}
+
+	@Override
+	public int updateMemberJoin(int memNo, String status, int uniNo) {
+	    Map<String, Object> map = new HashMap<>();
+	    map.put("memNo", memNo);
+	    map.put("status", status);
+	    map.put("uniNo", uniNo);
+
+	    return session.update("admin.updateMemberJoin", map);
+	}
+	
+	@Override
+	public int deleteMemberJoin(int memNo) {
+		return session.delete("admin.deleteMemberJoin", memNo);
+	}
+
 	// 학과관리
 	@Override
 	public List<Department> selectDepartmentList() {
@@ -65,44 +108,33 @@ public class AdminDaoImpl implements AdminDao{
 	public int insertDepartment(Department dept) {
 		return session.insert("admin.insertDepartment", dept);
 	}
-	
+
 	@Override
 	public int updateDepartment(Department dept) {
 		return session.update("admin.updateDepartment", dept);
 	}
-	
+
 	@Override
 	public int deleteDepartment(Department deptNo) {
 		return session.delete("admin.deleteDepartment", deptNo);
 	}
-	
-	// 강의관리	
+
+	// 강의관리
 	@Override
 	public List<Lecture> selectLectureList() {
 		return session.selectList("admin.selectLectureList");
 	}
 
 	@Override
-	public int insertLecture(Lecture lec) {
-		return session.insert("admin.insertLecture", lec);
+	public int insertLecture(Lecture lecture) {
+		return session.insert("admin.insertLecture", lecture);
+	}
+
+	@Override
+	public int deleteLecture(Lecture lectureNo) {
+		return session.delete("admin.deleteLecture", lectureNo);
 	}
 
 	
 
-
-	
-	
-	
-	
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }

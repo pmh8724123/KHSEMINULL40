@@ -5,7 +5,7 @@
 	<insert id="insertBoard" parameterType="Board">
 		<!-- insert 실행 전 시퀀스 번호를 가져와서 Board 객체의 boardNo에 담아줌 -->
 		<selectKey keyProperty="boardNo" resultType="_int" order="BEFORE">
-			SELECT SEQ_BNO.NEXTVAL FROM DUAL
+			SELECT SEQ_BOARD.NEXTVAL FROM DUAL
 		</selectKey>
 		INSERT INTO BOARD(
 			BOARD_NO, 

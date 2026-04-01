@@ -9,22 +9,21 @@ import com.kh.cam.mypage.model.vo.Lecture;
 public interface AdminService {
 
 	// 회원 상태 관리
-	List<Member> selectMemberList(String condition, String keyword);
+	List<Member> selectMemberList(int uniNo, String condition, String keyword);
 	
-	int updateMemberStatus(int memNo, String status);
+	int updateMemberStatus(int memNo, String status, int uniNo);
 	
-	int deleteMember(int memNo);
+	/* int deleteMember(int memNo); */
 	
 	
 	// 회원 승인 관리
-	List<Member> selectMemberJoinList();
+	List<Member> selectMemberJoinList(int uniNo, String condition, String keyword);
 	
-
-	int updateMemberJoin(int memNo, String status);
+	int approveMember(int memNo, int uniNo);
 	
+	int deleteMemberJoin(int memNo);
 
 	// 학과 관리
-	// List<Department> selectDepartmentList(int uniNo);
 	List<Department> selectDepartmentList();
 
 	int insertDepartment(Department dept);
@@ -36,7 +35,11 @@ public interface AdminService {
 	// 강의 관리
 	List<Lecture> selectLectureList();
 
-	int insertLecture(Lecture lec);
+	int insertLecture(Lecture lecture);
+
+	int deleteLecture(Lecture lecNo);
+
+
 
 
 

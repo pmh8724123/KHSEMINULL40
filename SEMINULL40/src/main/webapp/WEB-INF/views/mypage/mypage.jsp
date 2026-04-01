@@ -162,16 +162,20 @@
 	<!-- 탭 버튼 영역 -->
 	<div class="tab-wrapper">
 		<div class="tab-menu">
-			<button class="tab-btn ${category == 'attendance' ? 'active' : ''}" onclick="showTab('attendance')">
+			<button class="tab-btn ${category == 'attendance' ? 'active' : ''}"
+				onclick="showTab('attendance')">
 				<i class="fa-regular fa-calendar-check"></i> 출석체크
 			</button>
-			<button class="tab-btn ${category == 'friend' ? 'active' : ''}" onclick="showTab('friend')">
+			<button class="tab-btn ${category == 'friend' ? 'active' : ''}"
+				onclick="showTab('friend')">
 				<i class="fa-solid fa-user-group"></i> 친구
 			</button>
-			<button class="tab-btn ${category == 'timetable' ? 'active' : ''}" onclick="showTab('timetable')">
+			<button class="tab-btn ${category == 'timetable' ? 'active' : ''}"
+				onclick="showTab('timetable')">
 				<i class="fa-solid fa-calendar-days"></i> 시간표
 			</button>
-			<button class="tab-btn ${category == 'setting' ? 'active' : ''}" onclick="showTab('setting')">
+			<button class="tab-btn ${category == 'setting' ? 'active' : ''}"
+				onclick="showTab('setting')">
 				<i class="fa-solid fa-gear"></i> 설정
 			</button>
 
@@ -215,7 +219,7 @@
 				</div>
 
 				<form:form action="${path}/attendance/updateAtt" method="post">
-					<div class="att-btn-wrap" name>
+					<div class="att-btn-wrap">
 						<c:choose>
 							<c:when test="${attCnt >= 7}">
 								<button class="att-btn" disabled>출석 완료</button>
@@ -298,12 +302,57 @@
 				<div class="friend-actions">
 					<!-- 친구 추가 페이지로 이동 -->
 					<button class="friend-btn"
-						onclick="location.href='${path}/addfriend'">친구 추가</button>
+						onclick="location.href='${path}/friends/addfriend'">친구 추가</button>
 					<!-- 수락 대기 중인 친구 요청 페이지로 이동 -->
 					<button class="friend-btn"
-						onclick="location.href='${path}/acceptfriend'">친구 수락</button>
+						onclick="location.href='${path}/friends/acceptfriend'">친구
+						수락</button>
 				</div>
 			</div>
+
+			<!-- 친구 목록 -->
+			<c:if test="${not empty friendList}">
+				<c:forEach var="f" items="${friendList}">
+					<div class="friend-item">
+						<div class="friend-text">
+							<span class="friend-name">${f.friendName}</span>
+						</div>
+						<button class="friend-delete-btn"
+							onclick="deleteFriend(${f.friendNo})">친구 삭제</button>
+					</div>
+				</c:forEach>
+			</c:if>
+
+			<!-- 친구 삭제 기능 -->
+			<script>
+			function deleteFriend(friendNo) {
+			    if (confirm("정말 삭제하시겠습니까?")) {
+			    	
+			    	const token = document.querySelector('meta[name="_csrf"]').content;
+			        const header = document.querySelector('meta[name="_csrf_header"]').content;
+			    	
+			        fetch('${path}/friends/delete', {
+			            method: 'POST',
+			            headers: { 
+			            	'Content-Type': 'application/json', 
+			            	[header]: token
+			            },
+			            body: JSON.stringify({ friendNo: friendNo })
+			        })
+			        .then(res => res.json())
+			        .then(data => {
+			            if (data.result === 'success') {
+			                alert("삭제되었습니다.");
+			                location.reload(); // 화면 새로고침
+			            } else {
+			                alert("삭제에 실패했습니다.");
+			            }
+			        })
+			        .catch(err => console.error("Error:", err));
+			    }
+			}
+			</script>
+
 
 			<!-- 친구가 없을 때 -->
 			<c:if test="${empty friendList}">
@@ -311,33 +360,6 @@
 					<p>친구가 없습니다</p>
 				</div>
 			</c:if>
-
-			<!-- 친구 목록 -->
-			<c:if test="${not empty friendList}">
-				<c:forEach var="f" items="${friendList}">
-					<div class="friend-item">
-						<div class="friend-info">
-							<%-- 프로필 이미지 (사용 시 주석 해제)
-                    <img src="${path}/resources/profile/${f.profileImg}"
-                         class="profile-img" alt="${f.memName} 프로필"> --%>
-							<div class="friend-text">
-								<!-- 친구 이름 / receiverNo(memNo) 기준으로 상대방 이름 표시 -->
-								<span class="friend-name">${f.memName}</span>
-								<!-- 온라인 여부 / status 'O' = 온라인 -->
-								<c:choose>
-									<c:when test="${f.status eq 'O'}">
-										<span class="online">온라인</span>
-									</c:when>
-									<c:otherwise>
-										<span class="offline">오프라인</span>
-									</c:otherwise>
-								</c:choose>
-							</div>
-						</div>
-					</div>
-				</c:forEach>
-			</c:if>
-
 		</div>
 		<!-- /friend -->
 
@@ -351,8 +373,7 @@
 				<div class="tt-title-wrap" id="ttTitleWrap">
 					<!-- 드롭다운 버튼: onclick 제거, id 추가 -->
 					<button class="tt-title-btn" id="ttTitleBtn">
-						<span id="ttTitleText">2026년도 1학기 시간표</span> <span
-							style="font-size: 11px">▼</span>
+						<span id="ttTitleText">나의 시간표</span> <span style="font-size: 11px">▼</span>
 					</button>
 					<div class="tt-dropdown" id="ttDropdown"></div>
 					<div class="tt-plusminus">
@@ -375,6 +396,15 @@
 
 			<!-- 하단 버튼: 강의 추가 / 강의 삭제 -->
 			<div class="tt-bottombar">
+				<!-- 				
+				검색 기능 ui
+				<div class="lecture-search-wrap">
+					<input type="text" id="lectureSearchInp" placeholder="강의명 검색...">
+					<ul id="searchResultList">
+					</ul>
+				</div> 
+-->
+
 				<!-- 강의 추가 버튼: onclick 제거, id 추가 -->
 				<button class="btn-tt-add" id="ttBtnOpenModal">강의 추가</button>
 
@@ -385,18 +415,13 @@
 			<!-- 강의 추가 모달 (버튼 클릭 시 펼쳐짐) -->
 			<div class="tt-overlay" id="ttOverlay">
 				<div class="tt-modal">
-					<h3>강의 추가</h3>
-
-					<label>강의명</label> <input type="text" id="ttInpTitle"
-						placeholder="예: 데이터베이스"> <label>요일</label> <select
-						id="ttInpDay">
-						<option value="0">월요일</option>
-						<option value="1">화요일</option>
-						<option value="2">수요일</option>
-						<option value="3">목요일</option>
-						<option value="4">금요일</option>
-					</select> <label>시작 시간</label> <select id="ttInpStart"></select> <label>종료
-						시간</label> <select id="ttInpEnd"></select>
+					<label>강의 검색</label>
+					<div style="position: relative; flex: 1;">
+						<input type="text" id="ttInpTitle" autocomplete="off"
+							placeholder="강의명을 입력하세요"> <input type="hidden"
+							id="ttSelectedNo">
+						<div id="ttSearchRes" class="tt-search-results"></div>
+					</div>
 
 					<!-- 유효성 에러 메시지 출력 영역 -->
 					<div class="tt-hint" id="ttModalHint"></div>
@@ -412,7 +437,468 @@
 			</div>
 
 
-			<script src="${path}/resources/js/schedule.js"></script>
+			<!-- 강의 상세 보기 -->
+			<div id="ttDetailOverlay" class="tt-modal-overlay"
+				style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 10000; justify-content: center; align-items: center;">
+				<div class="tt-modal-content"
+					style="background: white; padding: 20px; border-radius: 8px; width: 350px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);">
+					<h3 id="detailLectureName" style="margin-top: 0; color: #333;">강의명</h3>
+					<p id="detailProfessor" style="color: #666; font-size: 14px;">교수님
+						성함</p>
+					<hr>
+
+					<div style="margin-bottom: 15px;">
+						<label>요일 선택</label> <select id="detailDay"
+							style="width: 100%; padding: 8px; margin-top: 5px;">
+							<option value="0">월요일</option>
+							<option value="1">화요일</option>
+							<option value="2">수요일</option>
+							<option value="3">목요일</option>
+							<option value="4">금요일</option>
+						</select>
+					</div>
+
+					<div style="display: flex; gap: 10px; margin-bottom: 20px;">
+						<div style="flex: 1;">
+							<label>시작 시간</label> <select id="detailStart"
+								style="width: 100%; padding: 8px; margin-top: 5px;"></select>
+						</div>
+						<div style="flex: 1;">
+							<label>종료 시간</label> <select id="detailEnd"
+								style="width: 100%; padding: 8px; margin-top: 5px;"></select>
+						</div>
+					</div>
+
+					<p id="detailHint"
+						style="color: red; font-size: 12px; height: 15px;"></p>
+
+					<div style="display: flex; justify-content: flex-end; gap: 10px;">
+						<button onclick="closeDetailModal()"
+							style="padding: 8px 15px; background: #ccc; border: none; border-radius: 4px; cursor: pointer;">취소</button>
+						<button onclick="confirmDetailAdd()"
+							style="padding: 8px 15px; background: #4A90E2; color: white; border: none; border-radius: 4px; cursor: pointer;">시간표에
+							추가</button>
+					</div>
+				</div>
+			</div>
+
+
+			<script>
+		    // 1. 전역 변수 및 경로 설정
+		    const path = "${pageContext.request.contextPath}"; 
+		    let tempSelectedLecture = null;
+		    
+		    const initialScheduleData = [
+		        <c:if test="${not empty scheduleList}">
+		            <c:forEach var="s" items="${scheduleList}" varStatus="status">
+		            {
+		                lectureNo: ${s.lectureNo != null ? s.lectureNo : 0},
+		                scheduleTitle: '${s.scheduleTitle != null ? s.scheduleTitle : "내 시간표"}', 
+		                lectureName: '${s.lectureName != null ? s.lectureName : ""}',
+		                scheduleDay: ${s.scheduleDay != null ? s.scheduleDay : 0},
+		                startSlot: ${s.startSlot != null ? s.startSlot : 0},
+		                endSlot: ${s.endSlot != null ? s.endSlot : 0}
+		            }${not status.last ? ',' : ''}
+		            </c:forEach>
+		        </c:if>
+		    ];
+
+		    // 페이지 로드 시 실행
+		    window.onload = function() {
+		        loadTimetable(); // 이 함수가 initialScheduleData를 읽어서 timetables 배열을 만듭니다.
+		        initEvents();    // 검색창 이벤트 등 초기화
+		    };
+		
+		    // 즉시 실행 함수 대신 일반 스코프로 관리 (버튼 클릭 이슈 방지)
+		    const DAYS        = ['월','화','수','목','금'];
+		    const START_HOUR  = 9;
+		    const END_HOUR    = 17;
+		    const SLOT_H      = 36;
+		    const TOTAL_SLOTS = (END_HOUR - START_HOUR) * 2;
+		
+		    let timetables = [{ name: '나의 시간표', courses: [] }];
+		    let currentIdx = 0;
+		    let deleteMode = false;
+		
+		    // ── 서버 통신 로직 ──────────────────────────────
+		    function loadTimetable() {
+		        if (typeof initialScheduleData !== 'undefined' && initialScheduleData.length > 0) {
+		            // scheduleTitle 기준으로 유니크한 시간표 이름 추출
+		            const tableNames = [...new Set(initialScheduleData.map(c => c.scheduleTitle))];
+		            
+		            timetables = tableNames.map(name => {
+		                return {
+		                    name: name,
+		                    courses: initialScheduleData
+		                        .filter(c => c.scheduleTitle === name)
+		                        .map(c => ({
+		                            lectureNo: c.lectureNo,
+		                            title: c.lectureName, // 화면에 그릴 땐 과목명 사용
+		                            scheduleDay: parseInt(c.scheduleDay),
+		                            startSlot: parseInt(c.startSlot),
+		                            endSlot: parseInt(c.endSlot)
+		                        }))
+		                };
+		            });
+		            currentIdx = 0;
+		        }
+		        else {
+		            timetables = [{ name: '나의 시간표', courses: [] }];
+		            currentIdx = 0;
+		        }
+		        updateDropdown();
+		        ttRenderGrid();
+		    }
+		
+		    function saveToDatabase() {
+		    	
+		        const currentTable = timetables[currentIdx];
+		        
+		        const payload = currentTable.courses.map(c => ({
+		            lectureNo: c.lectureNo,
+		            scheduleTitle: currentTable.name, 
+		            lectureName: c.title,           
+		            scheduleDay: c.scheduleDay	,
+		            startSlot: c.startSlot, 
+		            endSlot: c.endSlot
+		        }));
+		        
+		        console.log("서버로 보낼 데이터(Payload):", payload);
+		
+		        const csrfToken = document.querySelector('meta[name="_csrf"]');
+		        const csrfHeader = document.querySelector('meta[name="_csrf_header"]');
+		        const headers = { 'Content-Type': 'application/json' };
+		        if(csrfToken && csrfHeader) headers[csrfHeader.content] = csrfToken.content;
+		    
+		        fetch(path + '/schedule/save', {
+		            method: 'POST',
+		            headers: headers,
+		            body: JSON.stringify(payload)
+		        })
+		        .then(res => res.json())
+		        .then(data => { if(data.success) console.log("DB 저장 완료"); })
+		        .catch(err => console.error("저장 오류:", err));
+		    }
+		
+		    // ── 그리드 렌더링 ────────────────────────────
+		    function ttRenderGrid() {
+		        const grid = document.getElementById('ttGrid');
+		        if(!grid) return;
+		        grid.innerHTML = '';
+		
+		        // 헤더(요일)
+		        const emptyCell = document.createElement('div');
+		        emptyCell.className = 'tt-header-cell';
+		        grid.appendChild(emptyCell);
+		        DAYS.forEach(d => {
+		            const h = document.createElement('div');
+		            h.className = 'tt-header-cell';
+		            h.textContent = d;
+		            grid.appendChild(h);
+		        });
+		
+		        // 시간 열
+		        const timeCol = document.createElement('div');
+		        timeCol.className = 'tt-time-col';
+		        for (let s = 0; s < TOTAL_SLOTS; s++) {
+		            const sl = document.createElement('div');
+		            sl.className = 'tt-time-slot';
+		            sl.textContent = s % 2 === 0 ? String(START_HOUR + s / 2).padStart(2, '0') : '';
+		            timeCol.appendChild(sl);
+		        }
+		        grid.appendChild(timeCol);
+		
+		        // 요일별 데이터
+		        const courses = timetables[currentIdx].courses;
+		        DAYS.forEach((_, dayIdx) => {
+		            const col = document.createElement('div');
+		            col.className = 'tt-day-col';
+		            for (let s = 0; s < TOTAL_SLOTS; s++) {
+		                const line = document.createElement('div');
+		                line.className = 'tt-row-line';
+		                col.appendChild(line);
+		            }
+		
+		            courses.filter(c => Number(c.scheduleDay) === dayIdx).forEach(c => {
+		                const block = document.createElement('div');
+		                block.className = 'tt-block' + (deleteMode ? ' delete-mode' : '');
+		                block.style.top = (c.startSlot - START_HOUR * 2) * SLOT_H + 'px';
+		                block.style.height = (c.endSlot - c.startSlot) * SLOT_H + 'px';
+		                
+		                block.innerHTML = '<span>' + c.title + '</span>' +
+		                  '<span style="font-size:10px; opacity:.8">' + 
+		                  slotToTime(c.startSlot) + '~' + slotToTime(c.endSlot) + 
+		                  '</span>';
+		                
+		                block.onclick = (e) => {
+		                    if (!deleteMode) return;
+		                    e.stopPropagation();
+		                    timetables[currentIdx].courses = timetables[currentIdx].courses.filter(item => item !== c);
+		                    saveToDatabase();
+		                    ttRenderGrid();
+		                };
+		                col.appendChild(block);
+		            });
+		            grid.appendChild(col);
+		        });
+		    }
+		
+		    // ── 유틸리티 ──
+		    function slotToTime(slot) {
+		        let h = Math.floor(slot / 2);
+		        return h + (slot % 2 === 0 ? ':00' : ':30');
+		    }
+		
+		    function buildTimeOptions(selectEl, defaultHour, defaultMin) {
+		        if(!selectEl) return;
+		        selectEl.innerHTML = '';
+		        for (let h = START_HOUR; h <= END_HOUR; h++) {
+		            ['00', '30'].forEach(m => {
+		                if (h === END_HOUR && m === '30') return;
+		                let val = h * 2 + (m === '30' ? 1 : 0);
+		                let opt = document.createElement('option');
+		                opt.value = val;
+		                opt.textContent = h + ':' + m;
+		                if (h === defaultHour && parseInt(m) === defaultMin) opt.selected = true;
+		                selectEl.appendChild(opt);
+		            });
+		        }
+		    }
+		
+		    function ttOpenModal() {
+		        document.getElementById('ttInpTitle').value = '';
+		        document.getElementById('ttSelectedNo').value = '';
+		        document.getElementById('ttModalHint').textContent = '';
+		        buildTimeOptions(document.getElementById('ttInpStart'), 9, 0);
+		        buildTimeOptions(document.getElementById('ttInpEnd'), 10, 0);
+		        document.getElementById('ttOverlay').classList.add('open');
+		    }
+		
+		    function ttCloseModal() {
+		        document.getElementById('ttOverlay').classList.remove('open');
+		    }
+		
+		    function ttConfirmAdd() {
+		        const title = document.getElementById('ttInpTitle').value.trim();
+		        const lectureNo = document.getElementById('ttSelectedNo').value;
+		        const scheduleDay = parseInt(document.getElementById('ttInpDay').value);
+		        const startSlot = parseInt(document.getElementById('ttInpStart').value);
+		        const endSlot = parseInt(document.getElementById('ttInpEnd').value);
+		        const hintEl = document.getElementById('ttModalHint');
+		
+		        if (!lectureNo) { hintEl.textContent = '강의를 검색한 후 목록에서 선택해주세요.'; return; }
+		        if (endSlot <= startSlot) { hintEl.textContent = '종료 시간은 시작 시간보다 늦어야 합니다.'; return; }
+		
+		        const overlap = timetables[currentIdx].courses.some(c => 
+		            c.scheduleDay === scheduleDay && !(endSlot <= c.startSlot || startSlot >= c.endSlot)
+		        );
+		        if (overlap) { hintEl.textContent = '해당 시간에 이미 강의가 있습니다.'; return; }
+		
+		        timetables[currentIdx].courses.push({
+		            lectureNo: parseInt(lectureNo),
+		            title: title, 
+		            scheduleDay: scheduleDay,
+		            startSlot: startSlot,
+		            endSlot: endSlot
+		        });
+		
+		        saveToDatabase();
+		        ttCloseModal();
+		        ttRenderGrid();
+		    }
+		
+		    function initEvents() {
+		        const inpTitle = document.getElementById('ttInpTitle');
+		        const resDiv = document.getElementById('ttSearchRes');
+		
+		        document.getElementById('ttBtnOpenModal').onclick = ttOpenModal;
+		        document.getElementById('ttBtnConfirm').onclick = ttConfirmAdd;
+		        document.getElementById('ttBtnCancel').onclick = ttCloseModal;
+		
+		        document.getElementById('ttBtnDel').onclick = function() {
+		            deleteMode = !deleteMode;
+		            this.classList.toggle('active', deleteMode);
+		            document.getElementById('ttDelHint').textContent = deleteMode ? '삭제할 강의를 클릭하세요.' : '';
+		            ttRenderGrid();
+		        };
+		
+		        document.getElementById('ttBtnAdd').onclick = () => {
+		            const newName = prompt("새로운 시간표 이름을 입력하세요", "나의 시간표");
+		            if (newName) {
+		                timetables.push({ name: newName, courses: [] });
+		                currentIdx = timetables.length - 1;
+		                updateDropdown();
+		                ttRenderGrid();
+		            }
+		        };
+		
+		        document.getElementById('ttBtnMinus').onclick = () => {
+		            if (timetables.length <= 1) return alert("최소 하나의 시간표는 유지해야 합니다.");
+		            
+		            const targetName = timetables[currentIdx].name; // 삭제할 시간표 이름
+		            
+		            if (confirm("'" + targetName + "'을 삭제하시겠습니까?")) {
+		                // 1. 서버에 삭제 요청
+		                const csrfToken = document.querySelector('meta[name="_csrf"]');
+		                const csrfHeader = document.querySelector('meta[name="_csrf_header"]');
+		                const headers = { 'Content-Type': 'application/json' };
+		                if(csrfToken && csrfHeader) headers[csrfHeader.content] = csrfToken.content;
+
+		                // 삭제 전용 경로(예: /schedule/deleteTable)로 요청
+		                fetch(path + '/schedule/deleteTable', {
+		                    method: 'POST',
+		                    headers: headers,
+		                    body: JSON.stringify({ 
+		                        scheduleTitle: targetName 
+		                    })
+		                })
+		                .then(res => res.json())
+		                .then(data => {
+		                    if(data.success) {
+		                        // 2. 서버 삭제 성공 시 화면에서도 제거
+		                        timetables.splice(currentIdx, 1);
+		                        currentIdx = 0;
+		                        updateDropdown();
+		                        ttRenderGrid();
+		                        alert("삭제되었습니다.");
+		                    }
+		                });
+		            }
+		        };
+		        
+
+		
+		        if (inpTitle) {
+		            inpTitle.oninput = (e) => {
+		                const keyword = e.target.value.trim();
+		             	// 2글자 이상 입력 안하면 검색 안됌
+		                if (keyword.length < 2) { resDiv.style.display = 'none'; return; } 
+		                
+		                fetch(path + '/schedule/searchLecture?keyword=' + encodeURIComponent(keyword))
+		                    .then(res => res.json())
+		                    .then(data => {
+		                        resDiv.innerHTML = '';
+		                        if (data.length === 0) { resDiv.style.display = 'none'; return; }
+		                        data.forEach(lecture => {
+		                            const item = document.createElement('div');
+		                            item.style.cssText = 'padding: 10px; cursor: pointer; border-bottom: 1px solid #eee;';
+		                            item.innerHTML = item.innerHTML = '<strong>' + lecture.lectureName + '</strong> ' +
+		                            '<small>(' + lecture.professorName + ')</small>';
+		                            item.onclick = function() {
+		                                // 1. 첫 번째 로직 (값 세팅)
+		                                inpTitle.value = lecture.lectureName;
+		                                const selectedNoEl = document.getElementById('ttSelectedNo');
+		                                if (selectedNoEl) {
+		                                    selectedNoEl.value = lecture.lectureNo;
+		                                }
+
+		                                // 2. 두 번째 로직 (모달 띄우기 및 정리)
+		                                tempSelectedLecture = lecture; // 서버에서 받아온 lecture 객체 저장
+		                                openDetailModal(lecture);      // 상세 설정 모달 열기
+		                                
+		                                resDiv.style.display = 'none'; // 검색 목록 닫기
+		                                inpTitle.value = '';           // 입력창 비우기 (선택 완료됐으므로)
+		                            };
+		                            resDiv.appendChild(item);
+		                        });
+		                        resDiv.style.display = 'block';
+		                    });
+		            };
+		        }
+		
+		        // 검색창 외 클릭 시 닫기
+		        document.addEventListener('click', (e) => {
+		            if (e.target !== inpTitle) resDiv.style.display = 'none';
+		        });
+		
+		        document.getElementById('ttTitleBtn').onclick = (e) => {
+		            e.stopPropagation();
+		            document.getElementById('ttDropdown').classList.toggle('open');
+		        };
+		    }
+		    
+		    function openDetailModal(lecture) {
+		        const overlay = document.getElementById('ttDetailOverlay');
+		        document.getElementById('detailLectureName').textContent = lecture.lectureName;
+		        document.getElementById('detailProfessor').textContent = lecture.professorName + ' 교수님';
+		        document.getElementById('detailHint').textContent = '';
+
+		        // 시간 옵션 생성 (기존 buildTimeOptions 재사용)
+		        buildTimeOptions(document.getElementById('detailStart'), 9, 0);
+		        buildTimeOptions(document.getElementById('detailEnd'), 10, 0);
+
+		        overlay.style.display = 'flex'; // 모달 보이기
+		    }
+
+		    function closeDetailModal() {
+		        document.getElementById('ttDetailOverlay').style.display = 'none';
+		        tempSelectedLecture = null;
+		    }
+
+		    function confirmDetailAdd() {
+		        const scheduleDay = parseInt(document.getElementById('detailDay').value);
+		        const startSlot = parseInt(document.getElementById('detailStart').value);
+		        const endSlot = parseInt(document.getElementById('detailEnd').value);
+		        const hintEl = document.getElementById('detailHint');
+
+		        // 1. 유효성 검사
+		        if (endSlot <= startSlot) {
+		            hintEl.textContent = '종료 시간은 시작 시간보다 늦어야 합니다.';
+		            return;
+		        }
+
+		        // 2. 중복 검사
+		        const overlap = timetables[currentIdx].courses.some(c => 
+		            c.scheduleDay === scheduleDay && !(endSlot <= c.startSlot || startSlot >= c.endSlot)
+		        );
+		        if (overlap) {
+		            hintEl.textContent = '해당 시간에 이미 강의가 있습니다.';
+		            return;
+		        }
+
+		        // 3. 데이터 추가
+		        timetables[currentIdx].courses.push({
+		            lectureNo: tempSelectedLecture.lectureNo,
+		            title: tempSelectedLecture.lectureName,
+		            scheduleDay: scheduleDay,
+		            startSlot: startSlot,
+		            endSlot: endSlot
+		        });
+
+		        // 4. 후처리
+		        saveToDatabase();
+		        
+		        ttRenderGrid();
+		        closeDetailModal();
+		    }
+		    
+		    function updateDropdown() {
+		        const dropdown = document.getElementById('ttDropdown');
+		        const titleText = document.getElementById('ttTitleText');
+		        if(!dropdown || !titleText) return;
+		
+		        dropdown.innerHTML = '';
+		        titleText.textContent = timetables[currentIdx].name;
+		
+		        timetables.forEach((tt, idx) => {
+		            const item = document.createElement('div');
+		            item.className = 'tt-dropdown-item';
+		            item.textContent = tt.name;
+		            item.onclick = () => {
+		                currentIdx = idx;
+		                titleText.textContent = tt.name;
+		                dropdown.classList.remove('open');
+		                ttRenderGrid();
+		            };
+		            dropdown.appendChild(item);
+		        });
+		    }
+		
+		    document.addEventListener('DOMContentLoaded', () => {
+		        initEvents();
+		        loadTimetable();
+		    });	    
+		</script>
 
 		</div>
 		<!-- /timetable -->
@@ -428,21 +914,6 @@
 				<h3 class="setting-card-title">개인정보 수정</h3>
 
 				<div class="setting-form">
-
-					<!-- 프로필 이미지 -->
-					<%-- <div class="setting-profile-wrap">
-						<div class="setting-profile-img-box">
-							<img id="settingProfilePreview"
-								src="${path}/resources/profile/${loginUser.profileImg}"
-								alt="프로필 이미지"
-								onerror="this.src='${path}/resources/img/default_profile.png'"> 
-						</div>
-						<label class="setting-profile-btn" for="settingProfileInput">
-							이미지 변경 </label> <input type="file" id="settingProfileInput"
-							accept="image/*" style="display: none"
-							onchange="previewProfile(this)">
-					</div>	--%>
-
 
 					<!-- 아이디 -->
 					<div class="setting-field">
@@ -496,29 +967,13 @@
 
 			<!-- 로그아웃 / 회원탈퇴 카드 -->
 			<div class="setting-card">
-				<button class="setting-logout-btn"
-					onclick="location.href='${path}/logout'">로그아웃</button>
+			<form:form action="${contextPath}/member/logout" method="post">
+					<button class="setting-logout-btn" type="submit" class="logout">로그아웃</button>	
+			</form:form>
 				<button class="setting-withdraw-btn" onclick="confirmWithdraw()">
 					회원 탈퇴</button>
 			</div>
 			<script>
-			// 프로필 이미지 미리보기
-			// 파일 선택 즉시 서버 전송 없이 브라우저에서 바로 이미지를 미리 보여주는 기능
-			function previewProfile(input) {
-				
-				// 파일 선택됐는지 확인
-			    if (input.files && input.files[0]) {
-			        const reader = new FileReader();
-			        
-			        reader.onload = e => {
-			            document.getElementById('settingProfilePreview').src = e.target.result;
-			        };
-			        
-			        // 변환 완료시 onload 실행
-			        reader.readAsDataURL(input.files[0]);
-			    }
-			}
-
 			// 저장
 			function saveSetting() {
 			    const hint    = document.getElementById('settingHint');

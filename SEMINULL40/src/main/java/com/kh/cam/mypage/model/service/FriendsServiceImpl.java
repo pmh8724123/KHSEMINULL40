@@ -20,8 +20,14 @@ public class FriendsServiceImpl implements FriendsService {
 	private FriendsDao friendsDao;
 
 	@Override
-	public List<Friends> getFriendList(int memberNo) {
-		return friendsDao.getFriendList(memberNo);
+	public List<Friends> selectFriendList(int memberNo) {
+		return friendsDao.selectFriendList(memberNo);
+	}
+	
+	public String deleteFriend(int senderNo, int receiverNo) {
+	    // DAO에 두 번호를 넘겨서 삭제 수행
+	    int result = friendsDao.deleteFriend(senderNo, receiverNo);
+	    return (result > 0) ? "success" : "fail";
 	}
 
 	// 이름으로 회원 검색
@@ -43,7 +49,12 @@ public class FriendsServiceImpl implements FriendsService {
 	// 중복 체크 후 FRIEND 테이블에 INSERT
 	@Override
 	public String insertFriendRequest(int senderNo, int receiverNo) {
-
+		
+		// 본인에게 신청하는 것 방지
+	    if (senderNo == receiverNo) {
+	        return "self";
+	    }
+		
 		// FRIEND 테이블에서 양방향 중복 체크
 		int count = friendsDao.checkAlreadyRequested(senderNo, receiverNo);
 		if (count > 0) {
@@ -56,7 +67,7 @@ public class FriendsServiceImpl implements FriendsService {
 		fs.setReceiverNo(receiverNo); // 요청 받는 사람 memNo
 
 		int result = friendsDao.insertFriendRequest(fs);
-		return result > 0 ? "ok" : "fail";
+		return result > 0 ? "success" : "fail";
 	}
 
 	// 수락 대기 중인 친구 요청 목록 조회

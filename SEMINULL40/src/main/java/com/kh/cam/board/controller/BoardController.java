@@ -31,6 +31,7 @@ import com.kh.cam.board.model.vo.Attachment;
 import com.kh.cam.board.model.vo.Board;
 import com.kh.cam.member.model.vo.Member;
 import com.kh.cam.member.model.vo.CustomUserDetails; // [추가] 반드시 import 확인
+import com.kh.cam.member.model.vo.CustomUserDetails;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,6 +48,9 @@ public class BoardController {
 	public String boardList(
 			@RequestParam(value="category", required=false, defaultValue="all") String category,
 			Model model) {
+		CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		System.out.println(user.getMember().getMemName()+"/"+user.getAuthorities());
+		
 		List<Board> list = boardService.selectBoardList(category);
 		model.addAttribute("boardList", list);
 		model.addAttribute("cur", category);
