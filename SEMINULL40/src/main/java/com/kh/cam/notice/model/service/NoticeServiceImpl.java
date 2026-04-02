@@ -25,17 +25,14 @@ public class NoticeServiceImpl implements NoticeService {
 	@Override
 	@Transactional
 	public int insertNotice(Notice notice, List<Attachment> list) {
-		int result = nDao.insertNotice(notice);
+		nDao.insertNotice(notice);
 		
-//		if(result > 0 && !list.isEmpty()) {
-//            for(Attachment at : list) {
-//                if(nDao.insertFiles(at) < 0) {
-//                	result = -1;
-//                	break;
-//                }
-//            }
-//        }
-        return result;
+		for(Attachment at : list) {
+			at.setTargetNo(notice.getNoticeNo());
+			nDao.insertFiles(at);
+		}
+		
+        return 1;
 	}
 
 	@Override
@@ -51,6 +48,11 @@ public class NoticeServiceImpl implements NoticeService {
 	@Override
 	public int deleteNotice(int noticeNo) {
 		return nDao.deleteNotice(noticeNo);
+	}
+
+	@Override
+	public List<Attachment> selectAttList(int noticeNo) {
+		return nDao.selectAttList(noticeNo);
 	}
 	
 }

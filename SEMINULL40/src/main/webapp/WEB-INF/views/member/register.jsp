@@ -19,7 +19,7 @@ body {
 	background-color: #f0f5ff;
 	display: flex;
 	flex-direction: column;
-	min-height: 100vh;
+	min-height: 1100px;
 	align-items: center;
 }
 
@@ -218,7 +218,7 @@ footer {
 			</div>
 
 			<div class="form-group">
-				<input type="text" name="strStudentNo" id="studentNo" placeholder="학번">
+				<input type="text" name="studentNo" id="studentNo" placeholder="학번">
 				<div class="error-msg" id="snoMsg">학번을 입력해 주세요</div>
 			</div>
 

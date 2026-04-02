@@ -195,7 +195,7 @@
                         <c:forEach var="f" items="${list}">
                             <c:set var="fileName" value="${f.changeName.toLowerCase()}" />
                             <c:if test="${fileName.endsWith('.jpg') || fileName.endsWith('.png') || fileName.endsWith('.jpeg') || fileName.endsWith('.gif')}">
-                                <img src="${contextPath}/resources/upload_files/${f.changeName}">
+                                <img src="${pageContext.request.contextPath}/resources/upload_files/${f.changeName}">
                             </c:if>
                         </c:forEach>
                     </div>

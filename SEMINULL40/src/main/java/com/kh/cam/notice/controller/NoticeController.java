@@ -59,36 +59,59 @@ public class NoticeController {
 	}
 	
 	@PostMapping("/insertNotice")
-	public String insertNotice(@ModelAttribute Notice notice, MultipartFile[] upfiles, HttpSession session) {
+	public String insertNotice(@ModelAttribute Notice notice, MultipartFile[] upfiles, HttpSession session, RedirectAttributes ra) {
 		CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+		try {
+			// 공지사항 대학 설정
+			notice.setUniNo(user.getMember().getUniNo());
+			
+			// 파일 리스트 생성
+			List<Attachment> list = new ArrayList<>();
+			if(upfiles != null) {
+				String savePath = session.getServletContext().getRealPath("/resources/upload_files/");
+				makeDirectory(savePath); // 폴더 생성 공통 메서드 호출
 				
-		notice.setUniNo(user.getMember().getUniNo());
+				for(MultipartFile f : upfiles) {
+					if(!f.getOriginalFilename().equals("")) {
+						String changeName = saveFile(f, savePath); 
+						Attachment at = new Attachment();
+						at.setOriginName(f.getOriginalFilename());
+						at.setChangeName(changeName);
+						at.setTargetType("NOTICE");
+						list.add(at);
+					}
+				}
+			}
+			
+			nService.insertNotice(notice, list);
+			
+			ra.addFlashAttribute("");
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
 		
-		List<Attachment> list = new ArrayList<>();
-	    if(upfiles != null) {
-	        String savePath = session.getServletContext().getRealPath("/resources/upload_files/");
-	        makeDirectory(savePath); // 폴더 생성 공통 메서드 호출
-
-		    for(MultipartFile f : upfiles) {
-		        if(!f.getOriginalFilename().equals("")) {
-		            String changeName = saveFile(f, savePath); 
-		            Attachment at = new Attachment();
-		            at.setOriginName(f.getOriginalFilename());
-		            at.setChangeName(changeName);
-		            at.setTargetType("NOTICE");
-		            list.add(at);
-		        }
-		    }
-	    }
-		
-	    int result = nService.insertNotice(notice, list);
 		return "redirect:/notice/list";
 	}
 	
 	@GetMapping("/detail")
 	public String selectNotice(@RequestParam int noticeNo, Model model) {
-		Notice notice = nService.selectNotice(noticeNo);
-		model.addAttribute("notice", notice);
+		
+		try {
+			Notice notice = nService.selectNotice(noticeNo);
+			List<Attachment> list = nService.selectAttList(noticeNo);
+			
+			System.out.println(noticeNo);
+			System.out.println(list);
+			
+			model.addAttribute("notice", notice);
+			model.addAttribute("list", list);
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		
 		return "notice/noticeDetail";
 	}

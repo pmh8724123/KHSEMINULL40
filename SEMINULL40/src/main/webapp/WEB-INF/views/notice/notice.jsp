@@ -132,7 +132,7 @@
     <div class="board-wrapper">
         
         <header class="board-header">
-            <h1>게시판</h1>
+            <h1>공지사항</h1>
             <%-- 상세 페이지 이동을 위해 location.href 사용 시 boardno 소문자 권장 (Controller와 맞춤) --%>
             <sec:authorize access="hasRole('ADMIN')">
 	            <button class="write-btn" onclick="location.href='write'">글쓰기</button>        

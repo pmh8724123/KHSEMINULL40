@@ -17,4 +17,6 @@ public interface NoticeService {
 
 	int deleteNotice(int noticeNo);
 
+	List<Attachment> selectAttList(int noticeNo);
+
 }

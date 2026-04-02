@@ -19,4 +19,6 @@ public interface NoticeDao {
 
 	int insertFiles(Attachment at);
 
+	List<Attachment> selectAttList(int noticeNo);
+
 }
