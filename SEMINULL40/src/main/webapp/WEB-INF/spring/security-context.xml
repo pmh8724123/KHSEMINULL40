@@ -37,7 +37,9 @@
 		
 		
 		
-		<security:form-login login-page="/" login-processing-url="/member/loginProcess" username-parameter="memId" password-parameter="memPw" default-target-url="/board/list"/>
+		<security:form-login login-page="/" login-processing-url="/member/loginProcess" 
+			username-parameter="memId" password-parameter="memPw" 
+			default-target-url="/board/list" authentication-failure-url="/member/login"/>
 		<security:logout logout-url="/member/logout" invalidate-session="true" logout-success-url="/"/>
 		
 		<security:remember-me data-source-ref="datasource" token-validity-seconds="1209600"/>

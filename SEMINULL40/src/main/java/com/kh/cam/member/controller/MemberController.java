@@ -40,6 +40,13 @@ public class MemberController {
 	
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 	
+	@GetMapping("/login")
+	public String login(Model model, RedirectAttributes ra) {
+		ra.addFlashAttribute("errMsg", "아이디 또는 비밀번호가 옳지 않습니다. 다시 입력해주세요.");
+		
+		return "redirect:/";
+	}
+	
 	// 회원가입 페이지 이동
 	@GetMapping("/register")
 	public String enroll(Model model) {
@@ -73,7 +80,6 @@ public class MemberController {
 		
 		// 유효성 검사 성공시 비밀번호 암오화하여 회원가입
 		member.setMemPw(pwEncoder.encode(member.getMemPw()));
-		member.setStudentNo(Integer.parseInt(member.getStrStudentNo()));
 		mService.insertMember(member);
 		
 		// 회원 출석정보 추가

@@ -20,7 +20,7 @@ public class Member{
 	private String memName;
 	private Integer deptNo;
 	private String strStudentNo;
-	private int studentNo;
+	private String studentNo;
 	private String phone;
 	private Date createDate;
 	private char status;

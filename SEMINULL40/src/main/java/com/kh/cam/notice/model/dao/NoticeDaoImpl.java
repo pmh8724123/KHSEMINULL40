@@ -46,4 +46,9 @@ public class NoticeDaoImpl implements NoticeDao {
 		return session.insert("notice.insertFiles", at);
 	}
 
+	@Override
+	public List<Attachment> selectAttList(int noticeNo) {
+		return session.selectList("notice.selectAttList", noticeNo);
+	}
+
 }

@@ -70,10 +70,10 @@ public class MemberValidator implements Validator {
 		}
 		
 		// 학번 유효성 검사
-		if(member.getStrStudentNo() == null || member.getStrStudentNo().equals("0") || member.getStrStudentNo().trim().isEmpty()) {
+		if(member.getStudentNo() == null || member.getStudentNo().equals("0") || member.getStudentNo().trim().isEmpty()) {
 			errors.rejectValue("studentNo", "required", "학번를 입력하세요.");
 		}
-		if(!member.getStrStudentNo().matches("^[0-9]+$")) {
+		if(!member.getStudentNo().matches("^[0-9]+$")) {
 			errors.rejectValue("studentNo", "pattern", "학번은 숫자만 입력할 수 있습니다.");
 		}
 		

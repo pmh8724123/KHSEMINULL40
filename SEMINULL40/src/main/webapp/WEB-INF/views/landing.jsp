@@ -115,6 +115,13 @@ body {
 	font-size: 18px;
 }
 
+.err-msg {
+	color: red;
+	font-size: 12px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
 /* 푸터 스타일 */
 .footer {
 	width: 100%;
@@ -194,8 +201,13 @@ body {
 		</div>
 
 		<form:form action="${contextPath}/member/loginProcess" method="post" class="login-form">
-			<input type="text" name="memId" placeholder="아이디" required> <input
-				type="password" name="memPw" placeholder="비밀번호" required>
+			<input type="text" name="memId" placeholder="아이디" required>
+			<input type="password" name="memPw" placeholder="비밀번호" required>
+			
+			<c:if test="${errMsg != null}">
+				<div class="err-msg">${errMsg}</div>
+			</c:if>
+				
 			<button type="submit" class="login-btn">로그인</button>
 
 			<div class="login-options">
@@ -203,6 +215,8 @@ body {
 					로그인 유지</label> <a href="${contextPath}/member/findIdPw">아이디/비밀번호 찾기</a>
 			</div>
 		</form:form>
+		
+		
 
 		<div class="signup-link">
 			<a href="${contextPath}/member/register">회원가입</a>

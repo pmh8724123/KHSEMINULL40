@@ -79,9 +79,12 @@ public class MypageController {
 
 
 	private void attendance(int memNo, Model model) {
+		System.out.println(memNo);
+		
 		// 출석 정보 가져오기
 		Attendance att = attService.selectAtt(memNo);
-
+		
+		System.out.println(att);
 		System.out.println(att.getAttendDays());
 		
 		// 출석일 비교
