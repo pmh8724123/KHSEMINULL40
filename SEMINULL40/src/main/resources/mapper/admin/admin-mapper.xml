@@ -262,9 +262,12 @@
 	</select>
 
 	<insert id="insertDepartment">
+		<selectKey keyProperty="deptNo" resultType="int" order="BEFORE">
+			SELECT SEQ_DEPT.NEXTVAL FROM DUAL
+		</selectKey>
 		INSERT INTO DEPARTMENT
 		VALUES(
-		SEQ_DEPT.NEXTVAL,
+		#{deptNo},
 		#{uniNo},
 		#{deptName}
 		)
@@ -288,14 +291,48 @@
 	<!--★★★★★★★★★★★★★★★★★ 학과 END ★★★★★★★★★★★★★★★★★ -->
 
 	<!--☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ 강의 START ☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ -->
-	<select id="selectLectureList" resultType="Lecture">
-		SELECT
-		L.*,
-		SL.*
-		FROM
-		LECTURE L
-		LEFT JOIN SEMESTER_LECTURE SL ON L.LECTURE_NO = SL.LECTURE_NO
-	</select>
+	<select id="selectLectureList" parameterType="map" resultType="Lecture">
+	
+	SELECT
+	L.LECTURE_NO,
+	L.DEPT_NO,
+	U.UNI_NAME,
+	D.DEPT_NAME,
+	L.LECTURE_NAME,
+	L.PROFESSOR_NAME
+	FROM LECTURE L
+	LEFT JOIN DEPARTMENT D ON L.DEPT_NO = D.DEPT_NO
+	LEFT JOIN
+	UNIVERSITY U ON D.UNI_NO = U.UNI_NO
+	<where>
+		<if test="uniNo != 0">
+			D.UNI_NO = #{uniNo}
+		</if>
+
+		<if test="keyword != null and keyword != ''">
+			AND
+			<choose>
+				<when test="condition == 'deptName'">
+					D.DEPT_NAME LIKE '%' || #{keyword} || '%'
+				</when>
+				<when test="condition == 'lectureName'">
+					L.LECTURE_NAME LIKE '%' || #{keyword} || '%'
+				</when>
+				<when test="condition == 'professorName'">
+					L.PROFESSOR_NAME LIKE '%' || #{keyword} || '%'
+				</when>
+				<otherwise>
+					(
+					D.DEPT_NAME LIKE '%' || #{keyword} || '%'
+					OR L.LECTURE_NAME LIKE '%' || #{keyword} || '%'
+					OR L.PROFESSOR_NAME LIKE '%' || #{keyword} || '%'
+					)
+				</otherwise>
+			</choose>
+		</if>
+	</where>
+	ORDER BY L.LECTURE_NO DESC
+</select>
 
 	<insert id="insertLecture">
 		INSERT INTO LECTURE
@@ -306,11 +343,56 @@
 		#{professorName}
 		)
 	</insert>
+	
+	<update id="updateLecture" parameterType="Lecture">
+		UPDATE LECTURE
+		SET LECTURE_NAME = #{lectureName},
+			PROFESSOR_NAME = #{professorName}
+		WHERE LECTURE_NO = #{lectureNo}
+	</update>
 
-	<delete id="deleteLecture">
+	<delete id="deleteLecture" parameterType="int">
 		DELETE FROM LECTURE
 		WHERE LECTURE_NO = #{lectureNo}
 	</delete>
+	
+	<select id="selectUniList" resultType="University">
+		SELECT u.uni_no, u.uni_name, m.mem_id, (
+		    SELECT COUNT(*)
+		    FROM member m
+		    JOIN department d ON m.dept_no = d.dept_no
+		    WHERE d.uni_no = u.uni_no
+		    AND d.dept_no != 0
+		) AS count, u.status
+		FROM university u
+		LEFT JOIN department d ON u.uni_no = d.uni_no
+		LEFT JOIN member m ON d.dept_no = m.dept_no
+		WHERE d.dept_name = '공통교양'
+		<if test='"uniName".equals(condition)'>
+			AND u.uni_name LIKE '%' || #{keyword} || '%'
+		</if>
+		<if test='"memId".equals(condition)'>
+			AND m.mem_id LIKE '%' || #{keyword} || '%'
+		</if>
+		ORDER BY u.uni_name
+	</select>
+	
+	<insert id="insertUni">
+		<selectKey keyProperty="uniNo" resultType="int" order="BEFORE">
+			SELECT seq_uni.NEXTVAL FROM dual
+		</selectKey>
+		INSERT INTO university VALUES(#{uniNo}, #{uniName})
+	</insert>
 
+	<update id="updateUni">
+		UPDATE university
+		SET uni_name = #{uniName}
+		WHERE uni_no = #{uniNo}
+	</update>
 
+	<update id="updateUniStatus">
+		UPDATE university
+		SET status = #{status}
+		WHERE uni_no = #{uniNo}
+	</update>
 </mapper>

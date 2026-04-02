@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <meta charset="UTF-8">
 
 <div class="sidebar">
@@ -9,6 +10,9 @@
     <a href="memberJoin">회원 가입 관리</a>
 
     <h2>학교 관리</h2>
+    <sec:authorize access="hasRole('MASTER')">
+	    <a href="${pageContext.request.contextPath}/admin/university">학교 관리</a>
+    </sec:authorize>
     <a href="department">학과 관리</a>
     <a href="lecture">강의 관리</a>
     
@@ -19,6 +23,4 @@
     
     <h2>신고 관리</h2>
     <a href="report">신고 내역</a>
-
 </div>
-

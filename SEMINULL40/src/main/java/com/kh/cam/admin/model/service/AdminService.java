@@ -1,8 +1,10 @@
 package com.kh.cam.admin.model.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.kh.cam.common.model.vo.Department;
+import com.kh.cam.common.model.vo.University;
 import com.kh.cam.member.model.vo.Member;
 import com.kh.cam.mypage.model.vo.Lecture;
 
@@ -42,10 +44,12 @@ public interface AdminService {
 	int deleteLecture(int lectureNo);
 
 
+	List<University> selectUniList(Map<String, Object> param);
 
+	void insertUni(University uni);
 
+	void updateUni(University uni);
 
-
-
+	void updateUniStatus(University uni);
 
 }
