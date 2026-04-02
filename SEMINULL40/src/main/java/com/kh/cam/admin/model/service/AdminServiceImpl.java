@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.kh.cam.admin.model.dao.AdminDao;
+import com.kh.cam.board.model.vo.Board;
 import com.kh.cam.common.model.vo.Department;
 import com.kh.cam.common.model.vo.University;
 import com.kh.cam.member.model.dao.MemberDao;
@@ -145,7 +146,6 @@ public class AdminServiceImpl implements AdminService{
 		return adminDao.selectLectureList(map);
 	}
 
-	// 강의 관리
 	@Override
 	public int insertLecture(Lecture lecture) {
 		return adminDao.insertLecture(lecture);
@@ -159,6 +159,24 @@ public class AdminServiceImpl implements AdminService{
 	@Override
 	public int deleteLecture(int lectureNo) {
 		return adminDao.deleteLecture(lectureNo);
+	}
+	
+	// 게시판 관리
+	@Override
+	public List<Board> selectBoardList(int uniNo, String condition, String keyword) {
+		
+		Map<String, Object> map = new HashMap<>();
+	    map.put("uniNo", uniNo);
+	    
+	    if(condition != null && !condition.isEmpty()) {
+	        map.put("condition", condition);
+	    }
+
+	    if(keyword != null && !keyword.isEmpty()) {
+	        map.put("keyword", keyword);
+	    }
+	    
+	    return adminDao.selectBoardList(map);
 	}
 
 

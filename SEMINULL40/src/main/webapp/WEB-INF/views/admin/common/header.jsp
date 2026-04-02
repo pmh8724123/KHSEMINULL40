@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <meta charset="UTF-8">
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
     
 <div class="header">
 
@@ -16,8 +17,7 @@
 
         <div class="header-right">
             <span>
-                <b>👤 관리자 : 박무혁</b> <!-- 수정필요 -->
-                (pmh8724)
+                <b>👤 관리자 : <sec:authentication property="principal.member.memId"/></b>
             </span>
 			
 			<!-- 수정필요 -->

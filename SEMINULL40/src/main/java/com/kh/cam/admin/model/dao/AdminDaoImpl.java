@@ -7,6 +7,7 @@ import java.util.Map;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.kh.cam.board.model.vo.Board;
 import com.kh.cam.common.model.vo.Department;
 import com.kh.cam.common.model.vo.University;
 import com.kh.cam.member.model.vo.Member;
@@ -139,6 +140,12 @@ public class AdminDaoImpl implements AdminDao {
 	@Override
 	public int deleteLecture(int lectureNo) {
 		return session.delete("admin.deleteLecture", lectureNo);
+	}
+	
+	// 게시판 관리
+	@Override
+	public List<Board> selectBoardList(Map<String, Object> map) {
+		return session.selectList("admin.selectBoardList", map);
 	}
 
 	/* 대학 관리 */

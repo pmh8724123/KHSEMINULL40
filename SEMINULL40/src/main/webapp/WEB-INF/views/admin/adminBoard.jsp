@@ -1,5 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+	
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,7 +14,13 @@
 
 <body>
 	<jsp:include page="/WEB-INF/views/admin/common/header.jsp" />
-
+	
+	<c:if test="${not empty msg}">
+		<div id="toast-overlay">
+			<div id="toast-box" class="${type}">${msg}</div>
+		</div>
+	</c:if>
+	
 	<div class="container">
 		<jsp:include page="/WEB-INF/views/admin/common/sidebar.jsp" />
 		<div class="content">
@@ -21,14 +30,20 @@
 		 <!-- 🔥 검색/필터 영역 -->
             <div class="filter-box">
                 <div class="filter-left">
-            
-                <select>
-                    <option>전체</option>
-                    <option>카테고리</option>
-                    <option>작성자</option>
-                </select>
-                <input type="text" placeholder="검색어 입력">
-                <button>검색</button>
+                <form action="${pageContext.request.contextPath}/admin/board" method="get">
+						<select name="condition">
+							<option value="all" ${condition == 'all' ? 'selected' : ''}>전체</option>
+							<option value="boardTitle" ${condition == 'boardTitle' ? 'selected' : ''}>제목</option>
+							<option value="boardWriterName" ${condition == 'boardWriterName' ? 'selected' : ''}>작성자</option>
+							<option value="categoryName" ${condition == 'categoryName' ? 'selected' : ''}>카테고리</option>
+							<c:if test="${loginUser.uniNo == 0}">
+								<option value="uniName" ${condition == 'uniName' ? 'selected' : ''}>대학이름</option>
+							</c:if>
+							<option value="status" ${condition == 'status' ? 'selected' : ''}>상태</option>
+						</select> 
+						<input type="text" name="keyword" value="${keyword}" placeholder="검색어 입력">
+						<button type="submit">검색</button>
+					</form>
             </div>
 		</div>
 
@@ -36,37 +51,42 @@
 			<table>
 				<thead>
 					<tr>
-						<th>게시판번호</th>
-						<th>대학교</th>
+						<th>NO</th>
+						<c:if test="${loginUser.uniNo == 0}">
+							<th>대학교명</th>
+						</c:if>
 						<th>카테고리</th>
-						<th>게시판제목</th>
+						<th>제목</th>
 						<th>작성자</th>
-						<th>조회수</th>
-						<th>댓글</th>
-						<th>좋아요</th>
 						<th>게시날짜</th>
+						<th>상태</th>
 						<th>처리</th>
 					</tr>
 				</thead>
 
 				<tbody>
-					<% for(int i=1; i<=30; i++){ %>
+					<c:forEach var="b" items="${list}" varStatus="status">
 					<tr>
-						<td><%= i %></td>
-						<td>캠둘대학교</td>
-						<td>자유게시판</td>
-						<td>캠둘캠둘</td>
-						<td>캠둘(camdu123)</td>
-						<td>120</td>
-						<td>15</td>
-						<td>5</td>
-						<td>25.12.12 13:11:10</td>
+						<td>${status.index + 1}</td>
+						<c:if test="${loginUser.uniNo == 0}">
+							<td>${b.uniName}</td>
+						</c:if>
+						<td>${b.btypeName}</td>
+						<td class="board-title">${b.boardTitle}</td>
+						<td>${b.boardWriterName}</td>
 						<td>
-							<button class="btn btn-approve">바로가기</button>
-							<button class="btn btn-reject">삭제</button>
+							<fmt:formatDate value="${b.createDate}"	
+							pattern="yyyy-MM-dd HH:mm:ss" />
+						</td>
+						<td>${b.status}</td>
+						<td>
+							<a href="${pageContext.request.contextPath}/board/detail?boardno=${b.boardNo}" 
+							   class="btn btn-approve">
+							   바로가기
+							</a>
 						</td>
 					</tr>
-					 <% } %>
+					</c:forEach>
 				</tbody>
 			</table>
 		</div>

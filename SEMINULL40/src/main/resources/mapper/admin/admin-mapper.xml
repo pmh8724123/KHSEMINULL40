@@ -3,18 +3,17 @@
 <mapper namespace="admin">
 
 	<!--☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ 멤버 START ☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ -->
-	<select id="selectMemberList" parameterType="map"
-		resultType="Member">
+	<select id="selectMemberList" parameterType="map" resultType="Member">
 		SELECT
-		M.MEM_NO,
-		M.MEM_ID,
-		M.STUDENT_NO,
-		M.MEM_NAME,
-		D.DEPT_NAME,
-		U.UNI_NAME,
-		M.PHONE,
-		M.CREATE_DATE,
-		M.STATUS
+			M.MEM_NO,
+			M.MEM_ID,
+			M.STUDENT_NO,
+			M.MEM_NAME,
+			D.DEPT_NAME,
+			U.UNI_NAME,
+			M.PHONE,
+			M.CREATE_DATE,
+			M.STATUS
 		FROM MEMBER M
 		LEFT JOIN
 		DEPARTMENT D ON M.DEPT_NO = D.DEPT_NO
@@ -126,21 +125,18 @@
 		</if>
 	</delete>
 
-	<!-- <delete id="deleteMember"> DELETE FROM MEMBER WHERE MEM_NO = #{memNo}
-		</delete> -->
-
 	<select id="selectMemberJoinList" parameterType="map"
 		resultType="Member">
 		SELECT
-		M.MEM_NO,
-		M.MEM_ID,
-		M.STUDENT_NO,
-		M.MEM_NAME,
-		D.DEPT_NAME,
-		U.UNI_NAME,
-		M.PHONE,
-		M.CREATE_DATE,
-		M.STATUS
+			M.MEM_NO,
+			M.MEM_ID,
+			M.STUDENT_NO,
+			M.MEM_NAME,
+			D.DEPT_NAME,
+			U.UNI_NAME,
+			M.PHONE,
+			M.CREATE_DATE,
+			M.STATUS
 		FROM MEMBER M
 		LEFT JOIN
 		DEPARTMENT D ON M.DEPT_NO = D.DEPT_NO
@@ -231,13 +227,12 @@
 	<!--★★★★★★★★★★★★★★★★★ 멤버 END ★★★★★★★★★★★★★★★★★ -->
 
 	<!--☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ 학과 START ☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ -->
-	<select id="selectDepartmentList" parameterType="map"
-		resultType="Department">
+	<select id="selectDepartmentList" parameterType="map" resultType="Department">
 		SELECT
-		D.DEPT_NO,
-		D.DEPT_NAME,
-		D.UNI_NO,
-		U.UNI_NAME
+			D.DEPT_NO,
+			D.DEPT_NAME,
+			D.UNI_NO,
+			U.UNI_NAME
 		FROM DEPARTMENT D
 		JOIN
 		UNIVERSITY U ON D.UNI_NO = U.UNI_NO
@@ -284,22 +279,17 @@
 		DELETE FROM DEPARTMENT
 		WHERE DEPT_NO = #{deptNo}
 	</delete>
-
-
-
-
 	<!--★★★★★★★★★★★★★★★★★ 학과 END ★★★★★★★★★★★★★★★★★ -->
 
 	<!--☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ 강의 START ☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ -->
 	<select id="selectLectureList" parameterType="map" resultType="Lecture">
-	
 	SELECT
-	L.LECTURE_NO,
-	L.DEPT_NO,
-	U.UNI_NAME,
-	D.DEPT_NAME,
-	L.LECTURE_NAME,
-	L.PROFESSOR_NAME
+		L.LECTURE_NO,
+		L.DEPT_NO,
+		U.UNI_NAME,
+		D.DEPT_NAME,
+		L.LECTURE_NAME,
+		L.PROFESSOR_NAME
 	FROM LECTURE L
 	LEFT JOIN DEPARTMENT D ON L.DEPT_NO = D.DEPT_NO
 	LEFT JOIN
@@ -331,8 +321,8 @@
 			</choose>
 		</if>
 	</where>
-	ORDER BY L.LECTURE_NO DESC
-</select>
+		ORDER BY L.LECTURE_NO DESC
+	</select>
 
 	<insert id="insertLecture">
 		INSERT INTO LECTURE
@@ -355,8 +345,72 @@
 		DELETE FROM LECTURE
 		WHERE LECTURE_NO = #{lectureNo}
 	</delete>
+	<!--★★★★★★★★★★★★★★★★★ 강의 END ★★★★★★★★★★★★★★★★★ -->
 	
-	<select id="selectUniList" resultType="University">
+	<!--☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ 게시판 START ☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ -->
+	<select id="selectBoardList" parameterType="map" resultType="Board">
+		SELECT 
+			B.BOARD_NO,
+			B.BOARD_TITLE,
+			M.MEM_NAME AS BOARD_WRITER_NAME,
+			B.CREATE_DATE,
+			B.STATUS,
+			BT.BTYPE_NAME,
+			U.UNI_NAME
+		FROM BOARD B 
+		LEFT JOIN UNI_BOARD_TYPE UBT ON B.UBTYPE_NO = UBT.UBTYPE_NO
+		LEFT JOIN BOARD_TYPE BT ON UBT.BTYPE_NO = BT.BTYPE_NO
+		LEFT JOIN MEMBER M ON B.BOARD_WRITER = M.MEM_NO
+		LEFT JOIN UNIVERSITY U ON UBT.UNI_NO = U.UNI_NO
+		
+	
+		<where>
+		
+			    <if test="keyword == null or keyword == ''">
+			        B.STATUS = 'Y'
+			    </if>
+			    
+				<if test="uniNo != 0">
+					AND	UBT.UNI_NO = #{uniNo}
+				</if>
+				
+				<if test="keyword != null and keyword != ''">
+					AND
+					<choose>
+						<when test="condition == 'boardTitle'">
+							B.BOARD_TITLE LIKE '%' || #{keyword} || '%'
+						</when>
+						<when test="condition == 'boardWriterName'">
+							M.MEM_NAME LIKE '%' || #{keyword} || '%'
+						</when>
+						<when test="condition == 'categoryName'">
+							BT.BTYPE_NAME LIKE '%' || #{keyword} || '%'
+						</when>
+						<when test="condition == 'uniName'">
+							U.UNI_NAME LIKE '%' || #{keyword} || '%'
+						</when>
+						<when test="condition == 'status'">
+							B.status LIKE '%' || #{keyword} || '%'
+						</when>
+						<otherwise>
+							(
+								B.BOARD_TITLE LIKE '%' || #{keyword} || '%'
+								OR B.BOARD_WRITER LIKE '%' || #{keyword} || '%'
+								OR BT.BTYPE_NAME LIKE '%' || #{keyword} || '%'
+								OR U.UNI_NAME LIKE '%' || #{keyword} || '%'
+								OR B.STATUS LIKE '%' || #{keyword} || '%'
+							)
+						</otherwise>
+					</choose>
+				</if>
+			</where>
+			ORDER BY B.BOARD_NO DESC
+		</select>
+	
+	<!--★★★★★★★★★★★★★★★★★ 게시판 END ★★★★★★★★★★★★★★★★★ -->
+	
+	<!--☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ 학교관리 START ☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ -->
+		<select id="selectUniList" resultType="University">
 		SELECT u.uni_no, u.uni_name, m.mem_id, (
 		    SELECT COUNT(*)
 		    FROM member m
@@ -389,10 +443,15 @@
 		SET uni_name = #{uniName}
 		WHERE uni_no = #{uniNo}
 	</update>
-
+	
 	<update id="updateUniStatus">
 		UPDATE university
 		SET status = #{status}
 		WHERE uni_no = #{uniNo}
 	</update>
+	
+	
+	
+	
+	<!--★★★★★★★★★★★★★★★★★ 학교관리 END ★★★★★★★★★★★★★★★★★ -->
 </mapper>

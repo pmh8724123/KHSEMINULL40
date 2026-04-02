@@ -3,6 +3,7 @@ package com.kh.cam.admin.model.service;
 import java.util.List;
 import java.util.Map;
 
+import com.kh.cam.board.model.vo.Board;
 import com.kh.cam.common.model.vo.Department;
 import com.kh.cam.common.model.vo.University;
 import com.kh.cam.member.model.vo.Member;
@@ -42,8 +43,11 @@ public interface AdminService {
 	int updateLecture(Lecture lecture);
 	
 	int deleteLecture(int lectureNo);
+	
+	// 게시판 관리
+	List<Board> selectBoardList(int uniNo, String condition, String keyword);
 
-
+	// 학교관리
 	List<University> selectUniList(Map<String, Object> param);
 
 	void insertUni(University uni);
