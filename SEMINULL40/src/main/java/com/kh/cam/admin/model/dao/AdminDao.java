@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.kh.cam.board.model.vo.Board;
 import com.kh.cam.common.model.vo.Department;
 import com.kh.cam.common.model.vo.University;
 import com.kh.cam.member.model.vo.Member;
@@ -52,8 +53,11 @@ public interface AdminDao {
 	
 	int deleteLecture(int lectureNo);
 	
-
-
+	// 게시판관리
+	List<Board> selectBoardList(Map<String, Object> map);
+	
+	
+	// 학교관리
 	List<University> selectUniList(Map<String, Object> param);
 
 	int insertUni(University uni);

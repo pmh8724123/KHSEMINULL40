@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.kh.cam.admin.model.service.AdminService;
+import com.kh.cam.board.model.vo.Board;
 import com.kh.cam.common.model.vo.Department;
 import com.kh.cam.common.model.vo.University;
 import com.kh.cam.member.model.vo.CustomUserDetails;
@@ -322,8 +323,21 @@ public class AdminController {
 	}
 
 	// 게시판 관리
-	@GetMapping("/adminBoard")
-	public String adminBoard() {
+	@GetMapping("/board")
+	public String adminBoardList(@RequestParam(value = "condition", required = false) String condition,
+								 @RequestParam(value = "keyword", required = false) String keyword, 
+								 Model model) {
+		CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+		int uniNo = user.getMember().getUniNo();
+		
+		List<Board> list = adminService.selectBoardList(uniNo, condition, keyword);
+		
+		model.addAttribute("list", list);
+	    model.addAttribute("condition", condition);
+	    model.addAttribute("keyword", keyword);
+	    model.addAttribute("loginUser", user.getMember());
+		
 		return "admin/adminBoard";
 	}
 

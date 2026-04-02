@@ -460,3 +460,10 @@ tbody tr:hover {
     background: #4a79e8;
 }
 
+.board-title {
+	max-width: 250px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+

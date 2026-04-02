@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -190,7 +191,9 @@
 				</div>
 			</div>       
             <div class="post-info">
-                작성자 <b>${b.boardWriterName}</b> &nbsp;|&nbsp; 조회수 <b>${b.viewCount}</b> &nbsp;|&nbsp; 작성일 <b>${b.createDate}</b>
+                작성자 <b>${b.boardWriterName}</b> &nbsp;|&nbsp; 조회수 <b>${b.viewCount}</b> &nbsp;|&nbsp; 작성일 
+                <b><fmt:formatDate value="${b.createDate}" pattern="yyyy-MM-dd HH:mm:ss" /></b>
+                
             </div>
             
             <div class="post-content">
