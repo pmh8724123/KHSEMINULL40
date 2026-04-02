@@ -1,6 +1,9 @@
 package com.kh.cam.admin.controller;
 
+import java.io.Reader;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -14,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.kh.cam.admin.model.service.AdminService;
 import com.kh.cam.common.model.vo.Department;
+import com.kh.cam.common.model.vo.University;
 import com.kh.cam.member.model.vo.CustomUserDetails;
 import com.kh.cam.member.model.vo.Member;
 import com.kh.cam.mypage.model.vo.Lecture;
@@ -334,6 +338,71 @@ public class AdminController {
 	@GetMapping("/report")
 	public String report() {
 		return "admin/report";
+	}
+	
+// ---------------------마스터 계정 : 학교 관리------------------------
+	@GetMapping("/university")
+	public String university(@RequestParam(required = false, defaultValue = "all") String condition, @RequestParam(required = false) String keyword, Model model) {
+		Map<String, Object> param = new HashMap<>();
+		param.put("condition", condition);
+		param.put("keyword", keyword);
+		
+		List<University> list = adminService.selectUniList(param);
+		
+		model.addAttribute("condition", condition);
+		model.addAttribute("keyword", keyword);
+		model.addAttribute("list", list);
+		
+		return "admin/university";
+	}
+	
+	@PostMapping("/university/insert")
+	public String insertUni(@ModelAttribute University uni, RedirectAttributes ra) {
+		try {
+	        adminService.insertUni(uni);
+
+	        ra.addFlashAttribute("msg", "등록 성공");
+	        ra.addFlashAttribute("type", "success");
+
+	    } catch (Exception e) {
+	        ra.addFlashAttribute("msg", "등록 실패");
+	        ra.addFlashAttribute("type", "error");
+	    }
+
+		return "redirect:/admin/university";
+	}
+	
+	@PostMapping("/university/update")
+	public String updateUni(@ModelAttribute University uni, RedirectAttributes ra) {
+		try {
+			adminService.updateUni(uni);
+			
+			ra.addFlashAttribute("msg", "수정 성공");
+	        ra.addFlashAttribute("type", "success");
+		}
+		catch(Exception e) {
+			ra.addFlashAttribute("msg", "수정 실패");
+			ra.addFlashAttribute("type", "error");
+		}
+		
+		return "redirect:/admin/university";
+	}
+	
+	@PostMapping("university/changeStatus")
+	public String updateUniStatus(@ModelAttribute University uni, RedirectAttributes ra) {
+		try {
+			adminService.updateUniStatus(uni);
+			
+			ra.addFlashAttribute("msg", "수정 성공");
+	        ra.addFlashAttribute("type", "success");
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			ra.addFlashAttribute("msg", "수정 실패");
+			ra.addFlashAttribute("type", "error");
+		}
+		
+		return "redirect:/admin/university";
 	}
 
 }
