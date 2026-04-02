@@ -4,14 +4,39 @@
 
 <mapper namespace="attendance">
 	<insert id="insertAtt">
-		INSERT INTO attendance VALUES(#{memNo}, NULL, DEFAULT)
+		INSERT INTO attendance
+		VALUES(#{memNo}, NULL, DEFAULT)
 	</insert>
-	
+
 	<select id="selectAtt" resultType="Attendance">
-		SELECT * FROM attendance WHERE mem_no = #{userNo}
+		SELECT
+		a.MEM_NO,
+		a.ATTEND_DAYS,
+		a.COUNT,
+		NVL(p.POINT, 0) AS point
+		FROM ATTENDANCE a
+		LEFT JOIN USER_POINT
+		p ON (a.MEM_NO = p.MEM_NO)
+		WHERE
+		a.MEM_NO = #{userNo}
 	</select>
-	
+
 	<update id="updateAtt">
-		UPDATE attendance SET attend_days = SYSDATE, count = count + 1 WHERE mem_no = #{memNo}
+		UPDATE ATTENDANCE
+		SET ATTEND_DAYS = SYSDATE, COUNT =
+		COUNT + 1
+		WHERE MEM_NO = #{memNo}
 	</update>
+
+
+	<update id="updateUserPoint" parameterType="map">
+		MERGE INTO USER_POINT p
+		USING DUAL ON (p.MEM_NO = #{memNo})
+		WHEN MATCHED THEN
+		UPDATE SET p.POINT = p.POINT + #{amount}
+		WHEN NOT MATCHED THEN
+		INSERT (MEM_NO, POINT) VALUES (#{memNo}, #{amount})
+	</update>
+
+
 </mapper>

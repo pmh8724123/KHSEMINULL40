@@ -13,4 +13,6 @@ public class Attendance {
 	private Date attendDays;
 	private int count;
 	
+	
+	private int point;
 }

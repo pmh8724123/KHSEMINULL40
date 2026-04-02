@@ -25,15 +25,27 @@ public class ScheduleDaoImpl implements ScheduleDao {
 	public int deleteSchedule(Schedule searchKey) {
 		return sqlSession.delete("schedule.deleteSchedule", searchKey);
 	}
+	@Override
+	public int deleteScheduleTitle(Schedule target) {
+		return sqlSession.delete("schedule.deleteScheduleTitle", target);
+	}
+
+	
 
 	@Override
-	public void insertSchedule(Schedule vo) {
-		sqlSession.insert("schedule.insertSchedule", vo);
+	public int insertSchedule(Schedule vo) {
+		return sqlSession.insert("schedule.insertSchedule", vo);
 	}
 
 	@Override
 	public List<Lecture> searchLecture(String keyword) {
 		return sqlSession.selectList("schedule.searchLecture", keyword);
 	}
+	
+	@Override
+    public int insertScheduleTitle(Schedule schedule) {
+        return sqlSession.insert("schedule.insertScheduleTitle", schedule);
+    }
+
 
 }

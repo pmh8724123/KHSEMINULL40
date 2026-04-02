@@ -210,6 +210,7 @@
 				<div class="att-header">
 					<div>
 						<p class="att-title">출석 체크</p>
+						<strong>보유 포인트: ${userPoint} P</strong>
 						<p class="att-sub">7일 출석하고 포인트를 받으세요!</p>
 					</div>
 					<div style="text-align: right">
@@ -314,9 +315,15 @@
 			<c:if test="${not empty friendList}">
 				<c:forEach var="f" items="${friendList}">
 					<div class="friend-item">
-						<div class="friend-text">
+						<div class="friend-item"
+							onclick="viewFriendTimetable(${f.friendNo}, '${f.friendName}')"
+							style="cursor: pointer;">
 							<span class="friend-name">${f.friendName}</span>
 						</div>
+
+						<button
+							onclick="location.href='${path}/mypage?category=timetable&friendNo=${f.friendNo}'"
+							class="btn-view-tt">시간표 보기</button>
 						<button class="friend-delete-btn"
 							onclick="deleteFriend(${f.friendNo})">친구 삭제</button>
 					</div>
@@ -368,21 +375,35 @@
 		<div id="timetable"
 			class="tab-panel ${category == 'timetable' ? 'active' : ''}">
 
+			<c:if test="${isFriend}">
+				<div
+					style="background: #f0f7ff; padding: 10px; text-align: center; border-radius: 5px; margin-bottom: 10px;">
+					<strong style="color: #4a90e2;">친구의 시간표를 조회 중입니다.</strong>
+					<button
+						onclick="location.href='${pageContext.request.contextPath}/mypage?category=timetable'"
+						style="margin-left: 10px; font-size: 12px; border: none; background: #ddd; padding: 3px 8px; border-radius: 3px; cursor: pointer;">내
+						시간표로 돌아가기</button>
+				</div>
+			</c:if>
+
 			<!-- 상단 바: 시간표 선택 드롭다운(좌) ,  +/- 버튼(우) -->
 			<div class="tt-topbar">
 				<div class="tt-title-wrap" id="ttTitleWrap">
 					<!-- 드롭다운 버튼: onclick 제거, id 추가 -->
 					<button class="tt-title-btn" id="ttTitleBtn">
-						<span id="ttTitleText">나의 시간표</span> <span style="font-size: 11px">▼</span>
+						<span id="ttTitleText">시간표가 없습니다</span> <span
+							style="font-size: 11px">▼</span>
 					</button>
 					<div class="tt-dropdown" id="ttDropdown"></div>
-					<div class="tt-plusminus">
-						<!--  + 버튼 : prompt로 강의 제목을 받고, 그 강의에 대한 요일, 시간 설정 -->
-						<button id="ttBtnAdd" title="시간표 추가" style="color: #4a90e2">+</button>
+					<c:if test="${!isFriend}">
+						<div class="tt-plusminus">
+							<!--  + 버튼 : prompt로 강의 제목을 받고, 그 강의에 대한 요일, 시간 설정 -->
+							<button id="ttBtnAdd" title="시간표 추가" style="color: #4a90e2">+</button>
 
-						<!--  - 버튼 : 클릭 시 삭제 모드 활성화  -->
-						<button id="ttBtnMinus" title="시간표 삭제" style="color: #E24B4A">−</button>
-					</div>
+							<!--  - 버튼 : 클릭 시 삭제 모드 활성화  -->
+							<button id="ttBtnMinus" title="시간표 삭제" style="color: #E24B4A">−</button>
+						</div>
+					</c:if>
 				</div>
 			</div>
 
@@ -395,8 +416,9 @@
 			<div class="tt-del-hint" id="ttDelHint"></div>
 
 			<!-- 하단 버튼: 강의 추가 / 강의 삭제 -->
-			<div class="tt-bottombar">
-				<!-- 				
+			<c:if test="${!isFriend}">
+				<div class="tt-bottombar">
+					<!-- 				
 				검색 기능 ui
 				<div class="lecture-search-wrap">
 					<input type="text" id="lectureSearchInp" placeholder="강의명 검색...">
@@ -405,13 +427,13 @@
 				</div> 
 -->
 
-				<!-- 강의 추가 버튼: onclick 제거, id 추가 -->
-				<button class="btn-tt-add" id="ttBtnOpenModal">강의 추가</button>
+					<!-- 강의 추가 버튼: onclick 제거, id 추가 -->
+					<button class="btn-tt-add" id="ttBtnOpenModal">강의 추가</button>
 
-				<!-- 강의 삭제 버튼: onclick 제거 (id="ttBtnDel" 은 기존 유지) -->
-				<button class="btn-tt-del" id="ttBtnDel">강의 삭제</button>
-			</div>
-
+					<!-- 강의 삭제 버튼: onclick 제거 (id="ttBtnDel" 은 기존 유지) -->
+					<button class="btn-tt-del" id="ttBtnDel">강의 삭제</button>
+				</div>
+			</c:if>
 			<!-- 강의 추가 모달 (버튼 클릭 시 펼쳐짐) -->
 			<div class="tt-overlay" id="ttOverlay">
 				<div class="tt-modal">
@@ -484,108 +506,135 @@
 
 
 			<script>
-		    // 1. 전역 변수 및 경로 설정
+		    // 전역 변수 및 경로 설정
 		    const path = "${pageContext.request.contextPath}"; 
 		    let tempSelectedLecture = null;
+		    let emptyMsg = '';
 		    
+		    // 시간표 리스트 db에서 뽑기
 		    const initialScheduleData = [
 		        <c:if test="${not empty scheduleList}">
 		            <c:forEach var="s" items="${scheduleList}" varStatus="status">
 		            {
 		                lectureNo: ${s.lectureNo != null ? s.lectureNo : 0},
-		                scheduleTitle: '${s.scheduleTitle != null ? s.scheduleTitle : "내 시간표"}', 
+		                schtitleNo: ${s.schtitleNo != null ? s.schtitleNo : 0},
+		                schtitleName: '${s.schtitleName != null ? s.schtitleName : "내 시간표"}', 
 		                lectureName: '${s.lectureName != null ? s.lectureName : ""}',
 		                scheduleDay: ${s.scheduleDay != null ? s.scheduleDay : 0},
-		                startSlot: ${s.startSlot != null ? s.startSlot : 0},
-		                endSlot: ${s.endSlot != null ? s.endSlot : 0}
+		                startTime: ${s.startTime != null ? s.startTime : 0},
+		                endTime: ${s.endTime != null ? s.endTime : 0}
 		            }${not status.last ? ',' : ''}
 		            </c:forEach>
 		        </c:if>
 		    ];
 
-		    // 페이지 로드 시 실행
-		    window.onload = function() {
-		        loadTimetable(); // 이 함수가 initialScheduleData를 읽어서 timetables 배열을 만듭니다.
-		        initEvents();    // 검색창 이벤트 등 초기화
-		    };
-		
+
 		    // 즉시 실행 함수 대신 일반 스코프로 관리 (버튼 클릭 이슈 방지)
 		    const DAYS        = ['월','화','수','목','금'];
 		    const START_HOUR  = 9;
 		    const END_HOUR    = 17;
-		    const SLOT_H      = 36;
-		    const TOTAL_SLOTS = (END_HOUR - START_HOUR) * 2;
+		    const TIME_H      = 36;
+		    const TOTAL_TIMES = (END_HOUR - START_HOUR) * 2;
 		
-		    let timetables = [{ name: '나의 시간표', courses: [] }];
+		    let timetables = [{ name: '시간표', courses: [] }];
 		    let currentIdx = 0;
 		    let deleteMode = false;
 		
-		    // ── 서버 통신 로직 ──────────────────────────────
-		    function loadTimetable() {
-		        if (typeof initialScheduleData !== 'undefined' && initialScheduleData.length > 0) {
-		            // scheduleTitle 기준으로 유니크한 시간표 이름 추출
-		            const tableNames = [...new Set(initialScheduleData.map(c => c.scheduleTitle))];
-		            
-		            timetables = tableNames.map(name => {
-		                return {
-		                    name: name,
-		                    courses: initialScheduleData
-		                        .filter(c => c.scheduleTitle === name)
-		                        .map(c => ({
-		                            lectureNo: c.lectureNo,
-		                            title: c.lectureName, // 화면에 그릴 땐 과목명 사용
-		                            scheduleDay: parseInt(c.scheduleDay),
-		                            startSlot: parseInt(c.startSlot),
-		                            endSlot: parseInt(c.endSlot)
-		                        }))
-		                };
-		            });
-		            currentIdx = 0;
-		        }
-		        else {
-		            timetables = [{ name: '나의 시간표', courses: [] }];
-		            currentIdx = 0;
-		        }
-		        updateDropdown();
-		        ttRenderGrid();
-		    }
-		
-		    function saveToDatabase() {
-		    	
-		        const currentTable = timetables[currentIdx];
-		        
-		        const payload = currentTable.courses.map(c => ({
-		            lectureNo: c.lectureNo,
-		            scheduleTitle: currentTable.name, 
-		            lectureName: c.title,           
-		            scheduleDay: c.scheduleDay	,
-		            startSlot: c.startSlot, 
-		            endSlot: c.endSlot
-		        }));
-		        
-		        console.log("서버로 보낼 데이터(Payload):", payload);
-		
-		        const csrfToken = document.querySelector('meta[name="_csrf"]');
-		        const csrfHeader = document.querySelector('meta[name="_csrf_header"]');
-		        const headers = { 'Content-Type': 'application/json' };
-		        if(csrfToken && csrfHeader) headers[csrfHeader.content] = csrfToken.content;
+		    // 시간표를 생성 로직
+			function loadTimetable() {
+			    // JSP에서 전달받은 initialScheduleData가 있는지 확인
+			    if (initialScheduleData && initialScheduleData.length > 0) {
+			        const titleMap = new Map();
+			        initialScheduleData.forEach(item => {
+			            if(!titleMap.has(item.schtitleNo)) {
+			                titleMap.set(item.schtitleNo, item.schtitleName);
+			            }
+			        });
+			
+
+			        timetables = Array.from(titleMap).map(([no, name]) => ({
+			            schtitleNo: no, 
+			            name: name,
+			            courses: initialScheduleData
+			                .filter(c => c.schtitleNo === no)
+			                .map(c => ({
+			                    scheduleNo: c.scheduleNo,
+			                    lectureNo: c.lectureNo,
+			                    title: c.lectureName,
+			                    scheduleDay: c.scheduleDay,
+			                    startTime: c.startTime,
+			                    endTime: c.endTime
+			                }))
+			        }));
+			    } else {
+			    	emptyMsg = '<div style="position:absolute; text-align:center; padding-top:100px; color:#black;">';
+			    	+ '<p>등록된 시간표가 없습니다.</p>';
+			    	+ '<p style="font-size:0.9em;">상단 [+] 버튼을 눌러 새 시간표를 만들어보세요!</p></div>';
+			        timetables = []; 
+			        document.getElementById('ttGrid').innerHTML = emptyMsg;
+			            
+			        return;
+			    }
+			    currentIdx = 0;
+			    updateDropdown();
+			    ttRenderGrid();
+			}
+			
 		    
-		        fetch(path + '/schedule/save', {
-		            method: 'POST',
-		            headers: headers,
-		            body: JSON.stringify(payload)
-		        })
-		        .then(res => res.json())
-		        .then(data => { if(data.success) console.log("DB 저장 완료"); })
-		        .catch(err => console.error("저장 오류:", err));
-		    }
+		    // 변경 사항을 db에 저장 시킴.
+			function saveToDatabase() {
+			    const currentTable = timetables[currentIdx];
+			    
+			    // 디버깅용 로그 (전송 직전 상태 확인)
+			    console.log("현재 인덱스:", currentIdx);
+			    console.log("현재 시간표 데이터:", currentTable);
+
+			 	// 1. 이름이 no든 schtitleNo든 값이 있으면 가져오기
+			    const targetNo = currentTable.schtitleNo || currentTable.no;
+
+			    console.log("검증 중인 번호:", targetNo); // 여기서 1이 찍히는지 확인
+
+			    // 2. 조건문 수정: null, undefined, 빈 문자열만 체크 (0이나 1은 통과해야 함)
+			    if (targetNo === undefined || targetNo === null || targetNo === "") {
+			        console.error("저장 실패: 번호가 없습니다.", currentTable);
+			        return;
+			    }
+
+			    const payload = {
+			        schtitleNo: Number(targetNo),
+			        courses: currentTable.courses.map(c => ({
+			            lectureNo: c.lectureNo,
+			            scheduleDay: c.scheduleDay,
+			            startTime: c.startTime,
+			            endTime: c.endTime
+			        }))
+			    };
+
+			    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+			    const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+
+			    fetch(path + '/schedule/save', {
+			        method: 'POST',
+			        headers: {
+			            'Content-Type': 'application/json',
+			            [csrfHeader]: csrfToken
+			        },
+			        body: JSON.stringify(payload)
+			    })
+			    .then(res => res.json())
+			    .then(data => {
+			        if(data.success) console.log("DB 동기화 완료 (삭제 및 저장)");
+			    })
+			    .catch(err => console.error("저장 실패:", err));
+			}
 		
-		    // ── 그리드 렌더링 ────────────────────────────
+		    // 시간표 영역 생성.
 		    function ttRenderGrid() {
 		        const grid = document.getElementById('ttGrid');
 		        if(!grid) return;
 		        grid.innerHTML = '';
 		
+		        
 		        // 헤더(요일)
 		        const emptyCell = document.createElement('div');
 		        emptyCell.className = 'tt-header-cell';
@@ -596,24 +645,26 @@
 		            h.textContent = d;
 		            grid.appendChild(h);
 		        });
+		        
 		
 		        // 시간 열
 		        const timeCol = document.createElement('div');
 		        timeCol.className = 'tt-time-col';
-		        for (let s = 0; s < TOTAL_SLOTS; s++) {
+		        for (let s = 0; s < TOTAL_TIMES; s++) {
 		            const sl = document.createElement('div');
-		            sl.className = 'tt-time-slot';
+		            sl.className = 'tt-time-time';
 		            sl.textContent = s % 2 === 0 ? String(START_HOUR + s / 2).padStart(2, '0') : '';
 		            timeCol.appendChild(sl);
 		        }
 		        grid.appendChild(timeCol);
-		
+			
+		        
 		        // 요일별 데이터
 		        const courses = timetables[currentIdx].courses;
 		        DAYS.forEach((_, dayIdx) => {
 		            const col = document.createElement('div');
 		            col.className = 'tt-day-col';
-		            for (let s = 0; s < TOTAL_SLOTS; s++) {
+		            for (let s = 0; s < TOTAL_TIMES; s++) {
 		                const line = document.createElement('div');
 		                line.className = 'tt-row-line';
 		                col.appendChild(line);
@@ -622,12 +673,12 @@
 		            courses.filter(c => Number(c.scheduleDay) === dayIdx).forEach(c => {
 		                const block = document.createElement('div');
 		                block.className = 'tt-block' + (deleteMode ? ' delete-mode' : '');
-		                block.style.top = (c.startSlot - START_HOUR * 2) * SLOT_H + 'px';
-		                block.style.height = (c.endSlot - c.startSlot) * SLOT_H + 'px';
+		                block.style.top = (c.startTime - START_HOUR * 2) * TIME_H + 'px';
+		                block.style.height = (c.endTime - c.startTime) * TIME_H + 'px';
 		                
 		                block.innerHTML = '<span>' + c.title + '</span>' +
 		                  '<span style="font-size:10px; opacity:.8">' + 
-		                  slotToTime(c.startSlot) + '~' + slotToTime(c.endSlot) + 
+		                  TimeToTime(c.startTime) + '~' + TimeToTime(c.endTime) + 
 		                  '</span>';
 		                
 		                block.onclick = (e) => {
@@ -642,13 +693,79 @@
 		            grid.appendChild(col);
 		        });
 		    }
-		
-		    // ── 유틸리티 ──
-		    function slotToTime(slot) {
-		        let h = Math.floor(slot / 2);
-		        return h + (slot % 2 === 0 ? ':00' : ':30');
+			
+		    
+		    
+		 // 친구 목록의 버튼/이름 클릭 시 호출될 함수
+		    function viewFriendTimetable(friendNo, friendName) {
+		        fetch('${path}/schedule/friendSchedule?friendNo=${friendNo}')
+		            .then(res => res.json())
+		            .then(data => {
+		                if (!data || data.length === 0) {
+		                    alert("해당 친구는 등록된 시간표가 없습니다.");
+		                    return;
+		                }
+
+		                // 1. 기존 timetables 구조에 맞게 데이터 가공
+		                const titleMap = new Map();
+		                data.forEach(item => {
+		                    if(!titleMap.has(item.schtitleNo)) {
+		                        titleMap.set(item.schtitleNo, item.schtitleName);
+		                    }
+		                });
+
+		                // 2. 전역 변수 timetables 업데이트 (친구 데이터로 덮어쓰기)
+		                timetables = Array.from(titleMap).map(([no, name]) => ({
+		                    schtitleNo: no, 
+		                    name: friendName + "님의 " + name, // 누구의 시간표인지 표시
+		                    courses: data
+		                        .filter(c => c.schtitleNo === no)
+		                        .map(c => ({
+		                            scheduleNo: c.scheduleNo,
+		                            lectureNo: c.lectureNo,
+		                            title: c.lectureName,
+		                            scheduleDay: c.scheduleDay,
+		                            startTime: c.startTime,
+		                            endTime: c.endTime
+		                        }))
+		                }));
+
+		                // 3. 현재 인덱스 초기화 및 화면 렌더링
+		                currentIdx = 0;
+		                updateDropdown();
+		                ttRenderGrid();
+		                
+		                // 4. 친구 시간표 조회 모드이므로 편집 버튼들 숨기기
+		                setReadOnlyMode(true);
+		            })
+		            .catch(err => console.error("친구 시간표 로드 실패:", err));
 		    }
-		
+
+		    // 편집 버튼들을 숨기거나 보여주는 유틸리티
+		    function setReadOnlyMode(isRead) {
+		        const editButtons = ['ttBtnAdd', 'ttBtnMinus', 'ttBtnOpenModal', 'ttBtnDel'];
+		        editButtons.forEach(id => {
+		            const btn = document.getElementById(id);
+		            if(btn) btn.style.display = isRead ? 'none' : 'inline-block';
+		        });
+		        
+		        // 삭제 모드 강제 해제
+		        deleteMode = false;
+		        const delBtn = document.getElementById('ttBtnDel');
+		        if(delBtn) delBtn.classList.remove('active');
+		        document.getElementById('ttDelHint').textContent = isRead ? '(친구 시간표 조회 중)' : '';
+		    }
+		    
+		    
+		    
+		    
+		    
+		    
+		    // 시간 설정에 대한 코드 
+		    function TimeToTime(time) {
+		        let h = Math.floor(time / 2);
+		        return h + (time % 2 === 0 ? ':00' : ':30');
+		    }
 		    function buildTimeOptions(selectEl, defaultHour, defaultMin) {
 		        if(!selectEl) return;
 		        selectEl.innerHTML = '';
@@ -664,8 +781,27 @@
 		            });
 		        }
 		    }
-		
+			
+		    
+		    
+		    // 강의 추가 모달 창 : 강의 추가 버튼 누르면 시간표에 모습이 보이는 창.
+		    // 강의 추가 모달 창 열기 및 기존 값 초기화
 		    function ttOpenModal() {
+		    	
+		    	// 시간표 존재 여부 체크
+		        // timetables 배열이 비었거나, 현재 인덱스의 데이터가 없는 경우
+		        if (!timetables || timetables.length === 0) {
+		            alert("생성된 시간표가 없습니다. 상단의 [+] 버튼을 눌러 시간표를 먼저 생성해주세요.");
+		            return; // 함수 종료 (모달 안 열림)
+		        }
+
+		        // 만약 선택된 시간표는 있는데 schtitleNo가 유효하지 않은 경우 (혹시 모를 예외 처리)
+		        const currentTable = timetables[currentIdx];
+		        if (!currentTable || !currentTable.schtitleNo) {
+		            alert("유효한 시간표가 선택되지 않았습니다. 다시 시도해주세요.");
+		            return;
+		        }
+		        
 		        document.getElementById('ttInpTitle').value = '';
 		        document.getElementById('ttSelectedNo').value = '';
 		        document.getElementById('ttModalHint').textContent = '';
@@ -673,24 +809,27 @@
 		        buildTimeOptions(document.getElementById('ttInpEnd'), 10, 0);
 		        document.getElementById('ttOverlay').classList.add('open');
 		    }
-		
+			
+		    // 강의 추가 모달 창 닫기
 		    function ttCloseModal() {
 		        document.getElementById('ttOverlay').classList.remove('open');
 		    }
-		
+			
+		    
+		    // 상세 모달 창의 확인 버튼
 		    function ttConfirmAdd() {
 		        const title = document.getElementById('ttInpTitle').value.trim();
 		        const lectureNo = document.getElementById('ttSelectedNo').value;
 		        const scheduleDay = parseInt(document.getElementById('ttInpDay').value);
-		        const startSlot = parseInt(document.getElementById('ttInpStart').value);
-		        const endSlot = parseInt(document.getElementById('ttInpEnd').value);
+		        const startTime = parseInt(document.getElementById('ttInpStart').value);
+		        const endTime = parseInt(document.getElementById('ttInpEnd').value);
 		        const hintEl = document.getElementById('ttModalHint');
 		
 		        if (!lectureNo) { hintEl.textContent = '강의를 검색한 후 목록에서 선택해주세요.'; return; }
-		        if (endSlot <= startSlot) { hintEl.textContent = '종료 시간은 시작 시간보다 늦어야 합니다.'; return; }
+		        if (endTime <= startTime) { hintEl.textContent = '종료 시간은 시작 시간보다 늦어야 합니다.'; return; }
 		
 		        const overlap = timetables[currentIdx].courses.some(c => 
-		            c.scheduleDay === scheduleDay && !(endSlot <= c.startSlot || startSlot >= c.endSlot)
+		            c.scheduleDay === scheduleDay && !(endTime <= c.startTime || startTime >= c.endTime)
 		        );
 		        if (overlap) { hintEl.textContent = '해당 시간에 이미 강의가 있습니다.'; return; }
 		
@@ -698,44 +837,86 @@
 		            lectureNo: parseInt(lectureNo),
 		            title: title, 
 		            scheduleDay: scheduleDay,
-		            startSlot: startSlot,
-		            endSlot: endSlot
+		            startTime: startTime,
+		            endTime: endTime
 		        });
 		
 		        saveToDatabase();
 		        ttCloseModal();
 		        ttRenderGrid();
 		    }
-		
+			
+		    
+		    // 각 버튼에 대한 이벤트들
 		    function initEvents() {
+
+		    	
 		        const inpTitle = document.getElementById('ttInpTitle');
 		        const resDiv = document.getElementById('ttSearchRes');
 		
 		        document.getElementById('ttBtnOpenModal').onclick = ttOpenModal;
 		        document.getElementById('ttBtnConfirm').onclick = ttConfirmAdd;
 		        document.getElementById('ttBtnCancel').onclick = ttCloseModal;
-		
-		        document.getElementById('ttBtnDel').onclick = function() {
+				
+		        
+		        // 삭제 모드 토글 기능
+		        document.getElementById('ttBtnDel').onclick = ttDeleteMode;
+		        
+		        function ttDeleteMode() {
+			        if (!timetables || timetables.length === 0) {
+			            alert("생성된 시간표가 없습니다. 상단의 [+] 버튼을 눌러 시간표를 먼저 생성해주세요.");
+			            return; // 함수 종료 (모달 안 열림)
+			        }
+		        	
 		            deleteMode = !deleteMode;
 		            this.classList.toggle('active', deleteMode);
 		            document.getElementById('ttDelHint').textContent = deleteMode ? '삭제할 강의를 클릭하세요.' : '';
 		            ttRenderGrid();
 		        };
-		
+				
+		        
+		        // 새로운 시간표 생성. 최초 생성을 안하면 에러 발생.
 		        document.getElementById('ttBtnAdd').onclick = () => {
-		            const newName = prompt("새로운 시간표 이름을 입력하세요", "나의 시간표");
-		            if (newName) {
-		                timetables.push({ name: newName, courses: [] });
-		                currentIdx = timetables.length - 1;
-		                updateDropdown();
-		                ttRenderGrid();
-		            }
+		            const newName = prompt("새로운 시간표 이름을 입력하세요", "시간표");
+		            if (!newName) return;
+
+		            const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+		            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+		            fetch(path + '/schedule/insertTitle', {
+		                method: 'POST',
+		                headers: { 'Content-Type': 'application/json', [csrfHeader]: csrfToken },
+		                body: JSON.stringify({ schtitleName: newName }) 
+		            })
+		            .then(res => res.json())
+		            .then(data => {
+						
+		                if(data && data.schtitleNo) {
+		                    const newTable = { 
+		                        schtitleNo: data.schtitleNo, 
+		                        name: newName, 
+		                        courses: [] 
+		                    };
+		                    
+		                    timetables.push(newTable);
+		                    currentIdx = timetables.length - 1;
+		                    
+		                    updateDropdown();
+		                    ttRenderGrid();
+		                    alert("새 시간표가 생성되었습니다.");
+		                }
+		            });
 		        };
-		
+				
+		        
+		        // 드롭다운 아래에 - 버튼. 시간표 삭제 버튼
 		        document.getElementById('ttBtnMinus').onclick = () => {
-		            if (timetables.length <= 1) return alert("최소 하나의 시간표는 유지해야 합니다.");
+		        	if (timetables.length === 0) return alert("삭제할 시간표가 없습니다.");
 		            
 		            const targetName = timetables[currentIdx].name; // 삭제할 시간표 이름
+		            
+				    const currentTable = timetables[currentIdx];
+				    const targetNo = currentTable.schtitleNo || currentTable.no;
 		            
 		            if (confirm("'" + targetName + "'을 삭제하시겠습니까?")) {
 		                // 1. 서버에 삭제 요청
@@ -749,7 +930,7 @@
 		                    method: 'POST',
 		                    headers: headers,
 		                    body: JSON.stringify({ 
-		                        scheduleTitle: targetName 
+		                    	schtitleNo: targetNo
 		                    })
 		                })
 		                .then(res => res.json())
@@ -767,7 +948,8 @@
 		        };
 		        
 
-		
+				
+		        // 모달 창의 검색 칸.  2글자 이상의 키워드를 작성해야 검색 목록이 뜸.
 		        if (inpTitle) {
 		            inpTitle.oninput = (e) => {
 		                const keyword = e.target.value.trim();
@@ -817,6 +999,8 @@
 		        };
 		    }
 		    
+		    // 상세 모달 : 검색으로 나온 강의 클릭 시 나오는 창.
+		    // 상세 모달 창 열기 
 		    function openDetailModal(lecture) {
 		        const overlay = document.getElementById('ttDetailOverlay');
 		        document.getElementById('detailLectureName').textContent = lecture.lectureName;
@@ -829,27 +1013,31 @@
 
 		        overlay.style.display = 'flex'; // 모달 보이기
 		    }
-
+			
+		    
+		    // 상세 모달 창의 취소 버튼
 		    function closeDetailModal() {
 		        document.getElementById('ttDetailOverlay').style.display = 'none';
 		        tempSelectedLecture = null;
 		    }
-
+			
+		    
+		    // 상세 모달 창의 확인 버튼
 		    function confirmDetailAdd() {
 		        const scheduleDay = parseInt(document.getElementById('detailDay').value);
-		        const startSlot = parseInt(document.getElementById('detailStart').value);
-		        const endSlot = parseInt(document.getElementById('detailEnd').value);
+		        const startTime = parseInt(document.getElementById('detailStart').value);
+		        const endTime = parseInt(document.getElementById('detailEnd').value);
 		        const hintEl = document.getElementById('detailHint');
 
 		        // 1. 유효성 검사
-		        if (endSlot <= startSlot) {
+		        if (endTime <= startTime) {
 		            hintEl.textContent = '종료 시간은 시작 시간보다 늦어야 합니다.';
 		            return;
 		        }
 
 		        // 2. 중복 검사
 		        const overlap = timetables[currentIdx].courses.some(c => 
-		            c.scheduleDay === scheduleDay && !(endSlot <= c.startSlot || startSlot >= c.endSlot)
+		            c.scheduleDay === scheduleDay && !(endTime <= c.startTime || startTime >= c.endTime)
 		        );
 		        if (overlap) {
 		            hintEl.textContent = '해당 시간에 이미 강의가 있습니다.';
@@ -861,8 +1049,8 @@
 		            lectureNo: tempSelectedLecture.lectureNo,
 		            title: tempSelectedLecture.lectureName,
 		            scheduleDay: scheduleDay,
-		            startSlot: startSlot,
-		            endSlot: endSlot
+		            startTime: startTime,
+		            endTime: endTime
 		        });
 
 		        // 4. 후처리
@@ -872,32 +1060,56 @@
 		        closeDetailModal();
 		    }
 		    
+		    
+		    // 시간표를 드롭다운으로 표시 
 		    function updateDropdown() {
 		        const dropdown = document.getElementById('ttDropdown');
 		        const titleText = document.getElementById('ttTitleText');
 		        if(!dropdown || !titleText) return;
-		
-		        dropdown.innerHTML = '';
-		        titleText.textContent = timetables[currentIdx].name;
-		
-		        timetables.forEach((tt, idx) => {
-		            const item = document.createElement('div');
-		            item.className = 'tt-dropdown-item';
-		            item.textContent = tt.name;
-		            item.onclick = () => {
-		                currentIdx = idx;
-		                titleText.textContent = tt.name;
-		                dropdown.classList.remove('open');
-		                ttRenderGrid();
-		            };
-		            dropdown.appendChild(item);
-		        });
+
+		        dropdown.innerHTML = ''; // 기존 목록 비우기
+		        
+		        if (timetables.length > 0) {
+		            titleText.textContent = timetables[currentIdx].name;
+
+		            timetables.forEach((tt, idx) => {
+		                const item = document.createElement('div');
+		                item.className = 'tt-dropdown-item';
+		                item.textContent = tt.name;
+		                item.onclick = () => {
+		                    currentIdx = idx;
+		                    titleText.textContent = tt.name;
+		                    dropdown.classList.remove('open');
+		                    ttRenderGrid();
+		                };
+		                dropdown.appendChild(item);
+		            });
+		        } else {
+		            titleText.textContent = "시간표 없음";
+		        }
 		    }
 		
 		    document.addEventListener('DOMContentLoaded', () => {
-		        initEvents();
+		    	const isFriendMode = ${isFriend};
+				
+		        if (!isFriendMode) {
+		        	emptyMsg = '<div style="position:absolute; text-align:center; padding-top:100px; color:#black;">';
+			    	+ '<p>친구에게 등록된 시간표가 없습니다.</p>';
+		            initEvents(); // 내 시간표일 때만 클릭 이벤트들(모달 열기, 삭제 등) 활성화
+		        } else {
+		            // 조회 모드일 때 필요한 최소한의 이벤트만 실행 (예: 드롭다운 메뉴 열기)
+		            const titleBtn = document.getElementById('ttTitleBtn');
+		            if(titleBtn) {
+		                titleBtn.onclick = (e) => {
+		                    e.stopPropagation();
+		                    document.getElementById('ttDropdown').classList.toggle('open');
+		                };
+		            }
+		        }
+		    
 		        loadTimetable();
-		    });	    
+		    });	   
+		    
 		</script>
 
 		</div>
@@ -908,146 +1120,140 @@
 		<!-- <div id="setting" class="tab-panel"> -->
 		<div id="setting"
 			class="tab-panel ${category == 'setting' ? 'active' : ''}">
-
-			<!-- 개인정보 수정 카드 -->
 			<div class="setting-card">
 				<h3 class="setting-card-title">개인정보 수정</h3>
-
 				<div class="setting-form">
 
-					<!-- 아이디 -->
 					<div class="setting-field">
-						<label>아이디</label> <input type="text" id="settingId"
-							placeholder="새 아이디를 입력하세요" value="${loginUser.memId}">
+						<label>현재 비밀번호 확인</label>
+						<div style="display: flex; gap: 10px;">
+							<input type="password" id="settingCurPw"
+								placeholder="현재 비밀번호를 입력하세요" style="flex: 1;">
+							<button type="button" class="setting-check-btn"
+								onclick="verifyPassword()" id="verifyBtn">확인</button>
+						</div>
 					</div>
 
-					<!-- 학번 -->
-					<div class="setting-field">
-						<label>학번</label> <input type="text" id="settingName"
-							placeholder="새 학번을 입력하세요" value="${loginUser.studentNo}">
+					<hr style="margin: 20px 0; border: 0; border-top: 1px dashed #ddd;">
+
+					<div id="updateFields">
+						<div class="setting-field">
+							<label>아이디</label> <input type="text" id="settingId"
+								value="${loginUser.memId}" disabled>
+						</div>
+						<div class="setting-field">
+							<label>학번</label> <input type="text" id="settingName"
+								value="${loginUser.studentNo}" disabled>
+						</div>
+						<div class="setting-field">
+							<label>전화번호</label> <input type="text" id="settingPhone"
+								value="${loginUser.phone}" disabled>
+						</div>
+						<div class="setting-field">
+							<label>학과 번호</label> <input type="text" id="settingDeptNo"
+								value="${loginUser.deptNo}" disabled>
+						</div>
+						<div class="setting-field">
+							<label>새 비밀번호</label> <input type="password" id="settingNewPw"
+								placeholder="변경 시에만 입력" disabled>
+						</div>
+						<div class="setting-field">
+							<label>새 비밀번호 확인</label> <input type="password"
+								id="settingNewPwCk" placeholder="새 비밀번호 다시 입력" disabled>
+						</div>
+
+						<div class="setting-hint" id="settingHint"></div>
+						<button class="setting-save-btn" id="saveBtn"
+							onclick="saveSetting()" disabled>저장</button>
 					</div>
-
-					<!-- 전화번호 -->
-					<div class="setting-field">
-						<label>전화번호</label> <input type="email" id="settingEmail"
-							placeholder="새 전화번호를 입력하세요" value="${loginUser.phone}">
-					</div>
-
-					<!-- 학과 번호 -->
-					<div class="setting-field">
-						<label>학과 번호</label> <input type="text" id="settingDeptNo"
-							placeholder="학과 번호를 입력하세요" value="${loginUser.deptNo}">
-					</div>
-
-					<!-- 현재 비밀번호 -->
-					<div class="setting-field">
-						<label>현재 비밀번호</label> <input type="password" id="settingCurPw"
-							placeholder="현재 비밀번호를 입력하세요">
-					</div>
-
-					<!-- 새 비밀번호 -->
-					<div class="setting-field">
-						<label>새 비밀번호</label> <input type="password" id="settingNewPw"
-							placeholder="새 비밀번호를 입력하세요 (변경 시에만 입력)">
-					</div>
-
-					<!-- 새 비밀번호 확인 -->
-					<div class="setting-field">
-						<label>새 비밀번호 확인</label> <input type="password"
-							id="settingNewPwCk" placeholder="새 비밀번호를 다시 입력하세요">
-					</div>
-
-					<!-- 유효성 메시지 -->
-					<div class="setting-hint" id="settingHint"></div>
-
-					<button class="setting-save-btn" onclick="saveSetting()">저장</button>
-
 				</div>
 			</div>
-
-			<!-- 로그아웃 / 회원탈퇴 카드 -->
-			<div class="setting-card">
-			<form:form action="${contextPath}/member/logout" method="post">
-					<button class="setting-logout-btn" type="submit" class="logout">로그아웃</button>	
-			</form:form>
-				<button class="setting-withdraw-btn" onclick="confirmWithdraw()">
-					회원 탈퇴</button>
-			</div>
 			<script>
-			// 저장
-			function saveSetting() {
-			    const hint    = document.getElementById('settingHint');
-			    const curPw   = document.getElementById('settingCurPw').value.trim();
-			    const newPw   = document.getElementById('settingNewPw').value.trim();
-			    const newPwCk = document.getElementById('settingNewPwCk').value.trim();
-
-			    hint.style.color = '#E24B4A';
-			    hint.textContent = '';
-
-			    // 새 비밀번호 입력 시 현재 비밀번호 필수
-			    if (newPw && !curPw) {
-			        hint.textContent = '현재 비밀번호를 입력해주세요.';
+			// CSRF 토큰 설정
+			const token = document.querySelector('meta[name="_csrf"]').content;
+			const header = document.querySelector('meta[name="_csrf_header"]').content;
+			
+			// [1단계] 현재 비밀번호 확인
+			function verifyPassword() {
+			    const curPw = document.getElementById('settingCurPw').value;
+			    const hint = document.getElementById('settingHint');
+			
+			    if (!curPw) {
+			        alert("현재 비밀번호를 입력해주세요.");
 			        return;
-			    }	
-
-			    // 새 비밀번호 확인 일치
+			    }
+			
+			    fetch('${path}/setting/verifyPw', {
+			        method: 'POST',
+			        headers: {
+			            'Content-Type': 'application/json',
+			            [header]: token
+			        },
+			        body: JSON.stringify({ curPw: curPw })
+			    })
+			    .then(res => res.json())
+			    .then(data => {
+			        if (data.result === 'ok') {
+			            alert("인증되었습니다. 정보를 수정할 수 있습니다.");
+			            // 모든 필드 잠금 해제
+			            const inputs = document.querySelectorAll('#updateFields input, #saveBtn');
+			            inputs.forEach(input => input.disabled = false);
+			            
+			            // 인증 버튼과 비밀번호 창은 수정 못하게 막기
+			            document.getElementById('settingCurPw').disabled = true;
+			            document.getElementById('verifyBtn').disabled = true;
+			            hint.textContent = "";
+			        } else {
+			            hint.style.color = '#E24B4A';
+			            hint.textContent = "비밀번호가 일치하지 않습니다.";
+			        }
+			    })
+			    .catch(err => console.error("Error:", err));
+			}
+			
+			// [2단계] 정보 저장
+			function saveSetting() {
+			    const hint = document.getElementById('settingHint');
+			    const newPw = document.getElementById('settingNewPw').value.trim();
+			    const newPwCk = document.getElementById('settingNewPwCk').value.trim();
+			
 			    if (newPw && newPw !== newPwCk) {
+			        hint.style.color = '#E24B4A';
 			        hint.textContent = '새 비밀번호가 일치하지 않습니다.';
 			        return;
 			    }
-
-			    // FormData로 파일 포함 전송
-			    const formData = new FormData();
-			    formData.append('memName',  document.getElementById('settingName').value.trim());
-			    formData.append('memId',    document.getElementById('settingId').value.trim());
-			    formData.append('email', document.getElementById('settingEmail').value.trim());
-			    formData.append('deptNo',      document.getElementById('settingDeptNo').value.trim());
-			    formData.append('curPw',       curPw);
-			    formData.append('newPw',       newPw);
-
-			    const profileFile = document.getElementById('settingProfileInput').files[0];
-			    if (profileFile) {
-			        formData.append('profileImg', profileFile);
-			    }
-
-			    // Ajax 전송
-			    $.ajax({
-			        url        : '${path}/setting/update',
-			        type       : 'POST',
-			        data       : formData,
-			        processData: false,   // FormData는 jQuery가 변환하면 안 됨
-			        contentType: false,   // FormData는 Content-Type 자동 설정
-			        headers    : { '${_csrf.headerName}': '${_csrf.token}' },
-
-			        success: function(data) {
-			            if (data.result === 'ok') {
-			                hint.style.color = '#16a34a';
-			                hint.textContent = '저장되었습니다.';
-			            } else {
-			                hint.style.color = '#E24B4A';
-			                hint.textContent = data.message || '저장에 실패했습니다.';
-			            }
-			        },
-
-			        error: function() {
-			            hint.style.color = '#E24B4A';
-			            hint.textContent = '서버와 연결할 수 없습니다.';
-			        }
-			    });
-			}
-
-			// 회원탈퇴
-			function confirmWithdraw() {
-			    if (confirm('회원 탈퇴 페이지로 이동하시겠습니까?')) {
-			        location.href = '${path}/member/withdraw';
-			    }
-			}
 			
+			    const updateData = {
+			        memId: document.getElementById('settingId').value.trim(),
+			        studentNo: document.getElementById('settingName').value.trim(),
+			        phone: document.getElementById('settingPhone').value.trim(),
+			        deptNo: document.getElementById('settingDeptNo').value.trim(),
+			        curPw: document.getElementById('settingCurPw').value, // 인증 때 쓴 비번 재사용
+			        newPw: newPw
+			    };
+			
+			    fetch('${path}/setting/update', {
+			        method: 'POST',
+			        headers: {
+			            'Content-Type': 'application/json',
+			            [header]: token
+			        },
+			        body: JSON.stringify(updateData)
+			    })
+			    .then(res => res.json())
+			    .then(data => {
+			        if (data.result === 'ok') {
+			            alert("회원 정보가 성공적으로 수정되었습니다.");
+			            location.reload(); 
+			        } else {
+			            hint.style.color = '#E24B4A';
+			            hint.textContent = data.message || '저장에 실패했습니다.';
+			        }
+			    })
+			    .catch(err => console.error("Error:", err));
+			}
 			</script>
-
-
 		</div>
-		<!-- /setting -->
 
 
 	</div>

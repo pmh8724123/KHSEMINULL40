@@ -131,7 +131,7 @@
 	flex-direction: column;
 }
 
-.tt-time-slot {
+.tt-time-time {
 	height: 36px; /* 30분 = 36px */
 	display: flex;
 	align-items: center;

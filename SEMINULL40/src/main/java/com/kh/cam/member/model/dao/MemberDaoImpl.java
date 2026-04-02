@@ -45,4 +45,9 @@ public class MemberDaoImpl implements MemberDao {
 		return session.selectOne("member.selectMemId", m);
 	}
 
+	@Override
+	public int updateMember(Member inputMember) {
+		return session.update("member.updateMember", inputMember);
+	}
+
 }

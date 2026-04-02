@@ -20,4 +20,7 @@ public interface MemberService extends UserDetailsService {
 
 	Member selectMemById(String memId);
 
+	int updateMember(Member inputMember);
+
+
 }

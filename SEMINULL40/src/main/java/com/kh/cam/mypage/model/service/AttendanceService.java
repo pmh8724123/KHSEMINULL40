@@ -11,4 +11,6 @@ public interface AttendanceService {
 
 	int updateAtt(int memNo);
 
+	int checkIn(int memNo);
+
 }
