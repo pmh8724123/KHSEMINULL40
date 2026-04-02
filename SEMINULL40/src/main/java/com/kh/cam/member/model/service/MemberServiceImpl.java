@@ -56,4 +56,9 @@ public class MemberServiceImpl implements MemberService {
 		return mDao.loadUserByUsername(memId);
 	}
 
+	@Override
+	public int updateMember(Member inputMember) {
+		return mDao.updateMember(inputMember);
+	}
+
 }

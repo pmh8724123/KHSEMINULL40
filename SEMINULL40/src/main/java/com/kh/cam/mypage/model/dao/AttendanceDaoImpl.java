@@ -1,5 +1,7 @@
 	package com.kh.cam.mypage.model.dao;
 
+import java.util.Map;
+
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -26,6 +28,12 @@ public class AttendanceDaoImpl implements AttendanceDao{
     @Override
 	public int updateAtt(int memNo) {
 		return session.update("attendance.updateAtt", memNo);
+	}
+
+	@Override
+	public void updateUserPoint(Map<String, Object> map) {
+		session.update("attendance.updateUserPoint", map);
+		
 	}
     
 }

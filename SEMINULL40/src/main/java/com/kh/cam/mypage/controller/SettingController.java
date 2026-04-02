@@ -7,9 +7,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.cam.member.model.service.MemberService;
 import com.kh.cam.member.model.vo.CustomUserDetails;
@@ -25,9 +27,30 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SettingController {
 	
-/*	private final BCryptPasswordEncoder pwEncoder;
+	private final BCryptPasswordEncoder pwEncoder;
 	private final MemberService mService;
 	
+	// [1단계] 현재 비밀번호 확인만 진행
+    @PostMapping(value = "/verifyPw", produces = "application/json; charset=utf-8")
+    public Map<String, Object> verifyPassword(Map<String, String> data) {
+        Map<String, Object> result = new HashMap<>();
+        
+        // SecurityContext에서 로그인 유저 추출
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String dbPw = userDetails.getMember().getMemPw();
+        String inputPw = data.get("curPw");
+
+        if (pwEncoder.matches(inputPw, dbPw)) {
+            result.put("result", "ok");
+        } else {
+            result.put("result", "fail");
+        }
+        return result;
+    }
+	
+	
+	// curPw : 현재 비번
+	// newPw : 새로운 비번
 	@PostMapping(value = "/update", produces = "application/json; charset=utf-8")
 	@ResponseBody
 	public Map<String, Object> updateMember(Member inputMember, 
@@ -57,15 +80,13 @@ public class SettingController {
 	        inputMember.setMemPw(loginUser.getMemPw()); // 비번 변경 안 함 (기존 암호 유지)
 	    }
 
-	    
-	    // member 쪽 건드려야 함
 	    // 4. DB 업데이트 실행
-	    int updateResult = mService.updateMember(inputMember);  
+	    int updateResult = mService.updateMember(inputMember);
 
 	    if (updateResult > 0) {
-	        // 5. ★ 중요: 세션(SecurityContext) 내 정보 갱신 ★
+	        // 5.  중요: 세션(SecurityContext) 내 정보 갱신 
 	        // DB만 바꾸면 화면 상의 'loginUser'는 로그아웃 전까지 옛날 정보를 들고 있습니다.
-	        Member updatedUser = mService.getMemberById(loginUser.getMemId());  
+	        Member updatedUser = mService.selectMemById(loginUser.getMemId());
 	        userDetails.setMember(updatedUser); // CustomUserDetails 내부의 VO 교체
 	        
 	        result.put("result", "ok");
@@ -74,6 +95,29 @@ public class SettingController {
 	        result.put("message", "수정 중 오류가 발생했습니다.");
 	    }
 
-	    return result;  
-	}*/
+	    return result;
+	}
+	
+//	@PostMapping("/update")
+//	public String updateMember1(@ModelAttribute Member member) {
+//		CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//		
+//		member.setMemPw(pwEncoder.encode(member.getMemPw()));
+//		
+//		int result = mService.updateMember(member);
+//		
+//	    if(inputMember.getMemPw() != null) {
+//	    	inputMember.setMemPw(pwEncoder.encode(inputMember.getMemPw()));
+//	    }
+//	    
+//	    mService.updateMember(inputMember);
+//		
+//		if(result > 0) {
+//			return "redirect:/mypage?category=setting";
+//		}
+//		else {
+//			// 에러페이지 반환
+//		}
+//		
+//	}
 }

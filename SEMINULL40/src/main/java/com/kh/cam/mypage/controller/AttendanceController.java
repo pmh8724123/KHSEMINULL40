@@ -25,7 +25,14 @@ public class AttendanceController {
     public String updateAtt(RedirectAttributes ra) {
     	CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     	int memNo = user.getUserno();
-    	attService.updateAtt(memNo);
+
+    	int result = attService.checkIn(memNo); // 포인트 로직이 포함된 checkIn 호출
+        
+        if(result > 0) {
+            ra.addFlashAttribute("message", "출석 체크 완료! 포인트가 지급되었습니다.");
+        } else {
+            ra.addFlashAttribute("message", "출석 체크 실패!");
+        }
     	
     	return "redirect:/mypage?category=attendance";
     }

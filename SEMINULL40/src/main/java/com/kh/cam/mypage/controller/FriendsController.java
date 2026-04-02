@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.kh.cam.member.model.service.MemberService;
 import com.kh.cam.member.model.vo.CustomUserDetails;
 import com.kh.cam.mypage.model.service.FriendsService;
+import com.kh.cam.mypage.model.service.ScheduleService;
 import com.kh.cam.mypage.model.vo.Friends;
+import com.kh.cam.mypage.model.vo.Schedule;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,7 @@ public class FriendsController {
 
 	private final FriendsService fService;
 	private final MemberService mService;
+	private final ScheduleService sService;
 
 	private int getMemNo() {
 		CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
@@ -42,6 +45,8 @@ public class FriendsController {
 
 		return result;
 	}
+
+	
 
 	// 친구 추가 페이지 이동
 	@GetMapping("/addfriend")

@@ -173,3 +173,16 @@
 .setting-withdraw-btn:hover {
 	background: #FFF0F0;
 }
+
+/* .setting-check-btn {
+	padding: 11px;
+	font-size: 14px;
+	font-weight: 600;
+	color: #fff;
+	background: #4a90e2;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: opacity .15s;
+	margin-top: 4px;
+} */

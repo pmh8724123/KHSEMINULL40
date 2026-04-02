@@ -20,4 +20,6 @@ public interface MemberDao {
 
 	String selectMemId(Member m);
 
+	int updateMember(Member inputMember);
+
 }

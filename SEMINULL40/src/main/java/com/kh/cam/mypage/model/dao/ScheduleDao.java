@@ -10,9 +10,14 @@ public interface ScheduleDao {
 	List<Schedule> selectScheduleList(int memNo);
 
 	int deleteSchedule(Schedule searchKey);
+	int deleteScheduleTitle(Schedule target);
 
-	void insertSchedule(Schedule vo);
+	int insertSchedule(Schedule vo);
 
 	List<Lecture> searchLecture(String keyword);
+
+	int insertScheduleTitle(Schedule schedule);
+
+
 
 }

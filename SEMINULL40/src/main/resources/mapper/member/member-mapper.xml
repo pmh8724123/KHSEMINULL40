@@ -60,4 +60,18 @@
 	<select id="selectMemId" resultType="String">
 		SELECT mem_id FROM member WHERE mem_name = #{memName} AND phone = #{phone}
 	</select>
+	
+	
+	<update id="updateMember" parameterType="Member">
+	    UPDATE MEMBER
+		<set>
+	        <if test="memName != null and memName != ''">MEM_NAME = #{memName},</if>
+	        <if test="phone != null and phone != ''">PHONE = #{phone},</if>
+	        <if test="studentNo != null and studentNo != ''">STUDENT_NO = #{studentNo},</if>
+	        <if test="deptNo != null and deptNo != ''">DEPT_NO = #{deptNo},</if>
+	        <if test="memPw != null and memPw != ''">MEM_PW = #{memPw},</if>
+    	</set>
+	    WHERE MEM_ID = #{memId}
+	</update>
+	
 </mapper>

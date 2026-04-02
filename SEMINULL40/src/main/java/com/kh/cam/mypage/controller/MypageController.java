@@ -34,14 +34,22 @@ public class MypageController {
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
 	@GetMapping("/mypage")
-	public String mypage(@RequestParam(value = "category", required = false, defaultValue = "attendance") String category, Model model) {
+	public String mypage(@RequestParam(value = "category", required = false, defaultValue = "attendance") String category,
+			@RequestParam(value = "friendNo", required = false, defaultValue = "0") int friendNo,
+			Model model) {
 		// 로그인한 사용자 정보 가져오기
 		CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
 		int memNo = user.getUserno();
-
+		
+		
+		// 기본적으로 내 번호를 사용하되, 친구 번호가 들어오면 그 번호를 사용
+		int targetNo = (friendNo > 0) ? friendNo : memNo;
+		
+		
 		// 카테고리 전달
 		model.addAttribute("category", category);
+		model.addAttribute("isFriend", friendNo > 0);
 
 		// 카테고리 검사
 		switch (category) {
@@ -54,7 +62,7 @@ public class MypageController {
 			break;
 			
 		case "timetable" :
-			timetable(memNo, model);
+			timetable(targetNo, model);
 			break;
 		
 		case "setting" :
@@ -75,7 +83,7 @@ public class MypageController {
 		Attendance att = attService.selectAtt(memNo);
 
 		System.out.println(att.getAttendDays());
-
+		
 		// 출석일 비교
 		String attDay = att.getAttendDays() != null ? sdf.format(att.getAttendDays()) : "0000-00-00";
 		String today = sdf.format(new Date());
@@ -86,6 +94,7 @@ public class MypageController {
 		// 출석일수, 오늘 출석여부 전달
 		model.addAttribute("attCnt", att.getCount());
 		model.addAttribute("checkedToday", checkedToday);
+		model.addAttribute("userPoint", att.getPoint());
 	}
 	
 	public void friends(int memNo, Model model) {

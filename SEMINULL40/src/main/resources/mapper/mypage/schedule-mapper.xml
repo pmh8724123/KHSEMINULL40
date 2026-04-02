@@ -7,31 +7,34 @@
 	<resultMap id="scheduleResultSet" type="Schedule">
 		<id column="SCHEDULE_NO" property="scheduleNo" />
 		<result column="MEM_NO" property="memNo" />
+		<result column="SCHTITLE_NO" property="schtitleNo" />
+		<result column="SCHTITLE_NAME" property="schtitleName" />
 		<result column="LECTURE_NO" property="lectureNo" />
-		<result column="SCHEDULE_TITLE" property="scheduleTitle" />
-		<result column="LECTURE_TITLE" property="lectureTitle" />
+		<result column="LECTURE_NAME" property="lectureName" />
 		<result column="SCHEDULE_DAY" property="scheduleDay" />
-		<result column="START_SLOT" property="startSlot" />
-		<result column="END_SLOT" property="endSlot" />
+		<result column="START_TIME" property="startTime" />
+		<result column="END_TIME" property="endTime" />
 	</resultMap>
-
-
+	
+	
+	<!-- 내가 저장한 시간표들 불러오기 -->
 	<select id="selectList" parameterType="_int"
 		resultMap="scheduleResultSet">
 		SELECT
-		S.*,
-		L.LECTURE_NAME
+		S.SCHEDULE_NO, S.MEM_NO, S.SCHTITLE_NO,
+		T.SCHTITLE_NAME, S.LECTURE_NO, L.LECTURE_NAME,
+		S.SCHEDULE_DAY,
+		S.START_TIME, S.END_TIME
 		FROM SCHEDULE S
-		JOIN LECTURE L ON
-		(S.LECTURE_NO = L.LECTURE_NO)
-		WHERE
-		S.MEM_NO = #{memNo}
-		ORDER BY
-		S.SCHEDULE_DAY, S.START_SLOT
+		JOIN SCHEDULE_TITLE T ON
+		(S.SCHTITLE_NO = T.SCHTITLE_NO)
+		JOIN LECTURE L ON (S.LECTURE_NO =
+		L.LECTURE_NO)
+		WHERE S.MEM_NO = #{memNo}
 	</select>
+	
 
-
-
+	<!-- 강의 검색 -->
 	<select id="searchLecture" parameterType="string"
 		resultType="Lecture">
 		SELECT
@@ -41,26 +44,58 @@
 		FROM LECTURE
 		WHERE
 		LECTURE_NAME LIKE '%' || #{keyword} || '%'
-		<![CDATA[
-    		AND ROWNUM <= 10
-    	]]>
+        <![CDATA[
+            AND ROWNUM <= 10
+        ]]>
 	</select>
-
+	
+	
+	<!-- 시간표 내의 강의 삭제 -->
 	<delete id="deleteSchedule" parameterType="Schedule">
 		DELETE FROM SCHEDULE
-		WHERE
-		MEM_NO = #{memNo}
-		AND SCHEDULE_TITLE = #{scheduleTitle}
+		WHERE MEM_NO = #{memNo}
+		AND SCHTITLE_NO = #{schtitleNo}
 	</delete>
 
+
+	<!-- 시간표 삭제 -->
+	<delete id="deleteScheduleTitle" parameterType="Schedule">
+		DELETE FROM SCHEDULE_TITLE
+		WHERE SCHTITLE_NO = #{schtitleNo}
+	</delete>
+
+
+	<!-- 시간표 내의 강의 추가 -->
 	<insert id="insertSchedule" parameterType="Schedule">
 		INSERT INTO SCHEDULE (
-		SCHEDULE_NO, MEM_NO, LECTURE_NO, SCHEDULE_TITLE,
-		SCHEDULE_DAY, START_SLOT, END_SLOT)
-		VALUES (SEQ_SCH_NO.NEXTVAL, #{memNo},
-		#{lectureNo}, #{scheduleTitle},
-		#{scheduleDay}, #{startSlot},
-		#{endSlot})
+		SCHEDULE_NO,
+		MEM_NO,
+		SCHTITLE_NO,
+		LECTURE_NO,
+		SCHEDULE_DAY,
+		START_TIME,
+		END_TIME
+		)
+		VALUES (
+		SEQ_SCH_NO.NEXTVAL,
+		#{memNo},
+		#{schtitleNo},
+		#{lectureNo},
+		#{scheduleDay},
+		#{startTime},
+		#{endTime}
+		)
+	</insert>
+
+	<!-- 시간표 추가 -->
+	<insert id="insertScheduleTitle" parameterType="Schedule">
+		<selectKey keyProperty="schtitleNo" resultType="_int"
+			order="BEFORE">
+			SELECT SEQ_SCH_NO.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO SCHEDULE_TITLE (SCHTITLE_NO, SCHTITLE_NAME)
+		VALUES
+		(#{schtitleNo}, #{schtitleName})
 	</insert>
 
 </mapper>
