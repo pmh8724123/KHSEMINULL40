@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Param;
 
 import com.kh.cam.common.model.vo.Department;
+import com.kh.cam.common.model.vo.University;
 import com.kh.cam.member.model.vo.Member;
 import com.kh.cam.mypage.model.vo.Lecture;
 
@@ -53,15 +54,12 @@ public interface AdminDao {
 	
 
 
+	List<University> selectUniList(Map<String, Object> param);
 
+	int insertUni(University uni);
 
+	void updateUni(University uni);
 
-
-	
-
-
-
-	
-
+	void updateUniStatus(University uni);
 
 }

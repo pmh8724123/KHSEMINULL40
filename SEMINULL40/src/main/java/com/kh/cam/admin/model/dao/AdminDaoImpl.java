@@ -8,6 +8,7 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.kh.cam.common.model.vo.Department;
+import com.kh.cam.common.model.vo.University;
 import com.kh.cam.member.model.vo.Member;
 import com.kh.cam.mypage.model.vo.Lecture;
 
@@ -140,7 +141,29 @@ public class AdminDaoImpl implements AdminDao {
 		return session.delete("admin.deleteLecture", lectureNo);
 	}
 
-
+	/* 대학 관리 */
 	
+	// 대학 조회
+	@Override
+	public List<University> selectUniList(Map<String, Object> param) {
+		return session.selectList("admin.selectUniList", param);
+	}
 
+	// 대학 추가
+	@Override
+	public int insertUni(University uni) {
+		return session.insert("insertUni", uni);
+	}
+
+	// 대학 수정
+	@Override
+	public void updateUni(University uni) {
+		session.update("admin.updateUni", uni);
+	}
+
+	@Override
+	public void updateUniStatus(University uni) {
+		session.update("admin.updateUniStatus", uni);
+	}
+	
 }

@@ -4,11 +4,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.kh.cam.admin.model.dao.AdminDao;
 import com.kh.cam.common.model.vo.Department;
+import com.kh.cam.common.model.vo.University;
+import com.kh.cam.member.model.dao.MemberDao;
 import com.kh.cam.member.model.vo.Member;
 import com.kh.cam.mypage.model.vo.Lecture;
 
@@ -19,6 +22,8 @@ import lombok.RequiredArgsConstructor;
 public class AdminServiceImpl implements AdminService{
 	
 	private final AdminDao adminDao;
+	private final MemberDao mDao;
+	private final BCryptPasswordEncoder pwEncoder;
 	
 	// 회원 상태 관리
 	@Override
@@ -158,16 +163,44 @@ public class AdminServiceImpl implements AdminService{
 
 
 	
+	/* 대학 정보 조회 */
+	@Override
+	public List<University> selectUniList(Map<String, Object> param) {
+		return adminDao.selectUniList(param);
+	}
 
-	
-	
+	@Override
+	@Transactional
+	public void insertUni(University uni) {
+		adminDao.insertUni(uni);
+		
+		Department dept = new Department();
+		dept.setUniNo(uni.getUniNo());
+		dept.setDeptName("공통교양");
+		
+		adminDao.insertDepartment(dept);
+		
+		Member member = new Member();
+		member.setMemId(uni.getMemId());
+	    member.setMemPw(pwEncoder.encode(uni.getMemId() + "00"));
+	    member.setMemName(uni.getMemName());
+	    member.setDeptNo(dept.getDeptNo());
+		
+	    mDao.insertMember(member);
+	    
+	    adminDao.insertAuthority(member.getMemNo(), "ROLE_USER", uni.getUniNo());
+	    adminDao.insertAuthority(member.getMemNo(), "ROLE_ADMIN", uni.getUniNo());
+	}
 
-	
+	@Override
+	public void updateUni(University uni) {
+		adminDao.updateUni(uni);
+	}
 
-	
-
-	
-
-	
+	@Override
+	public void updateUniStatus(University uni) {
+		uni.setStatus(uni.getStatus() == 'Y' ? 'N' : 'Y');
+		adminDao.updateUniStatus(uni);
+	}
 
 }
