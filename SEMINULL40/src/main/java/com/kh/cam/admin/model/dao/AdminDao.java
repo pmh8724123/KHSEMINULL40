@@ -19,7 +19,18 @@ public interface AdminDao {
 
 	int updateMemberStatus(@Param("memNo") int memNo, @Param("status") String status, @Param("uniNo") int uniNo);
 	
-	/* int deleteMember(int memNo); */
+	int deleteBoardLikeByMemNo(int memNo);
+	int deleteReplyLikeByMemNo(int memNo);
+	int deleteReplyByMemNo(int memNo);
+	int deleteBoardByMemNo(int memNo);
+	int deleteReportByMemNo(int memNo);
+	int deleteAuthoritiesByMemNo(int memNo);
+	int deleteAttendanceByMemNo(int memNo);
+	int deleteUserPointByMemNo(int memNo);
+	int deleteLectureAssessmentByMemNo(int memNo);
+	int deleteScheduleByMemNo(int memNo);
+	int deleteFriendsByMemNo(int memNo);
+	int deleteMemberByMemNo(int memNo);
 	
 	// 회원 승인관리
 	List<Member> selectMemberJoinList(Map<String, Object> map);
@@ -74,5 +85,6 @@ public interface AdminDao {
 	List<Map<String, Object>> selectRecentReports(int uniNo);
 
 	Map<String, Object> selectDashboardCounts(int uniNo);
+
 
 }

@@ -21,7 +21,7 @@
 
 
 .footer {
-	position : fixed;
+	position : relative;
 	bottom : 0;
 	width : 100%;
 	background: #0d1b2a;

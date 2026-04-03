@@ -69,6 +69,35 @@ public class AdminServiceImpl implements AdminService{
 	    return result;
 	}
 	
+	@Override
+	@Transactional
+	public int realDeleteMember(int memNo) {
+
+	    // 1. 좋아요 먼저
+	    adminDao.deleteBoardLikeByMemNo(memNo);
+	    adminDao.deleteReplyLikeByMemNo(memNo);
+
+	    // 2. 댓글 삭제
+	    adminDao.deleteReplyByMemNo(memNo);
+
+	    // 3. 게시글 삭제
+	    adminDao.deleteBoardByMemNo(memNo);
+
+	    // 4. 신고 삭제
+	    adminDao.deleteReportByMemNo(memNo);
+
+	    // 5. 회원 직접 참조 테이블 삭제
+	    adminDao.deleteAuthoritiesByMemNo(memNo);
+	    adminDao.deleteAttendanceByMemNo(memNo);
+	    adminDao.deleteUserPointByMemNo(memNo);
+	    adminDao.deleteLectureAssessmentByMemNo(memNo);
+	    adminDao.deleteScheduleByMemNo(memNo);
+	    adminDao.deleteFriendsByMemNo(memNo);
+
+	    // 6. 마지막 회원 삭제
+	    return adminDao.deleteMemberByMemNo(memNo);
+	}
+	
 	// 회원 승인관리 리스트
 	@Override
 	public List<Member> selectMemberJoinList(int uniNo, String condition, String keyword) {
@@ -241,5 +270,7 @@ public class AdminServiceImpl implements AdminService{
 	public List<Map<String, Object>> selectRecentReports(int uniNo) {
 		return adminDao.selectRecentReports(uniNo);
 	}
+
+	
 
 }

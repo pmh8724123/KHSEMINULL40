@@ -194,4 +194,64 @@ public class AdminDaoImpl implements AdminDao {
 	    return session.selectOne("admin.selectDashboardCounts", uniNo);
 	}
 	
+	@Override
+	public int deleteBoardLikeByMemNo(int memNo) {
+	    return session.delete("admin.deleteBoardLikeByMemNo", memNo);
+	}
+
+	@Override
+	public int deleteReplyLikeByMemNo(int memNo) {
+	    return session.delete("admin.deleteReplyLikeByMemNo", memNo);
+	}
+
+	@Override
+	public int deleteReplyByMemNo(int memNo) {
+	    return session.delete("admin.deleteReplyByMemNo", memNo);
+	}
+
+	@Override
+	public int deleteBoardByMemNo(int memNo) {
+	    return session.delete("admin.deleteBoardByMemNo", memNo);
+	}
+
+	@Override
+	public int deleteReportByMemNo(int memNo) {
+	    return session.delete("admin.deleteReportByMemNo", memNo);
+	}
+
+	@Override
+	public int deleteAuthoritiesByMemNo(int memNo) {
+	    return session.delete("admin.deleteAuthoritiesByMemNo", memNo);
+	}
+
+	@Override
+	public int deleteAttendanceByMemNo(int memNo) {
+	    return session.delete("admin.deleteAttendanceByMemNo", memNo);
+	}
+
+	@Override
+	public int deleteUserPointByMemNo(int memNo) {
+	    return session.delete("admin.deleteUserPointByMemNo", memNo);
+	}
+
+	@Override
+	public int deleteLectureAssessmentByMemNo(int memNo) {
+	    return session.delete("admin.deleteLectureAssessmentByMemNo", memNo);
+	}
+
+	@Override
+	public int deleteScheduleByMemNo(int memNo) {
+	    return session.delete("admin.deleteScheduleByMemNo", memNo);
+	}
+
+	@Override
+	public int deleteFriendsByMemNo(int memNo) {
+	    return session.delete("admin.deleteFriendsByMemNo", memNo);
+	}
+
+	@Override
+	public int deleteMemberByMemNo(int memNo) {
+	    return session.delete("admin.deleteMemberByMemNo", memNo);
+	}
+	
 }
