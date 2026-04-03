@@ -1,6 +1,7 @@
 package com.kh.cam.mypage.model.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,8 +24,8 @@ public class ScheduleServiceImpl implements ScheduleService{
     }
 	
 	@Override
-	public List<Lecture> searchLecture(String keyword) {
-	    return scheduleDao.searchLecture(keyword);
+	public List<Lecture> searchLecture(Map<String, Object> map) {
+	    return scheduleDao.searchLecture(map);
 	}
 	
 
