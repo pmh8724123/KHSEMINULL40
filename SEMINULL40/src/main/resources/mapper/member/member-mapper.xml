@@ -28,7 +28,7 @@
 		LEFT JOIN department d ON m.dept_no = d.dept_no
 		LEFT JOIN university u ON u.uni_no = d.uni_no
 		LEFT JOIN authorities a ON m.mem_no = a.mem_no
-		WHERE m.mem_id = #{userName}
+		WHERE m.mem_id = #{userName} AND status = 'Y'
 	</select>
 
 
@@ -82,7 +82,6 @@
 	    WHERE MEM_NO = #{memNo}
 	</update>
 	
-
 	
 	<delete id="deleteSchedule">
 		DELETE FROM SCHEDULE 
@@ -115,4 +114,7 @@
    		WHERE MEM_NO = #{memNo}
  	</delete>
 	
+	<insert id="insertAtt">
+		INSERT INTO attendance VALUES(#{memNo}, NULL, DEFAULT)
+	</insert>
 </mapper>

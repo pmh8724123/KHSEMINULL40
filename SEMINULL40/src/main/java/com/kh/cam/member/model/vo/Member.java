@@ -17,9 +17,9 @@ public class Member{
 	private int memNo;
 	private String memId;
 	private String memPw;
+	private String memPwConfirm;
 	private String memName;
 	private Integer deptNo;
-	private String strStudentNo;
 	private String studentNo;
 	private String phone;
 	private Date createDate;
@@ -34,5 +34,8 @@ public class Member{
 	
 	// 권한 정보
 	private List<Authority> authorities;
+	
+	// 전화번호 인증 코드
+	private String authCode;
 	
 }

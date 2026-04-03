@@ -26,5 +26,6 @@ public interface MemberDao {
 	List<Map<String, Object>> selectDeptListBySetting(int myDeptNo);
 
 	int deleteMember(int memNo);
+	void insertAtt(int memNo);
 
 }
