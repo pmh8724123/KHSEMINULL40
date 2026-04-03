@@ -83,7 +83,7 @@
 	</update>
 	
 	
-	<delete id="deleteSchedule">
+<!-- 	<delete id="deleteSchedule">
 		DELETE FROM SCHEDULE 
 		WHERE MEM_NO = #{memNo}
 	</delete>
@@ -107,12 +107,13 @@
  	<delete id="deleteUserpoint">
    		DELETE FROM USER_POINT 
    		WHERE MEM_NO = #{memNo}
- 	</delete>
+ 	</delete> -->
  	
- 	 <delete id="deleteMember">
-   		DELETE FROM MEMBER
-   		WHERE MEM_NO = #{memNo}
- 	</delete>
+ 	 <update id="deleteMember">
+   		UPDATE MEMBER
+   		SET STATUS = 'N'
+   		WHERE MEM_NO = ${memNo}
+ 	</update>
 	
 	<insert id="insertAtt">
 		INSERT INTO attendance VALUES(#{memNo}, NULL, DEFAULT)

@@ -39,6 +39,7 @@
 	margin: 50px auto; /* 좌우 여백 확보 (작은 화면 대비) */
 	padding: 0 16px;
 	box-sizing: border-box;
+	margin-bottom: 250px;
 }
 
 /* ── 페이지 제목 ────────────────────────────────
@@ -1141,15 +1142,15 @@
 					<div id="updateFields">
 						<div class="setting-field">
 							<label>아이디</label> <input type="text" id="settingId"
-								value="${loginUser.memId}" disabled>
+								placeholder="새 아이디를 입력하세요" value="${loginUser.memId}" disabled>
 						</div>
 						<div class="setting-field">
 							<label>학번</label> <input type="text" id="settingStuNo"
-								value="${loginUser.studentNo}" disabled>
+								placeholder="새 학번을 입력하세요" value="${loginUser.studentNo}" disabled>
 						</div>
 						<div class="setting-field">
 							<label>전화번호</label> <input type="text" id="settingPhone"
-								value="${loginUser.phone}" disabled>
+							placeholder="새  전화번호를 입력하세요" value="${loginUser.phone}" disabled>
 						</div>
 						<div class="setting-field">
 							<label>학과 선택</label> <select id="settingDeptNo" disabled>
@@ -1158,11 +1159,11 @@
 						</div>
 						<div class="setting-field">
 							<label>새 비밀번호</label> <input type="password" id="settingNewPw"
-								placeholder="변경 시에만 입력" disabled>
+								placeholder="새 비밀번호를 입력하세요" disabled>
 						</div>
 						<div class="setting-field">
 							<label>새 비밀번호 확인</label> <input type="password"
-								id="settingNewPwCk" placeholder="새 비밀번호 다시 입력" disabled>
+								id="settingNewPwCk" placeholder="새 비밀번호를 다시 입력하세요" disabled>
 						</div>
 
 						<div class="setting-hint" id="settingHint"></div>
@@ -1314,4 +1315,4 @@
 <!-- /mypage-container -->
 
 
-<jsp:include page="/WEB-INF/views/common2/footer.jsp" />
+<jsp:include page="/WEB-INF/views/common/footer.jsp" />

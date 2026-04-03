@@ -34,14 +34,14 @@
 <body>
 
 	<div class="container">
-		<jsp:include page="/WEB-INF/views/common2/header.jsp" />
+		<jsp:include page="/WEB-INF/views/common/header.jsp" />
 		<!-- 광고 영역 -->
 
 		<!-- 메인 영역 -->
 		<main class="content"></main>
 
 	</div>
-	<jsp:include page="/WEB-INF/views/common2/footer.jsp" />
+	<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 </body>
 </html>
 
