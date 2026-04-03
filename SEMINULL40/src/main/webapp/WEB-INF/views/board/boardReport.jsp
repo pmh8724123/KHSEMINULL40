@@ -99,7 +99,6 @@
             <option value="3">불법 정보 및 범죄</option>
             <option value="4">음란성 / 선정성</option>
             <option value="5">운영방해</option>
-            <option value="6">기타</option>
         </select>
 
         <div id="otherReasonArea">
