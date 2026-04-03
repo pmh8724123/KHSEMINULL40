@@ -440,7 +440,7 @@
 		<selectKey keyProperty="uniNo" resultType="int" order="BEFORE">
 			SELECT seq_uni.NEXTVAL FROM dual
 		</selectKey>
-		INSERT INTO university VALUES(#{uniNo}, #{uniName})
+		INSERT INTO university VALUES(SEQ_UNI.CURRVAL, #{uniName}, DEFAULT)
 	</insert>
 
 	<update id="updateUni">

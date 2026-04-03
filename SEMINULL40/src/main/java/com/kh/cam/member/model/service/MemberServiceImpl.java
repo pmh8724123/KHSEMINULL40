@@ -34,7 +34,8 @@ public class MemberServiceImpl implements MemberService {
 	
 	@Override
 	public int insertMember(Member member) {
-		
+		if(authCode == null) {
+		}
 		
 		return mDao.insertMember(member);
 	}
