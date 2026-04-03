@@ -66,9 +66,8 @@
 			<div class="footer-center">
 				<div>
 					<h4>고객지원</h4>
-					<a href="#">공지사항</a><br>
-					
-					<a href="#">Q&A(문의하기)</a>
+					<a href="${pageContext.request.contextPath}/information/informationNotice">공지사항</a><br>
+					<a href="${pageContext.request.contextPath}/information/qna">문의하기</a>
 				</div>
 				<div>
 					<h4>정보</h4>

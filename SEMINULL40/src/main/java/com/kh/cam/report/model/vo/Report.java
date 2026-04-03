@@ -23,5 +23,6 @@ public class Report {
 	private Date contentCreateDate;
 	private String reportMemName;
 	private int boardNo;
-	
+	private Date reportDate;
+	private String uniName;
 }

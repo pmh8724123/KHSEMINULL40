@@ -27,26 +27,15 @@
 
 			<h2>신고 내역</h2>
 
-			<div class="filter-box">
-				<div class="filter-left">
-					<select>
-						<option>전체</option>
-						<option>신고유형</option>
-						<option>신고자</option>
-						<option>상태</option>
-						<option>처리</option>
-					</select> <input type="text" placeholder="검색어 입력">
-					<button>검색</button>
-				</div>
-			</div>
-
-
 			<div class="table-container">
 
 				<table>
 					<thead>
 						<tr>
 							<th>NO</th>
+							<c:if test="${loginUser.uniNo == 0}">
+								<th>대학교명</th>
+							</c:if>
 							<th>컨텐츠 유형</th>
 							<th>작성자</th>
 							<th>작성 날짜</th>
@@ -61,24 +50,27 @@
 						<c:forEach var="r" items="${list}" varStatus="status">
 							<tr>
 								<td>${status.index + 1}</td>
+								<c:if test="${loginUser.uniNo == 0}">
+									<td>${r.uniName}</td>
+								</c:if>
 								<td>${r.contentType}</td>
 								<td>${r.writerName}</td>
-								<td><fmt:formatDate value="${r.contentCreateDate}"
-										pattern="yyyy-MM-dd HH:mm:ss" /></td>
+								<td>
+									<fmt:formatDate value="${r.contentCreateDate}" pattern="yyyy-MM-dd HH:mm:ss" /></td>
 								<td>${r.reasonName}</td>
 								<td>${r.reportMemName}</td>
-								<td>-</td>
+								<td>
+									<fmt:formatDate value="${r.reportDate}" pattern="yyyy-MM-dd HH:mm:ss" />
+								</td>
 								<td>
 									<button class="btn btn-approve" type="button"
 										onclick="location.href='${pageContext.request.contextPath}/board/detail?boardno=${r.boardNo}'">
 										바로가기</button>
 
 									<form
-										action="${pageContext.request.contextPath}/admin/report/delete"
-										method="post" style="display: inline;">
+										action="${pageContext.request.contextPath}/admin/report/delete" method="post" style="display: inline;">
 										<input type="hidden" name="reportNo" value="${r.reportNo}">
-										<input type="hidden" name="${_csrf.parameterName}"
-											value="${_csrf.token}">
+										<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
 										<button class="btn btn-delete" type="submit"
 											onclick="return confirm('이 신고 내역을 삭제하시겠습니까?');">삭제</button>
 									</form>
