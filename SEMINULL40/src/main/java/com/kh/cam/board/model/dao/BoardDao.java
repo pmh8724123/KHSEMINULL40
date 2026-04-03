@@ -43,4 +43,5 @@ public interface BoardDao {
 	List<Map<String, Object>> selectCategoryList(SqlSessionTemplate sqlSession, int uniNo);
 
 
+
 }

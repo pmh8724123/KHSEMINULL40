@@ -61,4 +61,8 @@ public interface AdminService {
 
 	int deleteReport(int reportNo);
 
+	Map<String, Object> selectDashboardCounts(int uniNo);
+
+	List<Map<String, Object>> selectRecentReports(int uniNo);
+
 }

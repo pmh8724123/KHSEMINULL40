@@ -36,7 +36,23 @@ public class AdminController {
 
 	// 관리자 메인
 	@GetMapping("/main")
-	public String adminMain() {
+	public String adminMain(Model model) {
+		// 로그인한 관리자 정보에서 uniNo 가져오기
+		CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
+								  .getPrincipal();
+		int uniNo = user.getMember().getUniNo();
+		
+		// 통계 데이터 조회
+		Map<String, Object> counts = adminService.selectDashboardCounts(uniNo);
+		
+		// 최근 신고 목록 조회
+		List<Map<String,Object>> reports = adminService.selectRecentReports(uniNo);
+		
+		// 데이터 전달
+		model.addAttribute("counts", counts);
+		model.addAttribute("reports", reports);
+		model.addAttribute("loginUser", user.getMember());
+		
 		return "admin/adminMain";
 	}
 

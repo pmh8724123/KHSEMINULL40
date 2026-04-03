@@ -183,5 +183,15 @@ public class AdminDaoImpl implements AdminDao {
 	public int deleteReport(int reportNo) {
 		return session.delete("admin.deleteReport", reportNo);
 	}
+
+	@Override
+	public List<Map<String, Object>> selectRecentReports(int uniNo) {
+	    return session.selectList("admin.selectRecentReports", uniNo);
+	}
+
+	@Override
+	public Map<String, Object> selectDashboardCounts(int uniNo) {
+	    return session.selectOne("admin.selectDashboardCounts", uniNo);
+	}
 	
 }

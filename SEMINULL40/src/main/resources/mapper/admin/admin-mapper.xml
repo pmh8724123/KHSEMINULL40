@@ -533,5 +533,68 @@
 	
 	<!--★★★★★★★★★★★★★★★★★ 신고관리 END ★★★★★★★★★★★★★★★★★ -->
 	
+	<!--★★★★★★★★★★★★★★★★★ 대시보드 통계 카운트 조회 ★★★★★★★★★★★★★★★★★ -->
+	<select id="selectDashboardCounts" parameterType="int" resultType="hashmap">
+	    SELECT 
+	        /* 1. 총 회원 (마스터 제외, 활동중인 유저) */
+	        (SELECT COUNT(*) FROM MEMBER M
+	         WHERE M.STATUS = 'Y' AND M.MEM_NO != 0
+	         <if test="uniNo != 0"> 
+	           AND M.DEPT_NO IN (SELECT DEPT_NO FROM DEPARTMENT WHERE UNI_NO = #{uniNo}) 
+	         </if>
+	        ) AS TOTAL_MEM,
+	
+	        /* 2. 가입 대기 (STATUS='Y'인데 ROLE_USER 권한이 없는 유저) */
+	        (SELECT COUNT(*) FROM MEMBER M
+	         WHERE M.STATUS = 'Y' AND M.MEM_NO != 0
+	         AND NOT EXISTS (
+	            SELECT 1 FROM AUTHORITIES A 
+	            WHERE A.MEM_NO = M.MEM_NO 
+	            AND A.AUTHORITY = 'ROLE_USER'
+	         )
+	         <if test="uniNo != 0"> 
+	           AND M.DEPT_NO IN (SELECT DEPT_NO FROM DEPARTMENT WHERE UNI_NO = #{uniNo}) 
+	         </if>
+	        ) AS PENDING_MEM,
+	
+	        /* 3. 정지 회원 */
+	        (SELECT COUNT(*) FROM MEMBER M
+	         WHERE M.STATUS = 'B'
+	         <if test="uniNo != 0"> 
+	           AND M.DEPT_NO IN (SELECT DEPT_NO FROM DEPARTMENT WHERE UNI_NO = #{uniNo}) 
+	         </if>
+	        ) AS BANNED_MEM,
+	
+	        /* 4. 신고 건수 (전체) */
+	        (SELECT COUNT(*) FROM REPORT) AS REPORT_COUNT,
+	
+	        /* 5. 게시글 수 */
+	        (SELECT COUNT(*) FROM BOARD B
+	         WHERE B.STATUS = 'Y'
+	         <if test="uniNo != 0"> 
+	           AND B.UBTYPE_NO IN (SELECT UBTYPE_NO FROM UNI_BOARD_TYPE WHERE UNI_NO = #{uniNo}) 
+	         </if>
+	        ) AS BOARD_COUNT,
+	
+	        /* 6. 학교 수 */
+	        (SELECT COUNT(*) FROM UNIVERSITY WHERE STATUS = 'Y') AS UNI_COUNT
+	    FROM DUAL
+	</select>
+	
+	<select id="selectRecentReports" parameterType="int" resultType="hashmap">
+	    SELECT * FROM (
+	        SELECT 
+	            R.REPORT_NO AS REPORT_NO,
+	            M.MEM_ID AS MEM_ID,
+	            RR.REASON_NAME AS REASON_NAME,
+	            R.CREATE_DATE AS CREATE_DATE
+	        FROM REPORT R
+	        JOIN MEMBER M ON R.REPORT_MEM = M.MEM_NO
+	        JOIN REPORT_REASON RR ON R.REASON_NO = RR.REASON_NO
+	        ORDER BY R.REPORT_NO DESC
+	    ) WHERE ROWNUM &lt;= 5
+	</select>
+	
+	
 	
 </mapper>
