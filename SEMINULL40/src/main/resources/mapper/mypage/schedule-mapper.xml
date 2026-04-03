@@ -74,8 +74,13 @@
 			LECTURE_NO, SCHEDULE_DAY, START_TIME, END_TIME
 		)
 		VALUES (
-		SEQ_SCHEDULE.NEXTVAL, #{memNo}, #{schtitleNo},
-		#{lectureNo}, #{scheduleDay}, #{startTime}, #{endTime}
+		SEQ_SCHEDULE.NEXTVAL,
+		#{memNo},
+		#{schtitleNo},
+		#{lectureNo},
+		#{scheduleDay},
+		#{startTime},
+		#{endTime}
 		)
 	</insert>
 

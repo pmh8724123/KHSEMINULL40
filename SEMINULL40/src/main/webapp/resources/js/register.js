@@ -132,3 +132,35 @@ phone.addEventListener("input", function() {
 
 	pMsg.innerHTML = "&nbsp;";
 });
+
+
+// 전화번호 인증 코드
+let isPhoneVerified = false;
+
+
+		
+// 인증번호 요청
+document.getElementById("sendCodeBtn").addEventListener("click", function() {
+	const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+	const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+	const phone = document.getElementById("phone").value;
+			
+	if(!phone) {
+		document.getElementById("phoneMsg").innerHTML = "전화번호의 값이 옳지 않습니다.";
+		return;
+	}
+	
+	fetch(contextPath + '/member/sendSms', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			[csrfHeader]: csrfToken
+		},
+		body: JSON.stringify({phone:phone})
+	})
+	.then(res => res.text())
+	.then(data => {
+		alert("인증번호가 전송되었습니다.");
+	});
+});

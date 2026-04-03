@@ -26,6 +26,9 @@ public interface MemberService extends UserDetailsService {
 	List<Map<String, Object>> selectDeptListBySetting(int myDeptNo);
 
 	int deleteMember(int memNo);
+	void sendSms(String phone);
+
+	void register(Member member);
 
 
 }

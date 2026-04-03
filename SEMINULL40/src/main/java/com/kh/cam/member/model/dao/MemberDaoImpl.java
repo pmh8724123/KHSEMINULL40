@@ -69,7 +69,10 @@ public class MemberDaoImpl implements MemberDao {
 		
 		return session.delete("member.deleteMember", memNo);
 		
-		
+	}
+	
+	public void insertAtt(int memNo) {
+		session.insert("member.insertAtt", memNo);
 	}
 
 }
