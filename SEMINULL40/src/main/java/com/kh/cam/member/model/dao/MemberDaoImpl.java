@@ -60,14 +60,14 @@ public class MemberDaoImpl implements MemberDao {
 	@Override
 	public int deleteMember(int memNo) {
 		
-		session.delete("member.deleteAuthorities", memNo);
-		session.delete("member.deleteFriends", memNo);
-		session.delete("member.deleteAttendance", memNo);
-		session.delete("member.deleteUserpoint", memNo);
-		session.delete("member.deleteSchedule", memNo);
+//		session.delete("member.deleteAuthorities", memNo);
+//		session.delete("member.deleteFriends", memNo);
+//		session.delete("member.deleteAttendance", memNo);
+//		session.delete("member.deleteUserpoint", memNo);
+//		session.delete("member.deleteSchedule", memNo);
 
 		
-		return session.delete("member.deleteMember", memNo);
+		return session.update("member.deleteMember", memNo);
 		
 	}
 	

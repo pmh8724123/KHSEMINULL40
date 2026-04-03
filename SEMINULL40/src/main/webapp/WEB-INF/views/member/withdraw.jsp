@@ -201,4 +201,4 @@
 </script>
 
 
-<jsp:include page="/WEB-INF/views/common2/footer.jsp" />
+<jsp:include page="/WEB-INF/views/common/footer.jsp" />
