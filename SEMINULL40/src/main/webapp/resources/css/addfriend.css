@@ -156,3 +156,100 @@ body {
 	border-color: #ddd;
 	cursor: default;
 }
+
+
+/* ── 레이아웃 보완 (화면 꽉 채우기) ── */
+.friends-layout-container {
+    display: flex;
+    max-width: 1000px; /* 적절한 너비 제한 */
+    margin: 40px auto;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+/* 메인 랩퍼들 너비 고정 해제 및 확장 */
+.addfriend-wrap {
+    flex: 2; /* 70% 차지 */
+    background: #fff;
+    border: 1px solid #c8d8f0;
+    border-radius: 12px;
+    padding: 24px;
+    min-height: 500px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* 사이드바 스타일 */
+.friends-side-info {
+    flex: 1; /* 30% 차지 */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.side-card {
+    background: #f8f9fb;
+    border: 1px solid #e3e9f3;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.side-card h4 {
+    color: #4a90e2;
+    font-size: 14px;
+    margin: 0 0 10px 0;
+}
+
+.side-card p {
+    font-size: 13px;
+    color: #6b8aaa;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ── 기존 컴포넌트 디자인 강화 ── */
+.search-box {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+#searchInput {
+    flex: 1;
+    height: 44px;
+    border: 2px solid #f2f2f2;
+    border-radius: 8px;
+    padding: 0 15px;
+    font-size: 14px;
+}
+
+#searchInput:focus {
+    border-color: #4a90e2;
+    outline: none;
+}
+
+.search-btn {
+    background: #4a90e2;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.result-item, .pending-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-bottom: 1px solid #f8f8f8;
+    background: #fff;
+}
+
+/* 비어있을 때 디자인 */
+.result-guide, .result-empty, .pending-empty {
+    text-align: center;
+    padding: 80px 0;
+    color: #aaa;
+    font-size: 15px;
+}

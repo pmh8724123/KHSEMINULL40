@@ -61,17 +61,58 @@
 		SELECT mem_id FROM member WHERE mem_name = #{memName} AND phone = #{phone}
 	</select>
 	
+	<select id="selectDeptListBySetting" parameterType="int" resultType="Map">
+    	SELECT DEPT_NO, DEPT_NAME
+   		FROM DEPARTMENT
+    	WHERE UNI_NO = (SELECT UNI_NO FROM DEPARTMENT WHERE DEPT_NO = #{deptNo})
+    	ORDER BY DEPT_NAME ASC
+	</select>
+	
+	
 	
 	<update id="updateMember" parameterType="Member">
 	    UPDATE MEMBER
 		<set>
-	        <if test="memName != null and memName != ''">MEM_NAME = #{memName},</if>
-	        <if test="phone != null and phone != ''">PHONE = #{phone},</if>
+	        <if test="memId != null and memId != ''">MEM_ID = #{memId},</if>
 	        <if test="studentNo != null and studentNo != ''">STUDENT_NO = #{studentNo},</if>
+	       	<if test="phone != null and phone != ''">PHONE = #{phone},</if>
 	        <if test="deptNo != null and deptNo != ''">DEPT_NO = #{deptNo},</if>
 	        <if test="memPw != null and memPw != ''">MEM_PW = #{memPw},</if>
     	</set>
-	    WHERE MEM_ID = #{memId}
+	    WHERE MEM_NO = #{memNo}
 	</update>
+	
+
+	
+	<delete id="deleteSchedule">
+		DELETE FROM SCHEDULE 
+		WHERE MEM_NO = #{memNo}
+	</delete>
+	
+	<delete id="deleteAuthorities">
+		DELETE FROM AUTHORITIES
+		WHERE MEM_NO = #{memNo}
+	</delete>
+	
+	
+	<delete id="deleteAttendance">
+   		DELETE FROM ATTENDANCE 
+   		WHERE MEM_NO = #{memNo}
+	</delete>
+	
+	<delete id="deleteFriends">
+   		DELETE FROM FRIENDS 
+   		WHERE SENDER_NO = #{memNo} OR RECEIVER_NO = #{memNo}
+ 	</delete>
+ 	
+ 	<delete id="deleteUserpoint">
+   		DELETE FROM USER_POINT 
+   		WHERE MEM_NO = #{memNo}
+ 	</delete>
+ 	
+ 	 <delete id="deleteMember">
+   		DELETE FROM MEMBER
+   		WHERE MEM_NO = #{memNo}
+ 	</delete>
 	
 </mapper>

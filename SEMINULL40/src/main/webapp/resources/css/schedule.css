@@ -246,10 +246,16 @@
 	min-height: 16px;
 }
 
+
+
+
+
+
 /* ── 강의 추가 모달 영역 ─────────────────────── */
 .tt-overlay {
 	display: none;
 	margin-top: 12px;
+	backdrop-filter: blur(2px); /* 배경 살짝 흐리게 */
 }
 
 .tt-overlay.open {
@@ -301,6 +307,30 @@
 	font-size: 13px;
 	font-weight: 500;
 	cursor: pointer;
+}
+
+.tt-modal-content {
+    border: none !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+    padding: 25px !important;
+}
+
+.tt-modal-content h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 5px !important;
+}
+
+.tt-modal-content hr {
+    border: 0;
+    border-top: 1px solid #eee;
+    margin: 15px 0;
+}
+
+.tt-modal-content label {
+    font-size: 12px;
+    color: #888;
+    font-weight: 600;
 }
 
 .btn-tt-confirm {
@@ -356,4 +386,86 @@
 .tt-dropdown-item.drag-over {
     border-top: 2px solid #4a90e2;
     background: #f0f7ff;
+}
+
+/* 1. 친구 시간표 조회 알림 바 디자인 개선 */
+.tt-friend-notice {
+    background: #f0f7ff !important;
+    border: 1px solid #c8d8f0;
+    padding: 12px;
+    text-align: center;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.tt-friend-notice strong {
+    color: #4a90e2;
+    font-size: 13px;
+}
+
+.tt-friend-notice button {
+    background: #fff !important;
+    border: 1px solid #d1d1d1 !important;
+    color: #666 !important;
+    padding: 4px 10px !important;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tt-friend-notice button:hover {
+    background: #f5f5f5 !important;
+}
+
+
+
+.tt-modal-content select {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #f9f9f9;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.tt-modal-content select:focus {
+    border-color: #4a90e2;
+}
+
+/* 모달 내 버튼 디자인 */
+.tt-modal-content button {
+    font-weight: 700;
+    font-size: 13px;
+    transition: opacity 0.2s;
+}
+
+.tt-modal-content button:last-child {
+    background: #4a90e2 !important; /* 추가 버튼 */
+}
+
+.tt-modal-content button:first-child {
+    background: #eee !important; /* 취소 버튼 */
+    color: #666 !important;
+}
+
+/* 3. 드롭다운 버튼 (ttTitleBtn) 세부 조정 */
+#ttTitleBtn {
+    all: unset; /* 기본 버튼 스타일 제거 */
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: #fff;
+    border: 1px solid #c8d8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    color: #1a3a5c;
+    font-size: 14px;
 }

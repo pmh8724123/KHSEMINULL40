@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kh.cam.common.model.vo.Department;
 import com.kh.cam.common.model.vo.University;
@@ -48,6 +49,27 @@ public class MemberDaoImpl implements MemberDao {
 	@Override
 	public int updateMember(Member inputMember) {
 		return session.update("member.updateMember", inputMember);
+	}
+
+	@Override
+	public List<Map<String, Object>> selectDeptListBySetting(int myDeptNo) {
+		return session.selectList("member.selectDeptListBySetting", myDeptNo);
+	}
+
+	@Transactional
+	@Override
+	public int deleteMember(int memNo) {
+		
+		session.delete("member.deleteAuthorities", memNo);
+		session.delete("member.deleteFriends", memNo);
+		session.delete("member.deleteAttendance", memNo);
+		session.delete("member.deleteUserpoint", memNo);
+		session.delete("member.deleteSchedule", memNo);
+
+		
+		return session.delete("member.deleteMember", memNo);
+		
+		
 	}
 
 }
