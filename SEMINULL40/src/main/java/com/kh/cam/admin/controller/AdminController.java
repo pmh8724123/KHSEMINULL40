@@ -407,6 +407,8 @@ public class AdminController {
 	
 	@PostMapping("/university/insert")
 	public String insertUni(@ModelAttribute University uni, RedirectAttributes ra) {
+		System.out.println(uni);
+		
 		try {
 	        adminService.insertUni(uni);
 
@@ -414,6 +416,7 @@ public class AdminController {
 	        ra.addFlashAttribute("type", "success");
 
 	    } catch (Exception e) {
+	    	e.printStackTrace();
 	        ra.addFlashAttribute("msg", "등록 실패");
 	        ra.addFlashAttribute("type", "error");
 	    }
