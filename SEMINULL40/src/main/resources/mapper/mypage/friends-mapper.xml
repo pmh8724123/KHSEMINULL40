@@ -39,23 +39,22 @@
 		테이블 LEFT JOIN으로 확인 -->
 	<select id="searchMember" resultType="Friends">
 		SELECT
-		m.MEM_NO,
-		m.MEM_NAME,
-		f.STATUS
+			m.MEM_NO,
+			m.MEM_NAME,
+			f.STATUS
 		FROM MEMBER m
 		LEFT JOIN FRIENDS f ON (
-		(f.SENDER_NO =
-		#{senderNo} AND
-		f.RECEIVER_NO = m.MEM_NO)
-		OR
-		(f.SENDER_NO = m.MEM_NO AND
-		f.RECEIVER_NO =
-		#{senderNo})
+			(f.SENDER_NO = #{senderNo} AND f.RECEIVER_NO = m.MEM_NO)
+			OR
+			(f.SENDER_NO = m.MEM_NO AND f.RECEIVER_NO = #{senderNo})
 		)
-		WHERE m.MEM_NAME LIKE '%' || #{keyword} ||
-		'%'
-		AND
-		m.MEM_NO != #{senderNo}
+		WHERE m.MEM_NAME LIKE '%' || #{keyword} || '%'
+		AND m.MEM_NO != #{senderNo}
+		AND m.MEM_NO NOT IN (
+        	SELECT MEM_NO 
+        	FROM AUTHORITIES 
+       		WHERE AUTHORITY IN ('ROLE_ADMIN', 'ROLE_MASTER')
+    	)
 		ORDER BY m.MEM_NAME ASC
 	</select>
 

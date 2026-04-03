@@ -1,6 +1,7 @@
 package com.kh.cam.mypage.model.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
@@ -38,8 +39,8 @@ public class ScheduleDaoImpl implements ScheduleDao {
 	}
 
 	@Override
-	public List<Lecture> searchLecture(String keyword) {
-		return sqlSession.selectList("schedule.searchLecture", keyword);
+	public List<Lecture> searchLecture(Map<String, Object> map) {
+		return sqlSession.selectList("schedule.searchLecture", map);
 	}
 	
 	@Override
