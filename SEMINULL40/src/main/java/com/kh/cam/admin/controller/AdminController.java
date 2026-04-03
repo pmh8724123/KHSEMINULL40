@@ -1,6 +1,5 @@
 package com.kh.cam.admin.controller;
 
-import java.io.Reader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +21,7 @@ import com.kh.cam.common.model.vo.University;
 import com.kh.cam.member.model.vo.CustomUserDetails;
 import com.kh.cam.member.model.vo.Member;
 import com.kh.cam.mypage.model.vo.Lecture;
+import com.kh.cam.report.model.vo.Report;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -341,18 +341,37 @@ public class AdminController {
 		return "admin/adminBoard";
 	}
 
-	// 댓글 관리
-	@GetMapping("/reply")
-	public String adminReply() {
-		return "admin/reply";
-	}
-
 // ---------------------신고관리----------------------------------
 	// 신고 관리
 	@GetMapping("/report")
-	public String report() {
+	public String ReportList(Model model) {
+		CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+		int uniNo = user.getMember().getUniNo();
+		
+		List<Report> list = adminService.selectReportList(uniNo);
+		
+		model.addAttribute("list", list);
+		model.addAttribute("loginUser", user.getMember());
+		
 		return "admin/report";
 	}
+	
+	@PostMapping("/report/delete")
+	public String deleteReport(@RequestParam("reportNo") int reportNo,
+			   RedirectAttributes ra) {
+		int result = adminService.deleteReport(reportNo);
+		
+		if(result > 0) {
+			ra.addFlashAttribute("msg", "신고 내역 삭제 완료");
+			ra.addFlashAttribute("type", "success");
+		} else {
+			ra.addFlashAttribute("msg", "신고 내역 삭제 실패");
+			ra.addFlashAttribute("type", "error");
+		}
+		return "redirect:/admin/report";
+	}
+	
 	
 // ---------------------마스터 계정 : 학교 관리------------------------
 	@GetMapping("/university")

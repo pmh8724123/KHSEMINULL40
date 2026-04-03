@@ -57,6 +57,10 @@ body {
 	cursor: pointer;
 }
 
+.siteMove {
+	background-color: #0000ff!important;
+}
+
 .header-right {
 	width: 33%;
 	text-align: right;

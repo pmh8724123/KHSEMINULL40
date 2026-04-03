@@ -406,6 +406,11 @@
 			</where>
 			ORDER BY B.BOARD_NO DESC
 		</select>
+		
+		<delete id="deleteReport" parameterType="int">
+			DELETE FROM REPORT
+			WHERE REPORT_NO = #{reportNo}
+		</delete>
 	
 	<!--★★★★★★★★★★★★★★★★★ 게시판 END ★★★★★★★★★★★★★★★★★ -->
 	
@@ -449,9 +454,52 @@
 		SET status = #{status}
 		WHERE uni_no = #{uniNo}
 	</update>
-	
-	
-	
-	
 	<!--★★★★★★★★★★★★★★★★★ 학교관리 END ★★★★★★★★★★★★★★★★★ -->
+	
+	<!--☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ 신고관리 START ☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ -->
+	<select id="selectReportList" resultType="Report">
+		SELECT
+			R.REPORT_NO AS reportNo,
+			CASE
+				WHEN R.TARGET_TYPE = 'BOARD' THEN '게시글'
+				WHEN R.TARGET_TYPE = 'REPLY' THEN '댓글'
+				ELSE R.TARGET_TYPE
+			END AS contentType,
+			CASE
+				WHEN R.TARGET_TYPE = 'BOARD' THEN BW.MEM_NAME
+				WHEN R.TARGET_TYPE = 'REPLY' THEN RW.MEM_NAME
+			END AS writerName,
+			CASE
+				WHEN R.TARGET_TYPE = 'BOARD' THEN B.CREATE_DATE
+				WHEN R.TARGET_TYPE = 'REPLY' THEN RP.CREATE_DATE
+			END AS contentCreateDate,
+			RR.REASON_NAME AS reasonName,
+			M.MEM_NAME AS reportMemName,
+			R.TARGET_TYPE AS targetType,
+			R.TARGET_NO AS targetNo,
+			CASE
+				WHEN R.TARGET_TYPE = 'BOARD' THEN B.BOARD_NO
+				WHEN R.TARGET_TYPE = 'REPLY' THEN RP.BOARD_NO
+			END AS boardNo
+		FROM REPORT R
+		LEFT JOIN REPORT_REASON RR
+			ON R.REASON_NO = RR.REASON_NO
+		LEFT JOIN BOARD B
+			ON R.TARGET_TYPE = 'BOARD'
+			AND R.TARGET_NO = B.BOARD_NO
+		LEFT JOIN MEMBER BW
+			ON B.BOARD_WRITER = BW.MEM_NO
+		LEFT JOIN REPLY RP
+			ON R.TARGET_TYPE = 'REPLY'
+			AND R.TARGET_NO = RP.REPLY_NO
+		LEFT JOIN MEMBER RW
+			ON RP.REPLY_WRITER = RW.MEM_NO
+		LEFT JOIN MEMBER M
+			ON R.REPORT_MEM = M.MEM_NO
+		ORDER BY R.REPORT_NO DESC
+	</select>
+	
+	<!--★★★★★★★★★★★★★★★★★ 신고관리 END ★★★★★★★★★★★★★★★★★ -->
+	
+	
 </mapper>
