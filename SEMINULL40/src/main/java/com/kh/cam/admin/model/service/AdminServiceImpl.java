@@ -232,4 +232,14 @@ public class AdminServiceImpl implements AdminService{
 		return adminDao.deleteReport(reportNo);
 	}
 
+	@Override
+	public Map<String, Object> selectDashboardCounts(int uniNo) {
+		return adminDao.selectDashboardCounts(uniNo);
+	}
+
+	@Override
+	public List<Map<String, Object>> selectRecentReports(int uniNo) {
+		return adminDao.selectRecentReports(uniNo);
+	}
+
 }

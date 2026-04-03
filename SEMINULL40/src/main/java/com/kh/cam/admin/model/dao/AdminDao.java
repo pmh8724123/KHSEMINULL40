@@ -71,4 +71,8 @@ public interface AdminDao {
 
 	int deleteReport(int reportNo);
 
+	List<Map<String, Object>> selectRecentReports(int uniNo);
+
+	Map<String, Object> selectDashboardCounts(int uniNo);
+
 }

@@ -124,15 +124,32 @@ public class BoardController {
 
 	@GetMapping("/updateForm")
 	public String updateForm(@RequestParam("boardno") int boardNo, Model model) {
-		model.addAttribute("b", boardService.selectBoard(boardNo));
+		// 1. 수정할 게시글 상세 정보 조회
+		Board b = boardService.selectBoard(boardNo);
+		
+		// 2. 카테고리 목록을 불러오기 위해 학교 번호(uniNo) 가져오기
+		// 게시글 정보(b)에 담긴 uniNo를 쓰거나, 로그인한 사용자의 uniNo를 씁니다.
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		int uniNo = 0;
+		if (auth != null && auth.getPrincipal() instanceof CustomUserDetails) {
+			uniNo = ((CustomUserDetails)auth.getPrincipal()).getMember().getUniNo();
+		}
+		
+		// 3. ⭐ 이 코드가 추가되어야 카테고리가 나옵니다! ⭐
+		List<Map<String, Object>> catList = boardService.selectCategoryList(uniNo);
+		model.addAttribute("catList", catList);
+		
+		// 4. 기존 데이터 담기
+		model.addAttribute("b", b);
 		model.addAttribute("list", boardService.selectAttachmentList(boardNo));
+		
 		return "board/writeBoard";		
 	}
 	
 	@PostMapping("/update.bo")
 	public String updateBoard(Board b, 
-	                          @RequestParam(value="category", defaultValue="free") String category,
-                              @RequestParam(value="upfiles", required=false) MultipartFile[] upfiles, 
+	                          @RequestParam(value="category") String category, // defaultValue 제거 (필수값)
+	                          @RequestParam(value="upfiles", required=false) MultipartFile[] upfiles, 
 			                  @RequestParam(value="deleteFileNos", required=false) String deleteFileNos, 
 			                  HttpSession session) {
 		
@@ -142,17 +159,17 @@ public class BoardController {
             b.setBoardWriter(userDetails.getMember().getMemNo());
             b.setUniNo(userDetails.getMember().getUniNo()); 
             
-            String categoryName = "자유게시판"; 
-            if("qna".equals(category)) categoryName = "질문답변";
-            else if("accident".equals(category)) categoryName = "사건사고";
-            b.setCategoryName(categoryName);
+            // 🔥 [수정] 복잡한 if-else 제거. 
+            // JSP에서 넘어온 카테고리 이름(BTYPE_NAME)을 그대로 저장합니다.
+            b.setCategoryName(category);
         }
 
 		List<Attachment> list = new ArrayList<>();
 		if(upfiles != null) {
 			String savePath = session.getServletContext().getRealPath("/resources/upload_files/");
 			for(MultipartFile f : upfiles) {
-				if(!f.getOriginalFilename().equals("")) {
+				// 파일이 실제로 첨부되었을 때만 처리
+				if(f != null && !f.getOriginalFilename().equals("")) {
 					String changeName = saveFile(f, savePath);
 					Attachment at = new Attachment();
 					at.setOriginName(f.getOriginalFilename());
@@ -165,6 +182,8 @@ public class BoardController {
 		}	
 
 		int result = boardService.updateBoard(b, list, deleteFileNos);
+		
+		// 성공 시 상세페이지로 리다이렉트
 		return (result > 0) ? "redirect:/board/detail?boardno=" + b.getBoardNo() : "common/errorPage";
 	}
 	
@@ -273,7 +292,8 @@ public class BoardController {
 	public String insertReport(@RequestParam Map<String, Object> map) {
 		CustomUserDetails loginUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
-        map.put("reportMem", loginUser.getMember().getMemNo()); 
+	    map.put("reportMem", loginUser.getMember().getMemNo()); 
+	    
 
 	    return (boardService.insertReport(map) > 0) ? "success" : "fail";
 	}
