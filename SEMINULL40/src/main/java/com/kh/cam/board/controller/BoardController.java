@@ -270,15 +270,10 @@ public class BoardController {
 	
 	@ResponseBody
 	@PostMapping(value = "/report", produces = "text/html; charset=UTF-8")
-	public String insertReport(@RequestParam Map<String, Object> map, HttpSession session) {
-	    
-	    Member loginUser = (Member)session.getAttribute("loginUser");
-	    
-	    if(loginUser != null) {
-	        map.put("reportMem", loginUser.getMemNo()); 
-	    } else {
-	        map.put("reportMem", 1); 
-	    }
+	public String insertReport(@RequestParam Map<String, Object> map) {
+		CustomUserDetails loginUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		
+        map.put("reportMem", loginUser.getMember().getMemNo()); 
 
 	    return (boardService.insertReport(map) > 0) ? "success" : "fail";
 	}

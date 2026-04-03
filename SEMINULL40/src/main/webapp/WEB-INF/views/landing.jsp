@@ -196,7 +196,9 @@ body {
 		scope="application" />
 	<div class="login-container">
 		<div class="logo-section">
-			<div class="logo-circle"></div>
+			<div class="logo-circle">
+			    <img src="${pageContext.request.contextPath}/resources/images/logoImg.png" alt="로고">
+			</div>
 			<h1>캠둘기</h1>
 		</div>
 

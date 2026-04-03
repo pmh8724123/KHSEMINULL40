@@ -457,7 +457,7 @@
 	<!--★★★★★★★★★★★★★★★★★ 학교관리 END ★★★★★★★★★★★★★★★★★ -->
 	
 	<!--☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ 신고관리 START ☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆ -->
-	<select id="selectReportList" resultType="Report">
+	<select id="selectReportList" parameterType="map" resultType="Report">
 		SELECT
 			R.REPORT_NO AS reportNo,
 			CASE
@@ -475,27 +475,59 @@
 			END AS contentCreateDate,
 			RR.REASON_NAME AS reasonName,
 			M.MEM_NAME AS reportMemName,
+			R.CREATE_DATE AS reportDate,
 			R.TARGET_TYPE AS targetType,
 			R.TARGET_NO AS targetNo,
 			CASE
+				WHEN R.TARGET_TYPE = 'BOARD' THEN U1.UNI_NAME
+				WHEN R.TARGET_TYPE = 'REPLY' THEN U2.UNI_NAME
+			END AS uniName,
+			CASE
 				WHEN R.TARGET_TYPE = 'BOARD' THEN B.BOARD_NO
-				WHEN R.TARGET_TYPE = 'REPLY' THEN RP.BOARD_NO
+				WHEN R.TARGET_TYPE = 'REPLY' THEN RB.BOARD_NO
 			END AS boardNo
 		FROM REPORT R
 		LEFT JOIN REPORT_REASON RR
 			ON R.REASON_NO = RR.REASON_NO
+	
+		-- 게시글 신고
 		LEFT JOIN BOARD B
 			ON R.TARGET_TYPE = 'BOARD'
 			AND R.TARGET_NO = B.BOARD_NO
 		LEFT JOIN MEMBER BW
 			ON B.BOARD_WRITER = BW.MEM_NO
+		LEFT JOIN UNI_BOARD_TYPE UBT1
+			ON B.UBTYPE_NO = UBT1.UBTYPE_NO
+		LEFT JOIN UNIVERSITY U1
+			ON UBT1.UNI_NO = U1.UNI_NO
+	
+		-- 댓글 신고
 		LEFT JOIN REPLY RP
 			ON R.TARGET_TYPE = 'REPLY'
 			AND R.TARGET_NO = RP.REPLY_NO
 		LEFT JOIN MEMBER RW
 			ON RP.REPLY_WRITER = RW.MEM_NO
+		LEFT JOIN BOARD RB
+			ON RP.BOARD_NO = RB.BOARD_NO
+		LEFT JOIN UNI_BOARD_TYPE UBT2
+			ON RB.UBTYPE_NO = UBT2.UBTYPE_NO
+		LEFT JOIN UNIVERSITY U2
+			ON UBT2.UNI_NO = U2.UNI_NO
+	
+		-- 신고자
 		LEFT JOIN MEMBER M
 			ON R.REPORT_MEM = M.MEM_NO
+	
+		<where>
+			<if test="uniNo != 0">
+				(
+					(R.TARGET_TYPE = 'BOARD' AND UBT1.UNI_NO = #{uniNo})
+					OR
+					(R.TARGET_TYPE = 'REPLY' AND UBT2.UNI_NO = #{uniNo})
+				)
+			</if>
+		</where>
+	
 		ORDER BY R.REPORT_NO DESC
 	</select>
 	
