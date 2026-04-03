@@ -21,43 +21,51 @@
 </head>
 <body>
 
-	<div class="acceptfriend-wrap">
+	<body>
+	<div class="friends-layout-container">
+        
+        <div class="acceptfriend-wrap"> <div
+				class="acceptfriend-header">
+                <button class="back-btn" onclick="history.back()">&#8592;</button>
+                <h3>친구 수락</h3>
+                <c:if test="${not empty pendingList}">
+                    <span class="pending-count">${fn:length(pendingList)}건 대기중</span>
+                </c:if>
+            </div>
 
-		<!-- 헤더 -->
-		<div class="acceptfriend-header">
-			<button class="back-btn" onclick="history.back()">&#8592;</button>
-			<h3>친구 수락</h3>
-			<c:if test="${not empty pendingList}">
-				<span class="pending-count">${fn:length(pendingList)}건 대기중</span>
-			</c:if>
-		</div>
+            <c:if test="${empty pendingList}">
+                <div class="pending-empty">
+                    <div class="empty-icon">✉️</div>
+                    <p>대기 중인 친구 요청이 없습니다</p>
+                </div>
+            </c:if>
 
-		<!-- 대기 요청 없을 때 -->
-		<c:if test="${empty pendingList}">
-			<div class="pending-empty">대기 중인 친구 요청이 없습니다</div>
-		</c:if>
+            <c:if test="${not empty pendingList}">
+                <div class="pending-list" id="pendingList">
+                    <c:forEach var="p" items="${pendingList}">
+                        <div class="pending-item"
+							id="item-${p.senderNo}">
+                            <span class="pending-name">${p.friendName}</span>
+                            <div class="pending-actions">
+                                <button class="accept-btn"
+									onclick="handleRequest(${p.senderNo}, 'accept', this)">수락</button>
+                                <button class="reject-btn"
+									onclick="handleRequest(${p.senderNo}, 'reject', this)">거절</button>
+                            </div>
+                        </div>
+                    </c:forEach>
+                </div>
+            </c:if>
+        </div>
 
-		<!-- 대기 요청 목록 -->
-		<c:if test="${not empty pendingList}">
-			<div class="pending-list" id="pendingList">
-				<c:forEach var="p" items="${pendingList}">
-					<div class="pending-item" id="item-${p.senderNo}">
-						<span class="pending-name">${p.friendName}</span>
-						<div class="pending-actions">
-							<button class="accept-btn"
-								onclick="handleRequest(${p.senderNo}, 'accept', this)">
-								수락</button>
-							<button class="reject-btn"
-								onclick="handleRequest(${p.senderNo}, 'reject', this)">
-								거절</button>
-						</div>
-					</div>
-				</c:forEach>
-			</div>
-		</c:if>
+        <div class="friends-side-info">
+            <div class="side-card">
+                <h4>✅ 수락 대기 중</h4>
+                <p>나에게 친구 요청을 보낸 사용자 목록입니다. 수락 시 즉시 시간표가 공유됩니다.</p>
+            </div>
+        </div>
 
-	</div>
-
+    </div>
 	<script>
 		var token = $("meta[name='_csrf']").attr("content");
 		var header = $("meta[name='_csrf_header']").attr("content");
@@ -79,7 +87,7 @@
 
 	                item.querySelector('.pending-actions').innerHTML =
 	                    '<span class="done-msg">' +
-	                    (action === 'accept' ? '친구가 되었습니다' : '요청을 거절했습니다') +
+	                    (action === 'accept' ? '님과 친구가 되었습니다' : '요청을 거절했습니다') +
 	                    '</span>';
 
 	                // 1.5초 후 해당 아이템 제거
@@ -100,4 +108,6 @@
 </script>
 
 </body>
+
+
 </html>

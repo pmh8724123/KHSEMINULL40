@@ -20,29 +20,41 @@
 </head>
 <body>
 
-	<div class="addfriend-wrap">
 
-		<!-- 헤더 -->
-		<div class="addfriend-header">
-			<button class="back-btn" onclick="history.back()">&#8592;</button>
-			<h3>친구 추가</h3>
-		</div>
 
-		<!-- 검색창 -->
-		<div class="search-box">
-			<input type="text" id="searchInput" placeholder="이름으로 검색하세요"
-				onkeydown="if(event.key==='Enter') searchFriend()">
-			<button class="search-btn" onclick="searchFriend()">검색</button>
-		</div>
+	<body>
+	<div class="friends-layout-container">
+        
+        <div class="addfriend-wrap"> <div class="addfriend-header">
+                <button class="back-btn" onclick="history.back()">&#8592;</button>
+                <h3>친구 추가</h3>
+            </div>
 
-		<!-- 검색 결과 -->
-		<div class="result-list" id="resultList">
-			<div class="result-guide">이름을 입력하고 검색해보세요</div>
-		</div>
+            <div class="search-box">
+                <input type="text" id="searchInput"
+					placeholder="이름으로 검색하세요"
+					onkeydown="if(event.key==='Enter') searchFriend()">
+                <button class="search-btn" onclick="searchFriend()">검색</button>
+            </div>
 
-	</div>
+            <div class="result-list" id="resultList">
+                <div class="result-guide">이름을 입력하고 검색해보세요</div>
+            </div>
+        </div>
 
-	<script>
+        <div class="friends-side-info">
+            <div class="side-card">
+                <h4>💡 친구 검색 가이드</h4>
+                <p>동명이인이 있을 수 있으니 프로필 정보를 확인하고 신청해주세요.</p>
+            </div>
+            <div class="side-card">
+                <h4>🔒 개인정보 안내</h4>
+                <p>상대방이 수락하기 전까지는 서로의 시간표가 공개되지 않습니다.</p>
+            </div>
+        </div>
+        
+    </div>
+    <script>
 const token = document.querySelector('meta[name="_csrf"]').content;
 const header = document.querySelector('meta[name="_csrf_header"]').content;
 
@@ -101,4 +113,6 @@ const header = document.querySelector('meta[name="_csrf_header"]').content;
 </script>
 
 </body>
+
+
 </html>

@@ -79,9 +79,11 @@
 }
 
 .setting-field {
+	margin-top: 20px;
 	display: flex;
 	flex-direction: column;
 	gap: 4px;
+	display: flex;
 }
 
 .setting-field label {
@@ -90,7 +92,7 @@
 	font-weight: 500;
 }
 
-.setting-field input {
+.setting-field input, select {
 	padding: 9px 14px;
 	font-size: 13px;
 	border: 1px solid #c8d8f0;
@@ -138,51 +140,53 @@
 	opacity: .85;
 }
 
-/* 로그아웃 버튼 */
 .setting-logout-btn {
 	width: 100%;
-	padding: 10px;
+	padding: 11px;
 	font-size: 13px;
-	font-weight: 500;
+	font-weight: 600; /* 조금 더 굵게 */
 	color: #1a3a5c;
 	background: #f7f9fc;
 	border: 1px solid #c8d8f0;
 	border-radius: 8px;
 	cursor: pointer;
-	transition: background .15s;
+	transition: all .15s ease;
+	display: block;
+	text-align: center;
 }
 
 .setting-logout-btn:hover {
 	background: #e8f4ff;
+	border-color: #4a90e2;
+	color: #4a90e2;
 }
 
-/* 회원탈퇴 버튼 */
+/* 회원탈퇴 버튼: a 태그 자체가 버튼이 되도록 수정 */
 .setting-withdraw-btn {
 	width: 100%;
-	padding: 10px;
+	padding: 11px;
 	font-size: 13px;
-	font-weight: 500;
-	color: #A32D2D;
+	font-weight: 600;
+	color: #A32D2D; /* 붉은색 글자 */
 	background: #fff;
 	border: 1px solid #F09595;
 	border-radius: 8px;
 	cursor: pointer;
-	transition: background .15s;
+	transition: all .15s ease;
+	text-decoration: none; /* 밑줄 제거 */
+	display: block; /* 영역 꽉 채우기 */
+	text-align: center;
+	box-sizing: border-box; /* 패딩 포함 크기 계산 */
 }
 
 .setting-withdraw-btn:hover {
 	background: #FFF0F0;
+	border-color: #E24B4A;
+	color: #E24B4A;
 }
 
-/* .setting-check-btn {
-	padding: 11px;
-	font-size: 14px;
-	font-weight: 600;
-	color: #fff;
-	background: #4a90e2;
-	border: none;
-	border-radius: 8px;
-	cursor: pointer;
-	transition: opacity .15s;
-	margin-top: 4px;
-} */
+/* 기존에 있던 불필요한 중첩 스타일 제거/정리 */
+.setting-withdraw-btn>a {
+	/* 이 부분은 이제 필요 없습니다. 위에서 통합 관리합니다. */
+	display: none;
+}

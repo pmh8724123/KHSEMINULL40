@@ -2,9 +2,9 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <%-- 
-회원탈퇴 페이지 (withdraw.jsp)
-	- Spring Security CSRF 토큰을 meta 태그로 선언하여
-    Ajax 요청 시 헤더에 실어 보냄 
+	회원탈퇴 페이지 (withdraw.jsp)
+		- Spring Security CSRF 토큰을 meta 태그로 선언하여
+   		 Ajax 요청 시 헤더에 실어 보냄 
 --%>
 <c:set var="path" value="${pageContext.request.contextPath}" />
 
@@ -16,16 +16,15 @@
 <%-- Font Awesome : 아이콘 라이브러리 CDN --%>
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-	
+
 <link rel="stylesheet" href="${path}/resources/css/withdraw.css">
 
 
 <%-- ===================== HTML 본문 시작 ========================= --%>
-<jsp:include page="/WEB-INF/views/common2/header.jsp" />
+<jsp:include page="/WEB-INF/views/common/header.jsp" />
 
 <div class="withdraw-page">
 
-	<%-- 페이지 제목 : 왼쪽 빨간 세로선으로 경고성 페이지임을 표시 --%>
 	<h1 class="withdraw-page-title">회원 탈퇴</h1>
 
 	<%-- ───────────────────────────────────────────
@@ -36,10 +35,8 @@
     ─────────────────────────────────────────── --%>
 	<div class="withdraw-card">
 
-		<%-- ── 탈퇴 폼 영역 ─────────────────────── --%>
 		<div id="withdrawCard">
 
-			<%-- 카드 헤더 : 아이콘 + 제목 + 부제 --%>
 			<div class="withdraw-card-header">
 				<div class="icon-box">
 					<i class="fa-solid fa-user-xmark"></i>
@@ -136,119 +133,72 @@
 </div>
 <%-- /withdraw-page --%>
 
+
 <script>
-	/*
-	 doWithdraw()
-
-	 "탈퇴하기" 버튼 클릭 시 실행되는 메인 함수
-
-	 처리 순서
-	 1. 입력값 수집 (사유 / 비밀번호 / 동의 체크)
-	 2. 클라이언트 유효성 검사 → 실패 시 힌트 메시지 표시 후 중단
-	 3. 버튼 비활성화 (중복 클릭 방지)
-	 4. CSRF 토큰을 헤더에 실어 Ajax POST 전송
-	 5. 성공 응답(result: 'ok') → 완료 화면 전환 + 3초 후 메인 이동
-	 6. 실패 응답 또는 통신 오류 → 힌트 메시지 표시 + 버튼 재활성화
-	 */
 	function doWithdraw() {
-
-		/* ── 1. 입력값 수집 ──────────────────────────────────────── */
-		var hint = document.getElementById('withdrawHint');
-		var reason = document.getElementById('withdrawReason').value;
-		var pw = document.getElementById('withdrawPw').value.trim();
-		var agreed = document.getElementById('withdrawAgree').checked;
-		var btn = document.getElementById('btnWithdraw');
-
-		/* 이전 힌트 메시지 초기화 */
-		hint.style.color = '#E24B4A';
-		hint.textContent = '';
-
-		/* ── 2. 클라이언트 유효성 검사 ──────────────────────────── */
-
-		/* 탈퇴 사유 미선택 시 전송 중단 */
-		if (!reason) {
-			hint.textContent = '탈퇴 사유를 선택해주세요.';
-			return;
-		}
-
-		/* 비밀번호 미입력 시 전송 중단 */
-		if (!pw) {
-			hint.textContent = '현재 비밀번호를 입력해주세요.';
-			return;
-		}
-
-		/* 동의 체크 미완료 시 전송 중단 */
-		if (!agreed) {
-			hint.textContent = '탈퇴 동의에 체크해주세요.';
-			return;
-		}
-
-		/* ── 3. 버튼 비활성화 (중복 제출 방지) ──────────────────── */
-		btn.disabled = true;
-		btn.textContent = '처리 중...';
-
-		/* ── 4. Ajax POST 전송 ─────────────────────────────────── */
-		$
-				.ajax({
-					url : '${path}/withdraw/confirm',
-					type : 'POST',
-					contentType : 'application/json',
-					headers : {
-						'${_csrf.headerName}' : '${_csrf.token}'
-					},
-					data : JSON.stringify({
-						reason : reason,
-						curPw : pw
-					}),
-
-					/* ── 5. 성공 콜백 ─────────────────────────────────────
-					   서버 응답 형식 예시
-					     성공 : { "result": "ok" }
-					     실패 : { "result": "fail", "message": "비밀번호가 틀립니다." }
-					────────────────────────────────────────────────────── */
-					success : function(data) {
-
-						if (data.result === 'ok') {
-
-							/*
-							탈퇴 완료 화면으로 전환
-								폼 영역(#withdrawCard)을 숨기고
-								완료 안내(#withdrawSuccess)를 보이게 교체
-							 */
-							document.getElementById('withdrawCard').style.display = 'none';
-							document.getElementById('withdrawSuccess').style.display = 'block';
-
-							/*
-							 	3초(3000ms) 후 마이페이지로 자동 이동
-							 	setTimeout : 지정한 시간이 지난 뒤 콜백을 한 번만 실행하는 Web API
-							 */
-							setTimeout(function() {
-								location.href = '${path}/member/mypage';
-							}, 3000);
-
-						} else {
-							/* 서버가 실패(result !== 'ok')로 응답한 경우 메시지 표시 */
-							hint.textContent = data.message
-									|| '탈퇴에 실패했습니다. 다시 시도해주세요.';
-
-							/* 버튼을 다시 활성화, 재시도 허용하기 */
-							btn.disabled = false;
-							btn.innerHTML = '<i class="fa-solid fa-user-xmark" style="margin-right:5px"></i>탈퇴하기';
-						}
-					},
-
-					/* ── 6. 통신 오류 콜백 ───────────────────────────────
-					   네트워크 단절, 서버 500 에러 등 HTTP 수준 오류 발생 시 실행
-					────────────────────────────────────────────────────── */
-					error : function() {
-						hint.textContent = '서버와 연결할 수 없습니다. 잠시 후 다시 시도해주세요.';
-
-						/* 버튼 복원 */
-						btn.disabled = false;
-						btn.innerHTML = '<i class="fa-solid fa-user-xmark" style="margin-right:5px"></i>탈퇴하기';
-					}
-				});
+	    const hint = document.getElementById('withdrawHint');
+	    const reason = document.getElementById('withdrawReason').value;
+	    const pw = document.getElementById('withdrawPw').value.trim();
+	    const agreed = document.getElementById('withdrawAgree').checked;
+	    const btn = document.getElementById('btnWithdraw');
+	
+	    // CSRF 토큰 설정 (meta 태그에서 읽기)
+	    const token = document.querySelector('meta[name="_csrf"]').content;
+	    const header = document.querySelector('meta[name="_csrf_header"]').content;
+	
+	    hint.style.color = '#E24B4A';
+	    hint.textContent = '';
+	
+	    /* 1. 유효성 검사 */
+	    if (!reason) { hint.textContent = '탈퇴 사유를 선택해주세요.'; return; }
+	    if (!pw) { hint.textContent = '현재 비밀번호를 입력해주세요.'; return; }
+	    if (!agreed) { hint.textContent = '탈퇴 동의에 체크해주세요.'; return; }
+	
+	    /* 2. 최종 확인창 */
+	    if (!confirm("정말로 탈퇴하시겠습니까? 탈퇴 시 모든 데이터(시간표, 출석 등)가 영구 삭제되며 복구할 수 없습니다.")) {
+	        return;
+	    }
+	
+	    /* 3. 처리 시작 */
+	    btn.disabled = true;
+	    btn.textContent = '처리 중...';
+	
+	    // URLSearchParams 방식 사용 (설정 페이지와 통일)
+	    const params = new URLSearchParams();
+	    params.append('curPw', pw);
+	    params.append('reason', reason);
+	
+	    fetch('${path}/setting/withdraw/confirm', {
+	        method: 'POST',
+	        headers: {
+	            [header]: token
+	        },
+	        body: params
+	    })
+	    .then(res => res.json())
+	    .then(data => {
+	        if (data.result === 'ok') {
+	            // 성공 시 화면 전환
+	            document.getElementById('withdrawCard').style.display = 'none';
+	            document.getElementById('withdrawSuccess').style.display = 'block';
+	
+	            setTimeout(() => {
+	                location.href = '${path}/';
+	            }, 3000);
+	        } else {
+	            hint.textContent = data.message || '비밀번호가 일치하지 않거나 탈퇴 처리 중 오류가 발생했습니다.';
+	            btn.disabled = false;
+	            btn.innerHTML = '<i class="fa-solid fa-user-xmark" style="margin-right:5px"></i>탈퇴하기';
+	        }
+	    })
+	    .catch(err => {
+	        console.error("Error:", err);
+	        hint.textContent = '서버와 연결할 수 없습니다.';
+	        btn.disabled = false;
+	        btn.innerHTML = '<i class="fa-solid fa-user-xmark" style="margin-right:5px"></i>탈퇴하기';
+	    });
 	}
 </script>
+
 
 <jsp:include page="/WEB-INF/views/common2/footer.jsp" />

@@ -314,18 +314,20 @@
 			<!-- 친구 목록 -->
 			<c:if test="${not empty friendList}">
 				<c:forEach var="f" items="${friendList}">
-					<div class="friend-item">
-						<div class="friend-item"
-							onclick="viewFriendTimetable(${f.friendNo}, '${f.friendName}')"
-							style="cursor: pointer;">
-							<span class="friend-name">${f.friendName}</span>
-						</div>
+
+					<div class="friend-item"
+						onclick="viewFriendTimetable(${f.friendNo}, '${f.friendName}')"
+						style="cursor: pointer;">
+						<span class="friend-name">${f.friendName}</span>
+
 
 						<button
-							onclick="location.href='${path}/mypage?category=timetable&friendNo=${f.friendNo}'"
+							onclick="event.stopPropagation(); location.href='${path}/mypage?category=timetable&friendNo=${f.friendNo}'"
 							class="btn-view-tt">시간표 보기</button>
+
 						<button class="friend-delete-btn"
-							onclick="deleteFriend(${f.friendNo})">친구 삭제</button>
+							onclick="event.stopPropagation(); deleteFriend(${f.friendNo})">친구
+							삭제</button>
 					</div>
 				</c:forEach>
 			</c:if>
@@ -381,8 +383,8 @@
 					<strong style="color: #4a90e2;">친구의 시간표를 조회 중입니다.</strong>
 					<button
 						onclick="location.href='${pageContext.request.contextPath}/mypage?category=timetable'"
-						style="margin-left: 10px; font-size: 12px; border: none; background: #ddd; padding: 3px 8px; border-radius: 3px; cursor: pointer;">내
-						시간표로 돌아가기</button>
+						style="margin-left: 10px; font-size: 15px; border: none; background: #ddd; padding: 3px 8px; border-radius: 15px; cursor: pointer; background-color: 4a90e2;">
+						내 시간표로 돌아가기</button>
 				</div>
 			</c:if>
 
@@ -1142,7 +1144,7 @@
 								value="${loginUser.memId}" disabled>
 						</div>
 						<div class="setting-field">
-							<label>학번</label> <input type="text" id="settingName"
+							<label>학번</label> <input type="text" id="settingStuNo"
 								value="${loginUser.studentNo}" disabled>
 						</div>
 						<div class="setting-field">
@@ -1150,8 +1152,9 @@
 								value="${loginUser.phone}" disabled>
 						</div>
 						<div class="setting-field">
-							<label>학과 번호</label> <input type="text" id="settingDeptNo"
-								value="${loginUser.deptNo}" disabled>
+							<label>학과 선택</label> <select id="settingDeptNo" disabled>
+								<option value="${loginUser.deptNo}">기존 학과 유지</option>
+							</select>
 						</div>
 						<div class="setting-field">
 							<label>새 비밀번호</label> <input type="password" id="settingNewPw"
@@ -1166,6 +1169,20 @@
 						<button class="setting-save-btn" id="saveBtn"
 							onclick="saveSetting()" disabled>저장</button>
 					</div>
+
+					<hr style="margin: 20px 0; border: 0; border-top: 1px dashed #ddd;">
+
+					<div class="setting-field">
+						<form:form action="${path}/member/logout" method="post"
+							style="margin:0;">
+							<button type="submit" class="setting-logout-btn">로그아웃</button>
+						</form:form>
+					</div>
+
+					<div class="setting-field">
+						<a href="${path}/setting/withdraw" class="setting-withdraw-btn">
+							회원탈퇴</a>
+					</div>
 				</div>
 			</div>
 			<script>
@@ -1173,31 +1190,37 @@
 			const token = document.querySelector('meta[name="_csrf"]').content;
 			const header = document.querySelector('meta[name="_csrf_header"]').content;
 			
+
+			
 			// [1단계] 현재 비밀번호 확인
 			function verifyPassword() {
 			    const curPw = document.getElementById('settingCurPw').value;
 			    const hint = document.getElementById('settingHint');
-			
+				
 			    if (!curPw) {
 			        alert("현재 비밀번호를 입력해주세요.");
 			        return;
 			    }
 			
+				const params = new URLSearchParams();
+			    params.append('curPw', curPw);
+			    
 			    fetch('${path}/setting/verifyPw', {
 			        method: 'POST',
 			        headers: {
-			            'Content-Type': 'application/json',
 			            [header]: token
 			        },
-			        body: JSON.stringify({ curPw: curPw })
+			        body: params
 			    })
 			    .then(res => res.json())
 			    .then(data => {
 			        if (data.result === 'ok') {
 			            alert("인증되었습니다. 정보를 수정할 수 있습니다.");
 			            // 모든 필드 잠금 해제
-			            const inputs = document.querySelectorAll('#updateFields input, #saveBtn');
+			            const inputs = document.querySelectorAll('#updateFields input, #saveBtn, #settingDeptNo');
 			            inputs.forEach(input => input.disabled = false);
+			            
+			            loadDeptList();
 			            
 			            // 인증 버튼과 비밀번호 창은 수정 못하게 막기
 			            document.getElementById('settingCurPw').disabled = true;
@@ -1211,7 +1234,35 @@
 			    .catch(err => console.error("Error:", err));
 			}
 			
-			// [2단계] 정보 저장
+			
+			// 학과 리스트 로드 함수
+			function loadDeptList() {
+			    const deptSelect = document.getElementById('settingDeptNo');
+			    const currentDeptNo = "${loginUser.deptNo}"; // 기존 학과 번호
+
+			    fetch('${path}/setting/deptList')
+			        .then(res => res.json())
+			        .then(list => {
+
+
+			            list.forEach(dept => {
+			                const option = document.createElement('option');
+			                option.value = dept.DEPT_NO;
+			                option.textContent = dept.DEPT_NAME;
+			                
+			                // 현재 내 학과를 기본 선택값으로 설정
+			                if (dept.DEPT_NO == currentDeptNo) {
+			                    option.selected = true;
+			                }
+			                deptSelect.appendChild(option);
+			            });
+			        })
+			        .catch(err => console.error("학과 로드 실패:", err));
+			}
+			
+			
+			
+			// 정보 저장
 			function saveSetting() {
 			    const hint = document.getElementById('settingHint');
 			    const newPw = document.getElementById('settingNewPw').value.trim();
@@ -1223,22 +1274,20 @@
 			        return;
 			    }
 			
-			    const updateData = {
-			        memId: document.getElementById('settingId').value.trim(),
-			        studentNo: document.getElementById('settingName').value.trim(),
-			        phone: document.getElementById('settingPhone').value.trim(),
-			        deptNo: document.getElementById('settingDeptNo').value.trim(),
-			        curPw: document.getElementById('settingCurPw').value, // 인증 때 쓴 비번 재사용
-			        newPw: newPw
-			    };
+			    const params = new URLSearchParams();
+			    params.append('memId', document.getElementById('settingId').value.trim());
+			    params.append('studentNo', document.getElementById('settingStuNo').value.trim());
+			    params.append('phone', document.getElementById('settingPhone').value.trim());
+			    params.append('deptNo', document.getElementById('settingDeptNo').value);
+			    params.append('curPw', document.getElementById('settingCurPw').value);
+			    params.append('newPw', document.getElementById('settingNewPw').value.trim());
 			
 			    fetch('${path}/setting/update', {
 			        method: 'POST',
 			        headers: {
-			            'Content-Type': 'application/json',
 			            [header]: token
 			        },
-			        body: JSON.stringify(updateData)
+			        body: params
 			    })
 			    .then(res => res.json())
 			    .then(data => {
@@ -1252,6 +1301,8 @@
 			    })
 			    .catch(err => console.error("Error:", err));
 			}
+
+			
 			</script>
 		</div>
 

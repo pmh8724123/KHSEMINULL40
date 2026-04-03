@@ -1,6 +1,7 @@
 package com.kh.cam.member.model.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 
@@ -21,6 +22,10 @@ public interface MemberService extends UserDetailsService {
 	Member selectMemById(String memId);
 
 	int updateMember(Member inputMember);
+
+	List<Map<String, Object>> selectDeptListBySetting(int myDeptNo);
+
+	int deleteMember(int memNo);
 
 
 }

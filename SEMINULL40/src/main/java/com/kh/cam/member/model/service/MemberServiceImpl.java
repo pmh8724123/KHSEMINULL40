@@ -1,6 +1,7 @@
 package com.kh.cam.member.model.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -59,6 +60,16 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public int updateMember(Member inputMember) {
 		return mDao.updateMember(inputMember);
+	}
+
+	@Override
+	public List<Map<String, Object>> selectDeptListBySetting(int myDeptNo) {
+		return mDao.selectDeptListBySetting(myDeptNo);
+	}
+
+	@Override
+	public int deleteMember(int memNo) {
+		return mDao.deleteMember(memNo);
 	}
 
 }

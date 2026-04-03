@@ -1,6 +1,7 @@
 package com.kh.cam.member.model.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -21,5 +22,9 @@ public interface MemberDao {
 	String selectMemId(Member m);
 
 	int updateMember(Member inputMember);
+
+	List<Map<String, Object>> selectDeptListBySetting(int myDeptNo);
+
+	int deleteMember(int memNo);
 
 }
