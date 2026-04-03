@@ -103,6 +103,31 @@ public class AdminController {
 
 		return "redirect:/admin/memberStatus";
 	}
+	
+	@PostMapping("/member/realDelete")
+	public String realDeleteMember(@RequestParam("memNo") int memNo,
+								   RedirectAttributes ra) {
+
+		CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+		if(user.getMember().getUniNo() != 0) {
+			ra.addFlashAttribute("msg", "MASTER만 실제 삭제할 수 있습니다.");
+			ra.addFlashAttribute("type", "error");
+			return "redirect:/admin/memberStatus";
+		}
+
+		int result = adminService.realDeleteMember(memNo);
+
+		if(result > 0) {
+			ra.addFlashAttribute("msg", "회원 완전 삭제 완료");
+			ra.addFlashAttribute("type", "success");
+		} else {
+			ra.addFlashAttribute("msg", "회원 완전 삭제 실패");
+			ra.addFlashAttribute("type", "error");
+		}
+
+		return "redirect:/admin/memberStatus";
+	}
 
 
 // ---------------------회원승인관리----------------------------------

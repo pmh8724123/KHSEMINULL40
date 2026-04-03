@@ -17,7 +17,7 @@ public interface AdminService {
 	
 	int updateMemberStatus(int memNo, String status, int uniNo);
 	
-	/* int deleteMember(int memNo); */
+	int realDeleteMember(int memNo);
 	
 	
 	// 회원 승인 관리
@@ -64,5 +64,7 @@ public interface AdminService {
 	Map<String, Object> selectDashboardCounts(int uniNo);
 
 	List<Map<String, Object>> selectRecentReports(int uniNo);
+
+	
 
 }

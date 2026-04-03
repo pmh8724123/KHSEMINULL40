@@ -75,9 +75,9 @@
 					</thead>
 
 					<tbody>
-						<c:forEach var="m" items="${list}">
+						<c:forEach var="m" items="${list}" varStatus="status">
 							<tr>
-								<td>${m.memNo}</td>
+								<td>${status.index + 1}</td>
 								<td>${m.memId}</td>
 								<td>${m.studentNo}</td>
 								<td>${m.memName}</td>

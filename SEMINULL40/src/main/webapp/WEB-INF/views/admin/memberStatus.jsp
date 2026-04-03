@@ -73,9 +73,9 @@
 					</thead>
 
 					<tbody>
-						<c:forEach var="m" items="${list}">
+						<c:forEach var="m" items="${list}" varStatus="status">
 							<tr>
-								<td>${m.memNo}</td>
+								<td>${status.index + 1}</td>
 								<td>${m.memId}</td>
 								<td>${m.studentNo}</td>
 								<td>${m.memName}</td>
@@ -147,9 +147,35 @@
 
 											<c:when test="${m.status.toString() eq 'N'}">
 												<span>탈퇴</span>
+
+												<!-- 🔥 복구 버튼 -->
+												<c:if test="${loginUser.uniNo == 0}">
+												<form
+													action="${pageContext.request.contextPath}/admin/member/status"
+													method="post"
+													onsubmit="return confirm('해당 회원을 다시 활성화하시겠습니까?');">
+													<input type="hidden" name="${_csrf.parameterName}"
+														value="${_csrf.token}" /> <input type="hidden"
+														name="memNo" value="${m.memNo}"> <input
+														type="hidden" name="status" value="Y">
+													<button class="btn btn-approve" type="submit">복구</button>
+												</form>
+												</c:if>
+
+												<!-- 🔥 진짜삭제 (MASTER만) -->
+												<c:if test="${loginUser.uniNo == 0}">
+													<form
+														action="${pageContext.request.contextPath}/admin/member/realDelete"
+														method="post"
+														onsubmit="return confirm('해당 회원을 DB에서 완전히 삭제하시겠습니까?');">
+														<input type="hidden" name="${_csrf.parameterName}"
+															value="${_csrf.token}" /> <input type="hidden"
+															name="memNo" value="${m.memNo}">
+														<button class="btn btn-delete" type="submit">진짜삭제</button>
+													</form>
+												</c:if>
 											</c:when>
 										</c:choose>
-
 									</div>
 								</td>
 
