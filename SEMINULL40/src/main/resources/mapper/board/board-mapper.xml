@@ -176,14 +176,12 @@
 	        REPORT_NO,
 	        REPORT_MEM,
 	        REASON_NO,
-	        REASON_CONTENT,
 	        TARGET_TYPE,
 	        TARGET_NO
 	    ) VALUES(
 	        SEQ_REPORT.NEXTVAL, -- SEQ_REPORT_NO에서 변경
 	        #{reportMem},
 	        #{reasonNo},
-	        #{reasonContent},
 	        #{targetType},
 	        #{targetNo}
 	    )
