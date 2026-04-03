@@ -15,6 +15,7 @@ import com.kh.cam.common.model.vo.University;
 import com.kh.cam.member.model.dao.MemberDao;
 import com.kh.cam.member.model.vo.Member;
 import com.kh.cam.mypage.model.vo.Lecture;
+import com.kh.cam.report.model.vo.Report;
 
 import lombok.RequiredArgsConstructor;
 
@@ -219,6 +220,16 @@ public class AdminServiceImpl implements AdminService{
 	public void updateUniStatus(University uni) {
 		uni.setStatus(uni.getStatus() == 'Y' ? 'N' : 'Y');
 		adminDao.updateUniStatus(uni);
+	}
+
+	@Override
+	public List<Report> selectReportList(int uniNo) {
+		return adminDao.selectReportList(uniNo);
+	}
+
+	@Override
+	public int deleteReport(int reportNo) {
+		return adminDao.deleteReport(reportNo);
 	}
 
 }

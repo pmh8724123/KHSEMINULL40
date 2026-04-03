@@ -18,9 +18,9 @@
         <div class="header-right">
             <span>
                 <b>👤 관리자 : <sec:authentication property="principal.member.memId"/></b>
+            	<button class=siteMove onclick="location.href='${pageContext.request.contextPath}/board/list'">사이트로 이동</button>
             </span>
 			
-			<!-- 수정필요 -->
             <button onclick="location.href='${pageContext.request.contextPath}'">로그아웃</button>
             
         </div>

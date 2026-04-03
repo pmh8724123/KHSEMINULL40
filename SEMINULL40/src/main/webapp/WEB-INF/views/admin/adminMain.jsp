@@ -30,7 +30,7 @@
 				</div>
 
 				<div class="card">
-					<h3>🆕 오늘 가입</h3>
+					<h3> 가입대기</h3>
 					<p class="number">8</p>
 				</div>
 
@@ -45,21 +45,15 @@
 				</div>
 
 				<div class="card">
-					<h3>📝 게시글 수</h3>
+					<h3>📝 게시글</h3>
 					<p class="number">320</p>
 				</div>
 
 				<div class="card">
-					<h3>💬 댓글 수</h3>
+					<h3>🏫 학교/학과 </h3>
 					<p class="number">1245</p>
 				</div>
 
-			</div>
-
-			<!-- 🔥 그래프 영역 -->
-			<div class="chart-box">
-				<h3>📈 일별 가입자 통계</h3>
-				<canvas id="myChart"></canvas>
 			</div>
 
 			<!-- 🔥 최근 신고 -->
@@ -94,23 +88,4 @@
 		</div>
 	</div>
 
-	<!-- 🔥 Chart.js -->
-	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-	<script>
-		const ctx = document.getElementById('myChart');
-
-		new Chart(ctx, {
-			type : 'line',
-			data : {
-				labels : [ '월', '화', '수', '목', '금', '토', '일' ],
-				datasets : [ {
-					label : '가입자 수',
-					data : [ 3, 5, 2, 8, 6, 4, 7 ],
-					borderWidth : 2,
-					fill : false
-				} ]
-			}
-		});
-	</script>
 </html>

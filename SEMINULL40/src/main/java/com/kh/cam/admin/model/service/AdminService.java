@@ -8,6 +8,7 @@ import com.kh.cam.common.model.vo.Department;
 import com.kh.cam.common.model.vo.University;
 import com.kh.cam.member.model.vo.Member;
 import com.kh.cam.mypage.model.vo.Lecture;
+import com.kh.cam.report.model.vo.Report;
 
 public interface AdminService {
 
@@ -55,5 +56,9 @@ public interface AdminService {
 	void updateUni(University uni);
 
 	void updateUniStatus(University uni);
+
+	List<Report> selectReportList(int uniNo);
+
+	int deleteReport(int reportNo);
 
 }

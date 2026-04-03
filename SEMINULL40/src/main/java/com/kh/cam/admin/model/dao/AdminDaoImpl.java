@@ -12,6 +12,7 @@ import com.kh.cam.common.model.vo.Department;
 import com.kh.cam.common.model.vo.University;
 import com.kh.cam.member.model.vo.Member;
 import com.kh.cam.mypage.model.vo.Lecture;
+import com.kh.cam.report.model.vo.Report;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -171,6 +172,16 @@ public class AdminDaoImpl implements AdminDao {
 	@Override
 	public void updateUniStatus(University uni) {
 		session.update("admin.updateUniStatus", uni);
+	}
+
+	@Override
+	public List<Report> selectReportList(int uniNo) {
+		return session.selectList("admin.selectReportList", uniNo);
+	}
+
+	@Override
+	public int deleteReport(int reportNo) {
+		return session.delete("admin.deleteReport", reportNo);
 	}
 	
 }
