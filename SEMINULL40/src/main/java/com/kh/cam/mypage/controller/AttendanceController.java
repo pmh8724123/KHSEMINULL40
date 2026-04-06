@@ -9,6 +9,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.kh.cam.member.model.vo.CustomUserDetails;
 import com.kh.cam.mypage.model.service.AttendanceService;
+import com.kh.cam.mypage.model.vo.Attendance;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ public class AttendanceController {
     	CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     	int memNo = user.getUserno();
 
+    	
     	int result = attService.checkIn(memNo); // 포인트 로직이 포함된 checkIn 호출
         
         if(result > 0) {
