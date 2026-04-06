@@ -11,189 +11,55 @@
 <title>게시글 상세 보기</title>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <style>
-    body {
-        background-color: #f2f7ff; 
-        margin: 0; 
-        padding: 0; 
-        font-family: 'Pretendard', sans-serif; 
-    }
-     
-    .detail-wrapper { 
-        width: 100%; 
-        max-width: 750px; 
-        margin: 50px auto; 
-        padding: 40px; 
-        background-color: white; 
-        border: 1px solid #333; 
-        border-radius: 35px; 
-        box-sizing: border-box; 
-    }
-     
-    .post-header { 
-        display: flex; 
-        justify-content: space-between; 
-        align-items: center; 
-        margin-bottom: 15px; 
-    }
-     
-    .post-title { 
-        font-size: 26px;
-        font-weight: bold; 
-        margin: 0; 
-        color: #333; 
-    }
-     
-    .edit-btn { 
-        background-color: #31a1ff; 
-        color: white; 
-        border: none; 
-        padding: 8px 18px; 
-        border-radius: 12px; 
-        font-weight: bold; 
-        cursor: pointer; 
-    }
-     
-    .post-info { 
-        font-size: 14px; 
-        color: #666; 
-        margin-bottom: 25px; 
-        padding-bottom: 15px; 
-        border-bottom: 1px solid #eee; 
-    }
-    
-    .post-content { 
-        font-size: 16px; 
-        line-height: 1.8; 
-        min-height: 200px; 
-        margin-bottom: 30px; 
-        color: #333; 
-    }
-     
-    .content-img-area img { 
-        max-width: 100%; 
-        height: auto; 
-        display: block; 
-        margin: 20px auto; 
-        border-radius: 15px; 
-        border: 1px solid #eee; 
-    }
-     
-    .text-area { 
-        white-space: pre-wrap; 
-        word-wrap: break-word; 
-    }
-
-    .action-group { 
-        display: flex; 
-        gap: 10px; 
-        padding-top: 20px; 
-        border-top: 1px solid #eee; 
-    }
-     
-    .action-btn { 
-        display: flex; 
-        align-items: center; 
-        gap: 6px; 
-        padding: 8px 15px; 
-        background: white; 
-        border: 1px solid #333; 
-        border-radius: 15px; 
-        font-weight: bold; 
-        cursor: pointer; 
-    }
-     
-    .action-btn-report { 
-        margin-left: auto; 
-        padding: 8px 15px; 
-        background: white; 
-        border: 1px solid #333; 
-        border-radius: 15px; 
-        color: #ff4d4d; 
-        font-weight: bold; 
-        cursor: pointer; 
-    }
-    
-    .reply-section { 
-        margin-top: 40px; 
-    }
-     
-    .reply-count { 
-        font-size: 18px; 
-        font-weight: bold; 
-        margin-bottom: 15px; 
-    }
-     
-    .reply-write-box { 
-        padding: 15px; 
-        border: 1px solid #333; 
-        border-radius: 20px; 
-        margin-bottom: 25px;
-    }
-     
-    #replyContent { 
-        width: 100%; 
-        min-height: 70px; 
-        border: none; 
-        resize: none; 
-        outline: none; 
-        font-size: 15px; 
-    }
-     
-    .reply-submit-row { 
-        display: flex; 
-        justify-content: flex-end; 
-    }
-     
-    .reply-btn { 
-        background-color: #a2cfff; 
-        border: 1px solid #333; 
-        border-radius: 15px; 
-        padding: 8px 20px; 
-        font-weight: bold; 
-        cursor: pointer; 
-    }
-     
-    .reply-item { 
-        padding: 15px 5px; 
-        border-bottom: 1px solid #f0f0f0; 
-    }
-     
-    .reply-writer { 
-        font-size: 14px; 
-        font-weight: bold; 
-    }
-     
-    .reply-text { 
-        margin: 10px 0; 
-        font-size: 15px; 
-        color: #444; 
-    }
+    /* CSS 스타일은 동일하므로 생략합니다 (기존 코드 유지) */
+    body { background-color: #f2f7ff; margin: 0; padding: 0; font-family: 'Pretendard', sans-serif; }
+    .detail-wrapper { width: 100%; max-width: 750px; margin: 50px auto; padding: 40px; background-color: white; border: 1px solid #333; border-radius: 35px; box-sizing: border-box; }
+    .post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .post-title { font-size: 26px; font-weight: bold; margin: 0; color: #333; }
+    .edit-btn { background-color: #31a1ff; color: white; border: none; padding: 8px 18px; border-radius: 12px; font-weight: bold; cursor: pointer; }
+    .post-info { font-size: 14px; color: #666; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+    .post-content { font-size: 16px; line-height: 1.8; min-height: 200px; margin-bottom: 30px; color: #333; }
+    .content-img-area img { max-width: 100%; height: auto; display: block; margin: 20px auto; border-radius: 15px; border: 1px solid #eee; }
+    .text-area { white-space: pre-wrap; word-wrap: break-word; }
+    .action-group { display: flex; gap: 10px; padding-top: 20px; border-top: 1px solid #eee; }
+    .action-btn { display: flex; align-items: center; gap: 6px; padding: 8px 15px; background: white; border: 1px solid #333; border-radius: 15px; font-weight: bold; cursor: pointer; }
+    .action-btn-report { margin-left: auto; padding: 8px 15px; background: white; border: 1px solid #333; border-radius: 15px; color: #ff4d4d; font-weight: bold; cursor: pointer; }
+    .reply-section { margin-top: 40px; }
+    .reply-count { font-size: 18px; font-weight: bold; margin-bottom: 15px; }
+    .reply-write-box { padding: 15px; border: 1px solid #333; border-radius: 20px; margin-bottom: 25px; }
+    #replyContent { width: 100%; min-height: 70px; border: none; resize: none; outline: none; font-size: 15px; }
+    .reply-submit-row { display: flex; justify-content: flex-end; }
+    .reply-btn { background-color: #a2cfff; border: 1px solid #333; border-radius: 15px; padding: 8px 20px; font-weight: bold; cursor: pointer; }
+    .reply-item { padding: 15px 5px; border-bottom: 1px solid #f0f0f0; }
+    .reply-writer { font-size: 14px; font-weight: bold; }
+    .reply-text { margin: 10px 0; font-size: 15px; color: #444; }
 </style>
 </head>
 <body>
     <jsp:include page="/WEB-INF/views/common/header.jsp" />
     
-    <!-- Spring Security에서 로그인한 유저 정보를 가져와 loginUser 변수에 담음 -->
+    <!-- Spring Security에서 로그인한 유저 정보 및 권한 확인 -->
     <sec:authorize access="isAuthenticated()">
         <sec:authentication property="principal.member" var="loginUser" />
+        <!-- 관리자나 마스터 권한이 있는지 체크하여 isAdmin 변수에 저장 -->
+        <sec:authorize access="hasAnyRole('ROLE_ADMIN', 'ROLE_MASTER')" var="isAdmin" />
     </sec:authorize>
     
     <div class="detail-wrapper">
         <div class="post-section">
-			<div class="post-header">
-			    <h2 class="post-title">${b.boardTitle}</h2>
-				<div class="btns">
-				    <!-- 작성자 본인에게만 수정/삭제 버튼 노출 -->
-				    <c:if test="${not empty loginUser and loginUser.memNo eq b.boardWriter}">
-				        <button class="edit-btn" onclick="location.href='${pageContext.request.contextPath}/board/updateForm?boardno=${b.boardNo}'">수정</button>
-				        <button class="edit-btn" style="background-color: #ff4d4d; margin-left: 5px;" onclick="deleteBoard();">삭제</button>
-				    </c:if>
-				</div>
-			</div>       
+            <div class="post-header">
+                <h2 class="post-title">${b.boardTitle}</h2>
+                <div class="btns">
+                    <!-- 작성자 본인이거나 관리자/마스터인 경우에만 수정/삭제 버튼 노출 -->
+                    <c:if test="${not empty loginUser and (loginUser.memNo eq b.boardWriter or isAdmin)}">
+                        <button class="edit-btn" onclick="location.href='${pageContext.request.contextPath}/board/updateForm?boardno=${b.boardNo}'">수정</button>
+                        <button class="edit-btn" style="background-color: #ff4d4d; margin-left: 5px;" onclick="deleteBoard();">삭제</button>
+                    </c:if>
+                </div>
+            </div>       
             <div class="post-info">
                 작성자 <b>${b.boardWriterName}</b> &nbsp;|&nbsp; 조회수 <b>${b.viewCount}</b> &nbsp;|&nbsp; 작성일 
                 <b><fmt:formatDate value="${b.createDate}" pattern="yyyy-MM-dd HH:mm:ss" /></b>
-                
             </div>
             
             <div class="post-content">
@@ -227,9 +93,9 @@
             <div id="replyListArea"></div>
         </div>
     </div>
-	<jsp:include page="/WEB-INF/views/common/footer.jsp" /> 
+    <jsp:include page="/WEB-INF/views/common/footer.jsp" /> 
+
     <script>
-        // AJAX CSRF 설정 (Spring Security 필수)
         const token = $("meta[name='_csrf']").attr("content");
         const header = $("meta[name='_csrf_header']").attr("content");
 
@@ -241,8 +107,9 @@
             }
         });
 
-        // 로그인 유저의 번호를 할당 (비로그인시 0)
         const currentLoginUserNo = "${not empty loginUser ? loginUser.memNo : 0}";
+        // JS에서 사용할 권한 변수 (isAdmin은 위에서 정의한 jstl 변수 활용)
+        const isAdmin = ${not empty isAdmin and isAdmin};
 
         $(function() {
             selectReplyList();
@@ -255,7 +122,7 @@
                 window.open(url, "reportPopup", "width=500,height=650,top=100,left=500");
             });
         });
-		// 댓글 목록
+		// 댓글 목록 조회
         function selectReplyList() {
             $.ajax({
                 url: "${pageContext.request.contextPath}/reply/list",
@@ -266,11 +133,14 @@
                     $("#rcount").text(list.length);
                     if (list.length > 0) {
                         list.forEach(r => {
+                            // 본인 작성 댓글이거나 관리자일 때 삭제 버튼 표시
+                            const canDelete = (currentLoginUserNo == r.replyWriter || isAdmin);
+                            
                             html += `<div class='reply-item'>
                                         <div class='reply-writer'>\${r.userName || '익명'} <span style='font-size:11px; color:#999;'>(\${r.createDate})</span></div>
                                         <div class='reply-text'>\${r.replyContent}</div>
                                         <div style='font-size:12px; color:#888;'>
-                                            \${currentLoginUserNo == r.replyWriter ? `<span onclick='deleteReply(\${r.replyNo})' style='color:red; cursor:pointer;'>삭제</span>` : ''}
+                                            \${canDelete ? `<span onclick='deleteReply(\${r.replyNo})' style='color:red; cursor:pointer;'>삭제</span>` : ''}
                                         </div>
                                      </div>`;
                         });
@@ -283,18 +153,15 @@
         }
 		// 댓글 추가
         function addReply() {
-            // 로그인 체크
             if (currentLoginUserNo == 0) {
                 alert("로그인 후 이용 가능합니다.");
                 return;
             }
-
             const content = $("#replyContent").val();
             if (!content.trim()) {
                 alert("내용을 입력해주세요.");
                 return;
             }
-
             $.ajax({
                 url: "${pageContext.request.contextPath}/reply/insert",
                 type: "post",
@@ -313,7 +180,7 @@
                 }
             });
         }
-		// 좋아요 카운트
+		// 좋아요 조회
         function getLikeCount() {
             $.ajax({
                 url: "${pageContext.request.contextPath}/board/likeCount",
@@ -340,7 +207,7 @@
                 }
             });
         }
-        // 댓글 삭제
+		// 댓글 삭제
         function deleteReply(replyNo) {
             if(confirm("정말로 이 댓글을 삭제하시겠습니까?")) {
                 $.ajax({
@@ -358,32 +225,28 @@
                 });
             }
         }
-        // 게시글 삭제
-		function deleteBoard(){
-        	if(confirm("정말로 이 게시글을 삭제하시겠습니까?")){
-        		// 1. 동적 form 생성
-        		const form = document.createElement('form');
-        		form.method = 'POST';
-        		form.action = "${pageContext.request.contextPath}/board/delete";
-        		
-        		// 2. 게시글 번호 추가
-        		const boardNoInput = document.createElement('input');
-        		boardNoInput.type = 'hidden';
-        		boardNoInput.name = 'boardno';
-        		boardNoInput.value = "${b.boardNo}";
-        		form.appendChild(boardNoInput);
-        		
-        		// 3. CSRF 토큰 추가
-        		const csrfInput = document.createElement('input');
-        		csrfInput.type = 'hidden';
-        		csrfInput.name = "${_csrf.parameterName}";
-        		csrfInput.value = "${_csrf.token}";
-        		form.appendChild(csrfInput);
-        		
-        		// 4. form을 문서에 붙여서 전송
-        		document.body.appendChild(form);
-        		form.submit();
-        	}
+		// 게시글 삭제
+        function deleteBoard(){
+            if(confirm("정말로 이 게시글을 삭제하시겠습니까?")){
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = "${pageContext.request.contextPath}/board/delete";
+                
+                const boardNoInput = document.createElement('input');
+                boardNoInput.type = 'hidden';
+                boardNoInput.name = 'boardno';
+                boardNoInput.value = "${b.boardNo}";
+                form.appendChild(boardNoInput);
+                
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = "${_csrf.parameterName}";
+                csrfInput.value = "${_csrf.token}";
+                form.appendChild(csrfInput);
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
         }
     </script>
 </body>

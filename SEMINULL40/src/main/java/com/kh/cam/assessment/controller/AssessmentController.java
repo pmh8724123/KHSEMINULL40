@@ -67,34 +67,35 @@ public class AssessmentController {
     }
 
     @PostMapping("/insert")
-    public String insertAssessment(Assessment asse, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public String insertAssessment(Assessment asse) { // @AuthenticationPrincipal 일단 제거하고 직접 꺼내봅시다.
         
-        // 1. 서비스 객체 주입 확인 (NPE 방지)
-        if (assessmentService == null) {
-            System.out.println("❌ 오류: assessmentService가 주입되지 않았습니다(null).");
-            return "redirect:/rating?error=server";
+        // 1. 직접 SecurityContext에서 유저 정보 꺼내기 (가장 확실한 방법)
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        CustomUserDetails userDetails = null;
+        
+        if (principal instanceof CustomUserDetails) {
+            userDetails = (CustomUserDetails) principal;
         }
 
-        // 2. 로그인 유저 정보 확인 및 세팅
+        // 2. 로그인 유저 체크
         if (userDetails != null && userDetails.getMember() != null) {
-            // 정상적인 경우
+            // 로그인한 진짜 유저의 번호를 세팅합니다.
             asse.setMemNo(userDetails.getMember().getMemNo());
+            System.out.println("✅ 실제 유저 번호 세팅: " + asse.getMemNo());
         } else {
-            // 로그인 정보가 없거나 Member 객체가 null인 경우 (NPE 방지용 임시번호 1 부여)
-            System.out.println("⚠️ 경고: 로그인 정보가 없거나 Member가 null입니다. 임시로 1번 회원으로 진행합니다.");
-            asse.setMemNo(1); 
+            // 로그인 정보가 없으면 저장을 막고 로그인 페이지로 보냅니다.
+            System.out.println("❌ 저장 실패: 로그인 정보가 없습니다.");
+            return "redirect:/member/login.me"; 
         }
 
-        // 3. 데이터 확인용 출력
-        System.out.println("전달된 데이터: " + asse);
-
-        // 4. DB 저장 실행
+        // 3. DB 저장 실행
         try {
             int result = assessmentService.insertAssessment(asse);
             System.out.println("✅ 저장 성공! 결과: " + result);
         } catch (Exception e) {
-            System.out.println("❌ DB 저장 중 예외 발생: " + e.getMessage());
-            e.printStackTrace();
+            System.out.println("❌ DB 저장 중 에러 발생: " + e.getMessage());
+            // 에러가 나면 알림 처리를 위해 에러 파라미터를 들고 갑니다.
+            return "redirect:/rating?error=duplicate";
         }
         
         return "redirect:/rating";
