@@ -83,19 +83,21 @@ public class MypageController {
 		
 		// 출석 정보 가져오기
 		Attendance att = attService.selectAtt(memNo);
-		
-		System.out.println(att);
-		System.out.println(att.getAttendDays());
+		int totalCount = att.getCount();
+
 		
 		// 출석일 비교
 		String attDay = att.getAttendDays() != null ? sdf.format(att.getAttendDays()) : "0000-00-00";
 		String today = sdf.format(new Date());
 		Boolean checkedToday = attDay.equals(today);
+		int displayCount = (totalCount % 7 == 0 && totalCount != 0) ? 7 : (totalCount % 7);
+		
 
-		System.out.println(attDay);
-
-		// 출석일수, 오늘 출석여부 전달
-		model.addAttribute("attCnt", att.getCount());
+		// 총 출석 일수, 보여지는 출석 일수.
+		model.addAttribute("attCnt", totalCount);
+		model.addAttribute("disCnt", displayCount);
+		
+		// 오늘 출석여부, 포인트 수 전달  
 		model.addAttribute("checkedToday", checkedToday);
 		model.addAttribute("userPoint", att.getPoint());
 	}

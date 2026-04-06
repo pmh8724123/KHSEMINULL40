@@ -4,15 +4,18 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
-<c:set var="path" value="${pageContext.request.contextPath}" />
+
 
 
 <html>
 <head>
 <meta charset="UTF-8">
 <title>친구 수락</title>
+<c:set var="path" value="${pageContext.request.contextPath}" />
+
 
 <link rel="stylesheet" href="${path}/resources/css/addfriend.css">
+
 
 <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 
@@ -26,7 +29,7 @@
         
         <div class="acceptfriend-wrap"> <div
 				class="acceptfriend-header">
-                <button class="back-btn" onclick="history.back()">&#8592;</button>
+                <button class="back-btn" onclick="location.href='${path}/mypage?category=friend'">&#8592;</button>
                 <h3>친구 수락</h3>
                 <c:if test="${not empty pendingList}">
                     <span class="pending-count">${fn:length(pendingList)}건 대기중</span>

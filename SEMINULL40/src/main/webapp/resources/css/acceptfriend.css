@@ -80,68 +80,93 @@ body {
 }
 
 .pending-item {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 10px 12px;
-	border: 1px solid #e0eaf5;
-	border-radius: 8px;
-	background: #f7f9fc;
-	transition: background .15s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px; 
+    border: 1px solid #eef2f7;
+    border-radius: 12px;
+    background: #ffffff;
+    margin-bottom: 10px;
+    height: 70px; 
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+.pending-item:hover {
+    border-color: #4a90e2;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.08);
 }
 
-.pending-item:hover {
-	background: #f0f7ff;
-}
 
 .pending-name {
-	font-size: 13px;
-	font-weight: 500;
-	color: #1a3a5c;
+	font-size: 15px;
+    font-weight: 600;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
+.pending-name::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: #4a90e2;
+    border-radius: 50%;
+    display: inline-block;
+}
+
 
 /* 수락 / 거절 버튼 묶음 */
 .pending-actions {
 	display: flex;
-	gap: 6px;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-end;
+    /* 핵심: 충분한 고정 너비를 주어 왼쪽 이름 영역을 건드리지 않게 함 */
+    min-width: 180px; 
+    text-align: right;
+    flex-shrink: 0;
+}
+
+
+.accept-btn, .reject-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
 .accept-btn {
-	padding: 5px 12px;
-	font-size: 12px;
-	font-weight: 500;
-	color: #185FA5;
-	background: #B5D4F4;
-	border: 1px solid #85B7EB;
-	border-radius: 20px;
-	cursor: pointer;
-	transition: opacity .15s;
+	background: #4a90e2;
+    color: white;
 }
 
 .accept-btn:hover {
+	background: #357abd;
 	opacity: .8;
 }
 
 .reject-btn {
-	padding: 5px 12px;
-	font-size: 12px;
-	font-weight: 500;
-	color: #791F1F;
-	background: #F7C1C1;
-	border: 1px solid #F09595;
-	border-radius: 20px;
-	cursor: pointer;
-	transition: opacity .15s;
+	background: #f1f3f5;
+    color: #495057;
 }
 
 .reject-btn:hover {
+	background: #e9ecef;
 	opacity: .8;
 }
 
 /* 처리 완료 후 표시 */
 .done-msg {
-	font-size: 12px;
-	color: #aaa;
+	font-size: 13px;
+    font-weight: 500;
+    color: #4a90e2;
+    white-space: nowrap;
+    animation: fadeInRight 0.4s ease;
 }
 
 /* ── 레이아웃 보완 (화면 꽉 채우기) ── */

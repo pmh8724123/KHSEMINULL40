@@ -37,7 +37,8 @@ public class AttendanceServiceImpl implements AttendanceService {
 	public int checkIn(int memNo) {
 		// 1. 출석 업데이트 (count 증가)
 		int result = attDao.updateAtt(memNo);
-
+		
+		
 		if (result > 0) {
 			// 2. 업데이트된 최신 정보 가져오기 (count 확인용)
 			Attendance att = attDao.selectAtt(memNo);
@@ -45,10 +46,13 @@ public class AttendanceServiceImpl implements AttendanceService {
 
 			// 3. 포인트 계산 (% 7 로직)
 			int amount = 5; // 기본 5P
-			if (count % 7 >= 5 && count % 7 <= 6)
-				amount = 10;
-			else if (count % 7 == 0)
-				amount = 50;
+			int cycleDay = (count % 7 == 0) ? 7 : (count % 7);
+			
+			if (cycleDay == 5 || cycleDay == 6) {
+	            amount = 10;
+	        } else if (cycleDay == 7) {
+	            amount = 50;
+	        }
 
 			// 4. 포인트 업데이트 (이제 DUAL 방식이라 무조건 들어감)
 			Map<String, Object> map = new HashMap<>();

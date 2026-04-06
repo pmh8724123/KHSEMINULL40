@@ -80,21 +80,40 @@ public class SettingController {
 	public Map<String, Object> updateMember(Member inputMember, @RequestParam("curPw") String curPw,
 			@RequestParam("newPw") String newPw) {
 		Map<String, Object> result = new HashMap<>();
+		
+		String phoneRegex = "^\\d{2,3}-\\d{3,4}-\\d{4}$";
+	    String studentNoRegex = "^[0-9]+$";
+	    String pwRegex = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&]).{8,}$";
 
 		try {
-			// 1. 현재 로그인된 사용자 정보 가져오기
+
 			Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			CustomUserDetails userDetails = (CustomUserDetails) principal;
-			Member loginUser = userDetails.getMember(); // CustomUserDetails 내에 저장된 VO 추출
-
-			// 2. 현재 비밀번호 검증 (BCrypt matches 사용)
+			Member loginUser = userDetails.getMember();
+			
+		
+			// 현재 비밀번호 검증 (BCrypt matches 사용)
 			if (!pwEncoder.matches(curPw, loginUser.getMemPw())) {
 				result.put("result", "fail");
 				result.put("message", "현재 비밀번호가 일치하지 않습니다.");
 				return result;
 			}
+			
+			// 비밀번호 검사
+			if (newPw != null && !newPw.trim().isEmpty()) {
+		        if (!newPw.matches(pwRegex)) {
+		            result.put("result", "fail");
+		            result.put("message", "새 비밀번호는 영문, 숫자, 특수문자 포함 8자 이상이어야 합니다.");
+		            return result;
+		        }
+		        inputMember.setMemPw(pwEncoder.encode(newPw));
+		    } else {
+		        inputMember.setMemPw(loginUser.getMemPw());
+		    }
+			
+			
 
-			// 3. 변경할 데이터 세팅 (입력값이 없으면 기존값 유지)
+			// 변경할 데이터 세팅 (입력값이 없으면 기존값 유지)
 			// MyBatis에서 동적 쿼리(<if>)를 쓰더라도, VO에 기존 ID를 넣어줘야 WHERE절이 작동합니다.
 			inputMember.setMemNo(loginUser.getMemNo());
 

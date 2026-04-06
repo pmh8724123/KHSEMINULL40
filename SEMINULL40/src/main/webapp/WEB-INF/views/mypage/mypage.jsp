@@ -223,9 +223,6 @@
 				<form:form action="${path}/attendance/updateAtt" method="post">
 					<div class="att-btn-wrap">
 						<c:choose>
-							<c:when test="${attCnt >= 7}">
-								<button class="att-btn" disabled>출석 완료</button>
-							</c:when>
 
 							<c:when test="${checkedToday}">
 								<button class="att-btn" disabled style="font-size: 12px">
@@ -233,7 +230,9 @@
 							</c:when>
 
 							<c:otherwise>
-								<button type="submit" class="att-btn">출석 체크하기</button>
+								<form:form action="${path}/attendance/updateAtt" method="post">
+									<button type="submit" class="att-btn">출석 체크하기</button>
+								</form:form>
 							</c:otherwise>
 						</c:choose>
 					</div>
@@ -243,17 +242,19 @@
 					<c:forEach var="i" begin="1" end="7">
 						<c:set var="cls" value="att-dot" />
 
-						<c:if test="${i <= attCnt}">
+						<c:if test="${i <= disCnt}">
 							<c:set var="cls" value="${cls} done" />
 						</c:if>
 
-						<c:if test="${i == attCnt + 1}">
+						<c:if test="${i == disCnt + 1}">
 							<c:set var="cls" value="${cls} today" />
 						</c:if>
 
 						<div class="${cls}">
-							<span>${i}</span> <span class="di"> <c:choose>
-									<c:when test="${i <= attCnt}">✔</c:when>
+							<span>${i}</span> 
+							<span class="di"> 
+								<c:choose>
+									<c:when test="${i <= disCnt}">✔</c:when>
 									<c:otherwise>일</c:otherwise>
 								</c:choose>
 							</span>
@@ -264,19 +265,20 @@
 				<!-- 진행률 바 -->
 				<div class="att-progress-wrap">
 					<div class="att-prog-labels">
-						<span>진행률</span> <span>${attCnt} / 7일</span>
+						<span>진행률</span>
+						<span>${disCnt} / 7일</span>
 					</div>
 					<div class="att-prog-bar">
-						<div class="att-prog-fill" style="width: ${(attCnt / 7.0) * 100}%">
+						<div class="att-prog-fill" style="width: ${(disCnt / 7.0) * 100}%">
 						</div>
 					</div>
 				</div>
 
 				<div class="att-reward">
 					<c:choose>
-						<c:when test="${attCnt == 5}">포인트 +10</c:when>
-						<c:when test="${attCnt == 6}">포인트 +10</c:when>
-						<c:when test="${attCnt == 7}">포인트 +50 (7일 달성!)</c:when>
+						<c:when test="${disCnt == 5}">포인트 +10</c:when>
+						<c:when test="${disCnt == 6}">포인트 +10</c:when>
+						<c:when test="${disCnt == 7}">포인트 +50 (7일 달성!)</c:when>
 					</c:choose>
 				</div>
 
