@@ -37,9 +37,9 @@
 			<table>
 				<thead>
 					<tr>
-						<th>공지번호</th>
-						<th>공지이름</th>
-						<th>카테고리 종류(상시게시/긴급게시)</th>
+						<th>NO</th>
+						<th>업데이트 예정</th>
+						<th>업데이트 예정</th>
 						<th>작성자</th>
 						<th>작성/수정날짜</th>
 						<th>처리</th>
@@ -47,19 +47,17 @@
 				</thead>
 
 				<tbody>
-					<% for(int i=1; i<=30; i++){ %>
 					<tr>
-						<td><%= i %></td>
-						<td>※공지1※</td>
-						<td>긴급공지</td>
-						<td>박무혁(pmh8724)</td>
-						<td>sysdate</td>
+						<td>0</td>
+						<td>업데이트 예정</td>
+						<td>업데이트 예정</td>
+						<td>업데이트 예정</td>
+						<td>업데이트 예정</td>
 						<td>
 							<button class="btn btn-approve">수정</button>
-							<button class="btn btn-reject">삭제</button>
+							<button class="btn btn-delete">삭제</button>
 						</td>
 					</tr>
-					 <% } %>
 				</tbody>
 			</table>
 		</div>

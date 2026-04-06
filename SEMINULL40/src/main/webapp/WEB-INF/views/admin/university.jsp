@@ -84,7 +84,7 @@
 					<tbody>
 						<c:forEach var="uni" items="${list}" varStatus="status">
 							<tr>
-								<td>${uni.uniNo}</td>
+								<td>${status.index + 1}</td>
 								<td>${uni.uniName}</td>
 								<td>${uni.memId}</td>
 								<td>${uni.count}</td>
