@@ -360,7 +360,7 @@ public class AdminController {
 	// 공지사항
 	@GetMapping("/notice")
 	public String adminNotice() {
-		return "admin/notice";
+		return "admin/adminNotice";
 	}
 
 	// 게시판 관리
