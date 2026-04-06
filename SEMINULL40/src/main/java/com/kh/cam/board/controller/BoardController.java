@@ -43,6 +43,7 @@ public class BoardController {
 	@Autowired
 	private BoardService boardService; 
 	
+	// 게시글 목록
 	@GetMapping("/list")
 	public String boardList(
 	        @RequestParam(value="category", required=false, defaultValue="all") String category,
@@ -67,7 +68,7 @@ public class BoardController {
 	    
 	    return "board/board";
 	}
-	
+	// 게시글 작성
 	@GetMapping("/write")
 	public String writeForm(@RequestParam(value="category", required=false) String category, Model model) {
 	    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -121,7 +122,7 @@ public class BoardController {
 	        return "common/errorPage";
 	    }
 	}
-
+	// 게시글 수정 
 	@GetMapping("/updateForm")
 	public String updateForm(@RequestParam("boardno") int boardNo, Model model) {
 		// 1. 수정할 게시글 상세 정보 조회
@@ -186,7 +187,7 @@ public class BoardController {
 		// 성공 시 상세페이지로 리다이렉트
 		return (result > 0) ? "redirect:/board/detail?boardno=" + b.getBoardNo() : "common/errorPage";
 	}
-	
+	// 게시글 삭제
 	@PostMapping("/delete")
 	public String deleteBoard(@RequestParam("boardno") int boardNo, Model model) {
 	    int result = boardService.deleteBoard(boardNo); 
@@ -197,7 +198,7 @@ public class BoardController {
 	        return "common/errorPage";
 	    }
 	}
-	
+	// 게시글 상세보기
 	@GetMapping("/detail")
 	public String boardDetail(@RequestParam("boardno") int boardNo, HttpServletRequest request, HttpServletResponse response, Model model) {
 		Board b = boardService.selectBoard(boardNo);
@@ -240,7 +241,7 @@ public class BoardController {
 		model.addAttribute("list", list);
 		return "board/boardDetail";		
 	}
-
+	// 파일 저장
 	private void makeDirectory(String path) {
 	    File dir = new File(path);
 	    if(!dir.exists()) dir.mkdirs();
@@ -259,7 +260,7 @@ public class BoardController {
 	    }
 	    return changeName;
 	}
-
+	// 좋아요 입력
 	@ResponseBody
 	@PostMapping(value = "/like", produces = "text/html; charset=UTF-8")
 	public String boardLike(int boardNo, int memNo) {

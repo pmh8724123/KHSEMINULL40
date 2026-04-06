@@ -56,23 +56,32 @@
     </select>
 
     <!-- 4. 강의 평가 저장 -->
-    <insert id="insertAssessment" parameterType="assessment">
-        INSERT INTO LECTURE_ASSESSMENT (
-            ASSE_NO,
-            MEM_NO,
-            LECTURE_NO,
-            HOMEWORK,
-            GRADE,
-            TOTAL_SCORE
-        ) VALUES (
-            SEQ_ASSE.NEXTVAL,
-            #{memNo},
-            #{lectureNo},
-            #{homework},
-            #{grade},
-            #{totalScore}
-        )
-    </insert>
+	<insert id="insertAssessment" parameterType="assessment">
+	    MERGE INTO LECTURE_ASSESSMENT A
+	    USING DUAL
+	    ON (A.MEM_NO = #{memNo} AND A.LECTURE_NO = #{lectureNo})
+	    WHEN MATCHED THEN
+	        UPDATE SET 
+	            HOMEWORK = #{homework},
+	            GRADE = #{grade},
+	            TOTAL_SCORE = #{totalScore}
+	    WHEN NOT MATCHED THEN
+	        INSERT (
+	            ASSE_NO, 
+	            MEM_NO, 
+	            LECTURE_NO, 
+	            HOMEWORK, 
+	            GRADE, 
+	            TOTAL_SCORE
+	        ) VALUES (
+	            SEQ_ASSE.NEXTVAL, 
+	            #{memNo}, 
+	            #{lectureNo}, 
+	            #{homework}, 
+	            #{grade}, 
+	            #{totalScore}
+	        )
+	</insert>
     
 	<select id="searchLectures" resultType="LectureVO">
 	    SELECT 
