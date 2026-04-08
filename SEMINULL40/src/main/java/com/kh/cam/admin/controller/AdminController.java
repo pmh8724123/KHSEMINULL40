@@ -38,8 +38,11 @@ public class AdminController {
 	@GetMapping("/main")
 	public String adminMain(Model model) {
 		// 로그인한 관리자 정보에서 uniNo 가져오기
-		CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
+		CustomUserDetails user = (CustomUserDetails) SecurityContextHolder
+								.getContext()
+								.getAuthentication()
 								  .getPrincipal();
+		
 		int uniNo = user.getMember().getUniNo();
 		
 		// 통계 데이터 조회
@@ -62,8 +65,8 @@ public class AdminController {
 	public String memberStatus(@RequestParam(value = "condition", required = false) String condition,
 			@RequestParam(value = "keyword", required = false) String keyword, Model model) {
 
-		CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
-				.getPrincipal();
+		CustomUserDetails user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+				
 		int uniNo = user.getMember().getUniNo();
 
 		List<Member> list = adminService.selectMemberList(uniNo, condition, keyword);

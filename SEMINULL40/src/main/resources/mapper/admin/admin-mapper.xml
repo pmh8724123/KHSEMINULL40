@@ -596,5 +596,99 @@
 	</select>
 	
 	
+	<delete id="deleteBoardLikeByMemNo" parameterType="int">
+	    DELETE FROM BOARD_LIKE
+	    WHERE MEM_NO = #{memNo}
+	</delete>
+	
+	<delete id="deleteReplyLikeByMemNo" parameterType="int">
+	    DELETE FROM REPLY_LIKE
+	    WHERE MEM_NO = #{memNo}
+	</delete>
+	
+	<delete id="deleteBoardLikeByBoardWriter" parameterType="int">
+	    DELETE FROM BOARD_LIKE
+	    WHERE BOARD_NO IN (
+	        SELECT BOARD_NO
+	        FROM BOARD
+	        WHERE BOARD_WRITER = #{memNo}
+	    )
+	</delete>
+	
+	<delete id="deleteReplyLikeByBoardWriter" parameterType="int">
+	    DELETE FROM REPLY_LIKE
+	    WHERE REPLY_NO IN (
+	        SELECT REPLY_NO
+	        FROM REPLY
+	        WHERE BOARD_NO IN (
+	            SELECT BOARD_NO
+	            FROM BOARD
+	            WHERE BOARD_WRITER = #{memNo}
+	        )
+	    )
+	</delete>
+	
+	<delete id="deleteReplyByBoardWriter" parameterType="int">
+	    DELETE FROM REPLY
+	    WHERE BOARD_NO IN (
+	        SELECT BOARD_NO
+	        FROM BOARD
+	        WHERE BOARD_WRITER = #{memNo}
+	    )
+	</delete>
+	
+	<delete id="deleteReplyByMemNo" parameterType="int">
+	    DELETE FROM REPLY
+	    WHERE REPLY_WRITER = #{memNo}
+	</delete>
+	
+	<delete id="deleteBoardByMemNo" parameterType="int">
+	    DELETE FROM BOARD
+	    WHERE BOARD_WRITER = #{memNo}
+	</delete>
+	
+	<delete id="deleteReportByMemNo" parameterType="int">
+	    DELETE FROM REPORT
+	    WHERE REPORT_MEM = #{memNo}
+	</delete>
+	
+	<delete id="deleteAuthoritiesByMemNo" parameterType="int">
+	    DELETE FROM AUTHORITIES
+	    WHERE MEM_NO = #{memNo}
+	</delete>
+	
+	<delete id="deleteAttendanceByMemNo" parameterType="int">
+	    DELETE FROM ATTENDANCE
+	    WHERE MEM_NO = #{memNo}
+	</delete>
+	
+	<delete id="deleteUserPointByMemNo" parameterType="int">
+	    DELETE FROM USER_POINT
+	    WHERE MEM_NO = #{memNo}
+	</delete>
+	
+	<delete id="deleteLectureAssessmentByMemNo" parameterType="int">
+	    DELETE FROM LECTURE_ASSESSMENT
+	    WHERE MEM_NO = #{memNo}
+	</delete>
+	
+	<delete id="deleteScheduleByMemNo" parameterType="int">
+	    DELETE FROM SCHEDULE
+	    WHERE MEM_NO = #{memNo}
+	</delete>
+	
+	<delete id="deleteFriendsByMemNo" parameterType="int">
+	    DELETE FROM FRIENDS
+	    WHERE SENDER_NO = #{memNo}
+	       OR RECEIVER_NO = #{memNo}
+	</delete>
+	
+	
+	<delete id="deleteMemberByMemNo" parameterType="int">
+	    DELETE FROM MEMBER
+	    WHERE MEM_NO = #{memNo}
+	</delete>
+	
+	
 	
 </mapper>
