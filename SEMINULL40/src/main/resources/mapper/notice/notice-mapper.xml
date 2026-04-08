@@ -4,7 +4,7 @@
 	<select id="selectNoticeList" resultType="Notice">
 		SELECT notice_no, notice_title, notice_content, create_date 
 		FROM notice
-		WHERE uni_no = #{uniNo} AND status = 'Y'
+		WHERE (uni_no = #{uniNo} OR uni_no = 0) AND status = 'Y' 
 		ORDER BY notice_no DESC
 	</select>
 	
